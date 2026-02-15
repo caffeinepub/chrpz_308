@@ -1,0 +1,71 @@
+type Username = text;
+type UserProfileInput = 
+ record {
+   bio: opt text;
+   name: opt text;
+   profilePictureBlob: opt blob;
+   username: Username;
+ };
+type UserProfile = 
+ record {
+   bio: opt text;
+   createdAt: Time;
+   displayName: text;
+   followersCount: nat;
+   followingCount: nat;
+   isFollowedByCurrentUser: bool;
+   name: opt text;
+   postsCount: nat;
+   updatedAt: Time;
+   username: Username;
+ };
+type Time = int;
+type Post = 
+ record {
+   author: principal;
+   authorName: opt text;
+   authorProfilePicture: opt blob;
+   content: text;
+   id: nat;
+   isLikedByCurrentUser: bool;
+   likedBy: vec principal;
+   timestamp: Time;
+ };
+type Comment = 
+ record {
+   author: principal;
+   authorName: opt text;
+   authorProfilePicture: opt blob;
+   content: text;
+   id: nat;
+   isLikedByCurrentUser: bool;
+   likedBy: vec principal;
+   postId: nat;
+   timestamp: Time;
+ };
+service : {
+  checkUsernameAvailability: (username: text) -> (bool) query;
+  createComment: (postId: nat, content: text) -> ();
+  createPost: (content: text) -> ();
+  deleteComment: (commentId: nat) -> ();
+  deletePost: (id: nat) -> ();
+  followUser: (userToFollow: principal) -> ();
+  getAllPosts: () -> (vec Post) query;
+  getFollowersList: (user: principal) -> (vec principal) query;
+  getFollowingFeed: () -> (vec Post) query;
+  getFollowingList: (user: principal) -> (vec principal) query;
+  getPost: (id: nat) -> (opt Post) query;
+  getPostComments: (postId: nat) -> (vec Comment) query;
+  getProfilePictureBlob: (userPrincipal: principal) -> (opt blob) query;
+  getUserByUsername: (username: text) -> (opt UserProfile) query;
+  getUserPrincipalByUsername: (username: text) -> (opt principal) query;
+  getUserProfile: () -> (opt UserProfile) query;
+  getUserProfileWithStats: (user: principal) -> (opt UserProfile) query;
+  likeComment: (commentId: nat) -> ();
+  likePost: (postId: nat) -> ();
+  needsProfileSetup: () -> (bool) query;
+  saveUserProfile: (profileInput: UserProfileInput) -> ();
+  unfollowUser: (userToUnfollow: principal) -> ();
+  unlikeComment: (commentId: nat) -> ();
+  unlikePost: (postId: nat) -> ();
+}

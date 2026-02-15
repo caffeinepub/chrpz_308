@@ -1,0 +1,1129 @@
+# Chrpz Social Media Platform with ICP Wallet Integration
+
+## Overview
+
+Chrpz is a modern social media platform focused on microblogging with integrated cryptocurrency tipping functionality, enhanced paywall features, a comprehensive referral system, and newsletter subscription management using dual authentication (Internet Identity and Email). Users can create multimedia posts with text, images, videos, links, hashtags, paywall links, and dual video sections (public and paywalled) using Internet Identity or Email sign-in. The platform features a **Single ICP Wallet System** where each user has exactly one ICP wallet with **properly derived 64-character hexadecimal Account ID (AID) from their Principal ID using official CRC32 + SHA-224 algorithm as the main wallet identifier** displayed in correct ICP hexadecimal format with **Principal ID (PID) shown beneath for reference**, unified wallet dashboard supporting only ICP with **proper AID derivation and formatting for ICP wallet addresses** and **real-time balance display with transaction history** allowing users to tip post creators directly, **working wallet features for receiving ICP/tokens with address display, copy functionality, QR code generation, and token import capabilities**, **comprehensive token import system supporting canister addresses for automatic token metadata fetching and persistent token management**, a like system for post engagement, a 5-star rating system for content quality assessment, a comprehensive comment system, user profiles with follow/unfollow functionality, an activity feed for tracking user interactions, enhanced admin management capabilities with centralized newsletter management dashboard, **fully functional post deletion system for admins**, **working admin approval system for email registrations with functional approve/reject buttons**, **comprehensive admin moderation tools for post management with filtering, flagging, and reporting capabilities**, flexible feed sorting options, real-time chat functionality, forum discussions, **comprehensive paywall content system** including both video and link paywalls with custom pricing, newsletter subscription system with automatic user registration, and a referral system with unlockable reward videos. The platform maintains a clean, minimalistic design with a **dark theme featuring dark reddish outlines** and responsive layout optimized for both desktop and mobile devices.
+
+## Application Initialization and Error Handling
+
+- **Robust App Initialization**: Enhanced application initialization system with comprehensive retry logic for backend canister connection failures and Internet Computer initialization that ensures backend data loads completely before rendering the main UI components
+- **React Router Initialization**: Proper React Router setup and initialization to ensure routing works correctly and prevents blank screens during navigation
+- **Backend Actor Initialization**: Reliable backend actor initialization with proper error handling and retry mechanisms to ensure canister connections are established before UI rendering
+- **Error Boundary Implementation**: Comprehensive error boundary components that catch and handle React errors, initialization failures, and component crashes gracefully with retry buttons and fallback UI
+- **Safe Backend Connection**: AppInitializer component safely connects to the Chrpz canister before rendering main UI, with proper error handling and fallback mechanisms
+- **Home Feed Fallback**: System displays the home feed even if identity initialization is delayed, ensuring users can access content immediately
+- **Connection Retry Logic**: Automatic retry mechanism for failed backend canister connections with exponential backoff and maximum retry attempts to prevent blank screens
+- **Internet Computer Initialization**: Proper await logic for actor and identity initialization to ensure they resolve before rendering dependent components
+- **Safe Fallback UI System**: If initialization fails after all retry attempts, the app displays the main feed with limited access instead of remaining stuck on loading screen or blank screen
+- **Backend Data Preloading**: System to preload essential backend data including user authentication status, wallet information, initial feed data, chat messages, and forum posts before UI rendering with retry capability
+- **Loading State Management**: Comprehensive loading state management during app initialization with visual progress indicators and retry options to prevent blank screens and ensure smooth user experience
+- **Fallback UI System**: Comprehensive fallback UI components for handling initialization failures, connection errors, and component failures gracefully with retry functionality
+- **Connection Error Handling**: Graceful handling of backend connection issues with retry mechanisms, user-friendly error messages, and manual retry capability
+- **Initialization Verification**: System to verify that main feed, posts, profile, wallet, chat, and forum components render correctly after successful initialization
+- **Progressive Loading**: Progressive loading system that loads critical components first, then secondary features to ensure core functionality is always available
+- **Error Recovery**: Automatic error recovery mechanisms with retry functionality for failed initialization attempts and manual retry options
+- **Graceful Degradation**: System that maintains basic functionality even when some backend data fails to load properly
+- **Initialization Error Logging**: Console logging of initialization errors for debugging purposes with detailed error information and connection status
+- **Manual Retry Interface**: Visual retry button on the loading screen for users to manually reload the connection when initialization fails
+- **Restart Capability**: System capability to restart the initialization process after failed connections with proper cleanup and reset
+- **Reliable UI Display**: Initialization system ensures UI components reliably display content instead of showing blank screens
+- **Component Error Boundaries**: Individual error boundaries around major components to prevent single component failures from crashing the entire application
+- **Partial Data Loading**: System that allows UI to render with partial data when some backend calls fail, ensuring users always see functional interface elements
+
+## Dual Authentication System
+
+- **Dual Authentication Methods**: Support for both Internet Identity and Email authentication with unified backend integration
+- **Internet Identity Authentication**: Internet Identity sign-in with automatic single ICP wallet assignment and optional newsletter subscription
+- **Email Authentication**: Email-based sign-up and sign-in functionality with email validation, password management, and automatic single ICP wallet assignment
+- **Working Admin Approval System**: Email registrations require admin approval before users can access the platform, with **fully functional approve/reject buttons** in admin panel that properly process registration decisions
+- **Functional Pending Registration Management**: Admin interface to view, approve, or reject pending email registrations with **working approve and reject buttons** that successfully update registration status
+- **Registration Status Tracking**: System to track registration status (pending, approved, rejected) for email sign-ups with proper status updates when admin uses approve/reject functionality
+- **Unified Authentication Backend**: Both authentication methods integrate with the same backend system and single ICP wallet infrastructure
+- **Email Sign-up Process**: New user registration with email, password, display name, and optional newsletter subscription with automatic single ICP wallet creation upon admin approval
+- **Email Sign-in Process**: Existing user authentication with email and password validation for approved users with access to existing single ICP wallet
+- **Password Management**: Secure password hashing, validation, and reset functionality for email authentication
+- **Email Validation**: Email address validation and verification system for account security
+- **Authentication Method Selection**: User interface for choosing between Internet Identity and Email authentication methods
+- **Unified User Profiles**: Both authentication methods create the same user profile structure with single ICP wallet integration
+- **Session Management**: Secure session handling for both Internet Identity and Email authentication with unified token management
+- **Newsletter Integration During Sign-in**: Optional newsletter subscription checkbox during both Internet Identity and Email sign-in with automatic subscriber management
+- **Newsletter Automatic Registration**: Newsletter subscribers automatically register as full site members with generated user identities and profile entries upon subscription
+- **Newsletter Member Authentication**: Newsletter subscribers can sign in as registered users using their generated credentials for full platform access
+- **Single ICP Wallet Assignment**: All authenticated users (Internet Identity and Email) automatically receive single ICP wallets during sign-in process
+- **Admin Authentication**: Special admin access when the designated admin signs in with either Internet Identity or Email authentication
+- **Authentication Persistence**: Authentication state persistence across sessions for both methods
+- **Seamless Authentication Experience**: Full functionality available for authenticated users regardless of authentication method with proper error handling and session management
+
+## Core Features
+
+### Post Management and Content Feed
+
+- **Post Creation System**: Rich multimedia post creation supporting text content, image uploads, **dual video uploads (public and paywalled)**, links, **paywall links**, and hashtags
+- **Restored Video Upload Functionality**: **Complete video upload system with both public and paywalled video sections** in CreatePostModal and EditPostModal components
+- **Dual Video Upload Sections**: **Separate upload areas for regular (public) videos and paywalled videos within each post** with proper video handling and display
+- **Enhanced Video Format Support**: Both public and paywalled video sections support .mp4, .mov, and .webm file types with extension-based detection
+- **Paywall Link Section**: **Dedicated section for adding exclusive, paid-access external links** with payment amount settings and pricing configuration
+- **Restored Paywall Components**: **PaywallTab, PaywallLinkSection, and VideoPaywallUploader components** fully functional for managing premium content
+- **Dynamic Link Addition**: Users can add links one at a time when creating or editing posts with a "+" button to append new link inputs dynamically
+- **Link Management**: Add, edit, and remove both regular links and paywall links during post creation with individual link input fields
+- **Multiple Media Upload**: Multiple image and video upload support with efficient blob storage using current mediaUpload.ts logic
+- **Current Blob Upload Integration**: **Post creation and media upload use current blob upload logic from mediaUpload.ts** for reliable file handling
+- **File Extension-Based Media Detection**: Media type detection based solely on file extensions (.mp4, .mov, .webm for videos; .jpg, .jpeg, .png, .gif for images)
+- **Extension-Based Media Rendering**: Frontend media display logic uses file extensions to determine rendering method (video elements for video extensions, img elements for image extensions)
+- **Upload Progress Tracking**: Progress tracking for media uploads with real-time upload status feedback
+- **Hashtag System**: Hashtag system for content discovery and organization with hashtag-style tagging (#hashtag)
+- **Fully Functional Admin Post Deletion**: **Working post deletion functionality for admins** that allows admins to successfully delete any post on the platform through both the admin dashboard and directly from individual posts with proper backend integration and confirmation dialogs
+- **Admin Post Management Interface**: **Functional admin interface** for viewing, moderating, and deleting all posts with working delete buttons and proper backend processing
+- **Content Validation**: Content validation for text, media files, links, paywall links, and hashtags with detailed error messages
+- **Post Sorting Options**: All posts displayed according to selected sorting option (Latest, Most Liked, Most Commented)
+- **Consistent Media Upload Logic**: Consistent media upload logic for images and videos with unified error handling
+- **Enhanced Paywall Post Creation**: Options to mark video posts as premium/paywalled content and set paywall link prices during creation
+
+### Content Feed and Discovery
+
+- **Home Feed Display**: Home feed displaying all posts from the platform with flexible sorting options
+- **Sorting Options**: Posts can be sorted by Latest (chronological), Most Liked (by like count), or Most Commented (by comment count)
+- **Post Sorting Interface**: User-friendly sorting selection interface in the main feed
+- **Real-time Sorting**: Sorting updates reflect current like and comment counts
+- **Content Discovery**: Content discovery through hashtags with clickable hashtag links
+- **Hashtag-based Filtering**: Hashtag-based post filtering and organization
+- **Popular Hashtag Tracking**: Popular hashtag tracking and display
+- **Feed Performance**: Optimized feed loading and display performance
+
+### Comprehensive Admin Moderation Panel
+
+- **Enhanced Admin Panel**: Management panel accessible only when the designated admin signs in with comprehensive user and content management tools
+- **Restored Post Moderation Tools**: **Re-enabled post moderation tools in AdminPanel** to list, flag, unflag, and delete posts with full functionality
+- **Working Post Management Interface**: **Complete admin interface for viewing and managing all posts** with comprehensive filtering options including All Posts, Reported Posts, and Flagged Posts
+- **Post Filtering System**: **Advanced filtering system** allowing admins to filter posts by status including All, Reported, Flagged, and other criteria for efficient moderation
+- **Individual Post Actions**: **Direct post management actions** from the admin interface including Delete, Flag/Unflag, and Review Reports for each individual post
+- **Working Post Deletion Functionality**: **Functional admin capability** to successfully delete any post on the platform through the admin UI with proper backend integration, working delete buttons, and confirmation dialogs
+- **Post Flagging System**: **Admin capability to flag or unflag posts** directly from the admin moderation interface with proper status tracking and visual indicators
+- **Report Review System**: **Admin interface to review and manage post reports** with detailed report information, reporter details, and resolution actions
+- **Post Status Management**: **System to track and manage post status** including normal, flagged, reported, and deleted states with proper status indicators
+- **Moderation History Tracking**: **Track all moderation actions** performed on posts including deletion, flagging, and report resolutions with timestamps and admin identification
+- **Admin Role Permissions**: **Proper admin role verification** ensuring only authenticated admin users can access and perform moderation actions on posts
+- **Bulk Post Operations**: **Admin capability to perform bulk operations** on multiple posts including bulk deletion, bulk flagging, and bulk status updates
+- **Post Search and Filtering**: **Advanced search and filtering capabilities** for posts including search by content, author, date range, and moderation status
+- **Moderation Dashboard**: **Centralized moderation dashboard** showing post statistics, pending reports, flagged content count, and moderation activity summary
+- **User Overview**: Admin interface displaying all authenticated users with registration dates, profile information, newsletter subscription status, and account activity
+- **Working Pending Registration Management**: **Functional admin interface** for viewing and managing pending email registrations with **working approve and reject buttons** that properly process registration decisions and update user status
+- **Functional Registration Approval System**: **Working admin tools** for approving or rejecting pending email registrations with **functional buttons** that successfully update registration status and grant platform access
+- **User Profile Management**: Admin capability to view detailed user profiles including display names, bio information, wallet connections, and platform activity
+- **User Account Management**: Admin tools for managing user accounts including account status updates and account deletion with confirmation
+- **User Newsletter Management**: Admin interface for managing newsletter subscriptions for users including subscription status updates and bulk newsletter operations
+- **User Deletion**: Admin capability to delete user accounts with proper confirmation dialogs and data cleanup procedures
+- **User Activity Monitoring**: Admin tools for monitoring user activity including posts, comments, tips, and platform engagement
+- **User Wallet Management**: Admin interface for viewing and managing user single ICP wallet connections and transaction history
+- **User Statistics**: Admin dashboard showing user registration statistics, activity metrics, and engagement analytics
+- **Bulk User Operations**: Admin tools for performing bulk operations on users including newsletter management and account status updates
+- **User Search and Filtering**: Admin interface for searching and filtering users by various criteria including registration date, activity level, and newsletter subscription status
+- **Content Moderation Tools**: Advanced tools for managing inappropriate content and user behavior with working admin controls
+- **Wallet Regeneration System**: Admin capability to delete existing wallet entries and profile data for specific users and regenerate new wallets with valid ICP Account ID (AID) in 64-character hexadecimal format derived from their Principal ID
+- **User Data Reset Operations**: Admin tools to reset user wallet and profile data while maintaining user authentication credentials and regenerating proper wallet connections
+- **Wallet Synchronization Verification**: Admin interface to verify that regenerated wallets properly synchronize with the unified single-wallet system and display correctly in both admin panel and user profiles
+
+### Centralized Newsletter Management System
+
+- **Centralized Admin Newsletter Dashboard**: Comprehensive admin management dashboard for newsletters allowing creation, editing, scheduling, and sending newsletters to subscribed users
+- **Newsletter Creation Interface**: Admin interface for creating new newsletters with rich text editing, subject lines, content formatting, and preview functionality
+- **Newsletter Editing System**: Admin capability to edit existing newsletter drafts and templates with version control and save functionality
+- **Newsletter Scheduling System**: Admin interface for scheduling newsletter sends with date/time selection, timezone handling, and automated delivery
+- **Newsletter Sending Management**: Admin controls for sending newsletters immediately or on schedule with delivery confirmation and status tracking
+- **Newsletter Template Management**: System for creating, saving, and reusing newsletter templates for consistent branding and formatting
+- **Newsletter Content Editor**: Rich text editor for newsletter composition with formatting options, image insertion, and link management
+- **Newsletter Preview System**: Preview functionality allowing admins to see how newsletters will appear to subscribers before sending
+- **Newsletter Draft Management**: System for saving newsletter drafts, managing multiple drafts, and continuing work on unsent newsletters
+- **Newsletter History Tracking**: Complete history of sent newsletters with timestamps, recipient counts, and delivery status
+- **Newsletter Analytics Dashboard**: Analytics for newsletter performance including open rates, click rates, and subscriber engagement metrics
+- **Dual Authentication Newsletter Opt-in**: Newsletter subscription option when signing in with either Internet Identity or Email authentication
+- **Newsletter Automatic User Registration**: Newsletter subscribers automatically register as full site members with generated user identities and profile entries upon subscription
+- **Newsletter Member Authentication**: Newsletter subscribers can authenticate as registered users using their generated credentials for full platform access including single ICP wallet functionality
+- **Newsletter Member Storage**: Store newsletter member records with generated user identities and authentication credentials for future logins
+- **Newsletter Subscription Management**: Users can subscribe or unsubscribe from newsletters through their profile settings
+- **Newsletter Subscriber Storage**: Store newsletter subscriber information including email addresses and subscription preferences
+- **Newsletter Subscription Status**: Track and display newsletter subscription status in user profiles
+- **Newsletter Subscription Validation**: Validate email addresses for newsletter subscriptions and handle subscription errors
+- **Direct Newsletter Sending**: Admin capability to send newsletter content directly through the admin panel to all subscribers
+- **Admin Profile Newsletter Integration**: Newsletter management fully integrated into admin profile with comprehensive dashboard access
+- **ICP Canister Email Storage**: Email addresses stored in ICP canister and manageable through admin newsletter dashboard
+- **Optimized Newsletter Loading**: Newsletter management system optimized to prevent load issues and ensure smooth admin dashboard performance
+
+### Subscriber Management Tools
+
+- **Centralized Subscriber Management**: Admin tools for viewing, filtering, and managing all newsletter subscribers from a centralized dashboard
+- **Subscriber List Interface**: Comprehensive interface displaying all newsletter subscribers with email addresses, subscription dates, and status
+- **Subscriber Filtering System**: Advanced filtering options for subscribers by subscription date, status, engagement level, and other criteria
+- **Subscriber Search Functionality**: Search capability for finding specific subscribers by email address or other identifying information
+- **Subscriber Removal Tools**: Admin capability to remove subscribers from the newsletter list with confirmation dialogs and bulk removal options
+- **Subscriber Status Management**: Tools for managing subscriber status including active, inactive, bounced, and unsubscribed states
+- **Bulk Subscriber Operations**: Bulk operations for managing multiple subscribers including bulk removal, status updates, and export functionality
+- **Subscriber Import/Export**: Tools for importing subscriber lists and exporting subscriber data for external management
+- **Subscriber Engagement Tracking**: Track subscriber engagement including email opens, clicks, and interaction history
+- **Subscriber Segmentation**: Capability to segment subscribers into groups for targeted newsletter campaigns
+- **Subscriber Analytics**: Analytics dashboard showing subscriber growth, churn rates, and engagement metrics
+- **Subscriber Communication History**: Track all newsletter communications sent to each subscriber with delivery status
+- **Unsubscribe Management**: Automated handling of unsubscribe requests with confirmation and removal from active subscriber lists
+- **Subscriber Data Protection**: Ensure subscriber data privacy and compliance with data protection regulations
+- **Subscriber Verification**: Email verification system for new subscribers to confirm valid email addresses
+
+### Comprehensive Token Support System
+
+- **Token Import Interface**: **Working "Add Token" interface** within the wallet dashboard allowing users to paste valid token canister addresses to import custom tokens
+- **Canister Address Input**: **Input field for pasting token canister addresses** with validation to ensure correct canister ID format (e.g., `egjwt-lqaaa-aaaak-qi2aa-cai`)
+- **Canister Address Validation**: **Validation system for pasted canister addresses** ensuring they follow correct canister ID format before attempting token metadata retrieval
+- **Automatic Token Metadata Fetching**: **System to automatically fetch token metadata** from valid canister addresses including token name, symbol, decimal places, and current user balance via ICP canister calls
+- **Token Metadata Storage**: **Persistent storage of fetched token metadata** including token name, symbol, decimals, and balance information for each imported token
+- **Real-time Token Balance Updates**: **Token balances are fetched and updated in real-time** via ICP canister calls ensuring accurate balance display for all imported tokens
+- **Token Display Management**: **Imported tokens are displayed in the wallet section** with token name, symbol, current balance, and management options below the main ICP wallet
+- **Token Management Options**: **Management interface for imported tokens** including options to remove tokens, refresh balances, and view token details
+- **Persistent Token Storage**: **Imported tokens are persistently stored** and remain available across user sessions with automatic balance updates
+- **Token List Interface**: **Comprehensive token list display** showing all imported tokens with their metadata, balances, and management controls
+- **Token Balance Refresh**: **Manual and automatic token balance refresh functionality** to ensure up-to-date balance information for all imported tokens
+- **Token Removal System**: **Capability to remove imported tokens** from the wallet display with confirmation dialogs and proper cleanup
+- **Token Error Handling**: **Error handling for token import failures** including invalid canister addresses, network errors, and metadata fetch failures
+- **Token Import History**: **Track token import history** including when tokens were added, by which user, and import status
+- **Token Metadata Caching**: **Efficient caching of token metadata** to reduce redundant canister calls and improve performance
+- **Functional Token Registry**: **Keep existing wallet system with correct 64-character ICP Account IDs and imported token registry functional for tipping** ensuring all token functionality remains operational
+
+### Version 68 Compatible Single ICP Wallet System with Enhanced Token Import
+
+- **Single ICP Wallet Architecture**: Each user has exactly one ICP wallet with **properly derived 64-character hexadecimal Account ID (AID) from their Principal ID using official CRC32 + SHA-224 algorithm** displayed in correct ICP hexadecimal format identical to `faa31ce80a1ae772f2cb4cfe261c5e67117f7fa93e686be4bcf189d8b09f1bfd` with **Principal ID (PID) shown beneath for reference**
+- **Correct AID Derivation**: **Account ID (AID) calculated from Principal ID using the official CRC32 + SHA-224 algorithm** and displayed in proper 64-character hexadecimal format as the main wallet identifier identical to NNS/OpenChat examples without any "AID-" prefix or placeholder formatting
+- **Reference PID Display**: **Principal ID (PID) shown beneath AID for reference** and wallet controller identification without primary display
+- **Fixed Wallet Visibility**: **Each authenticated user (including admin) can clearly see their ICP wallet** with correct **Account ID (AID)** and **Principal ID (PID)** displayed properly under the profile view or wallet dashboard
+- **Clear Wallet Display**: **Wallet information prominently displayed** in user profiles and wallet dashboard with proper AID and PID formatting for all authenticated users including admin
+- **Automatic Single ICP Wallet Assignment**: All authenticated users (Internet Identity and Email) automatically receive single ICP wallets during sign-in process with proper AID derivation
+- **Unified Single Wallet Backend**: Both authentication methods integrate with the same single ICP wallet infrastructure and backend system with proper AID derivation
+- **Newsletter Member Single Wallet Assignment**: Newsletter subscribers automatically receive generated user identities and single ICP wallet functionality with proper AID derivation upon subscription as registered users
+- **Single ICP Wallet Dashboard**: Unified wallet dashboard displaying the single ICP wallet with **properly derived AID in 64-character hexadecimal format as main identifier**, **PID shown beneath for reference**, balance display, transaction history, and **imported token display section** with **dark theme and dark reddish outlines**
+- **ICP Balance Display**: Real-time balance display for the single ICP wallet with automatic refresh and live updates
+- **Transaction History**: Complete transaction history for the single ICP wallet including tips sent, tips received, paywall payments, and timestamps
+- **Wallet Address Formatting**: **Proper AID derivation and formatting for ICP wallet addresses** with correct 64-character hexadecimal display matching ICP standards using official CRC32 + SHA-224 algorithm without any prefix formatting
+- **Single Wallet Integration**: All platform functionality (tipping, paywall payments, balance display) uses the single ICP wallet system with proper AID
+- **Wallet Persistence**: Single ICP wallet connection persists across sessions for both authentication methods with proper AID derivation
+- **Secure Single Wallet Operations**: Secure wallet operations for tipping functionality and paywall payments using the single ICP wallet with proper AID
+- **Single Wallet Balance Management**: Balance management and updates for the single ICP wallet with real-time synchronization and proper AID tracking
+- **Enhanced Tipping System Integration**: Wallet system supports tipping transactions between single ICP wallets using proper AIDs
+- **Enhanced Paywall Integration**: Wallet system supports payments for accessing premium video content and paywall links using the single ICP wallet with proper AID
+- **Single Wallet Display Logic**: Frontend wallet display logic shows **properly derived AID in 64-character hexadecimal format as main wallet identifier** with deposit/copy buttons, with **PID shown beneath for reference**
+- **ICP Send/Receive Operations**: Full wallet functionality for sending and receiving ICP transactions between users using proper AIDs
+- **Wallet Transaction Processing**: Complete transaction processing system for ICP transfers, tips, and payments using proper AIDs
+- **NNS and dApp Compatibility**: Wallet addresses are compatible with NNS, ICP Swap, and other dApps using proper AID format
+- **No Duplicate Wallets**: System ensures each user has exactly one ICP wallet with no duplicates or subaccounts
+- **Wallet Regeneration System**: System capability to delete existing wallet entries and regenerate new wallets with valid ICP Account ID (AID) in 64-character hexadecimal format properly derived from Principal ID
+- **User Data Reset Operations**: Operations to reset user wallet and profile data while maintaining authentication credentials and regenerating proper wallet connections with unified single-wallet system synchronization
+- **Wallet Synchronization Verification**: System to verify that regenerated wallets properly synchronize with the unified single-wallet system and display correctly with proper AID and PID formatting
+- **Working Wallet Receive Features**: **Wallet functionality for receiving ICP/tokens** including address display, copy functionality, and QR code generation for easy deposits
+- **Wallet Address Copy Function**: One-click copy functionality for the 64-character hexadecimal Account ID for easy sharing and deposits
+- **QR Code Generation**: QR code generation for the wallet address to facilitate easy mobile deposits and transfers
+- **Version 68 Wallet Compatibility**: Wallet generation and display logic reverted to match Version 68 specifications ensuring valid ICP Account ID format identical to legitimate ICP addresses
+- **No Prefix Formatting**: Remove any "AID-" prefix string formatting or placeholder outputs to ensure compatibility with legitimate ICP transactions
+
+### Follow System
+
+- **Follow/Unfollow Functionality**: Authenticated users can follow or unfollow other authenticated users with real-time updates
+- **Follow Button Display**: Follow/Unfollow button visible on user profiles for all authenticated users
+- **Follower Count Tracking**: Display accurate follower count on user profiles with real-time updates
+- **Following Count Tracking**: Display accurate following count on user profiles with real-time updates
+- **Follow Status Indication**: Visual indication of follow relationship between users
+- **Follow Management**: Users can manage their following list and view followers
+- **Mutual Follow Updates**: When a user follows another, both profiles update their follower/following counts
+- **Follow Relationship Storage**: Backend storage of follow relationships between users
+- **Follow Validation**: Validation to prevent users from following themselves
+- **Follow Notifications**: Optional notifications when users gain new followers
+
+### Referral System
+
+- **Unique Referral Links**: Each authenticated user receives a unique referral link that can be shared with others
+- **Referral Registration Tracking**: When new users register via a referral link, the system tracks and credits the referrer
+- **Unlockable Reward Videos**: Referrers earn one unlockable reward video for each successful referral registration
+- **Referral Dashboard**: Users can view their referral statistics including total referrals made and unlocked reward videos earned
+- **Referral Link Generation**: Automatic generation of unique referral links for all authenticated users
+- **Referral Link Display**: Clear display of user's referral link with copy functionality in profile or dashboard
+- **Reward Video Management**: System to track and manage unlockable reward videos earned through referrals
+- **Referral Validation**: Validation system to ensure referral credits are only given for legitimate new user registrations
+- **Referral History**: Track and display referral history including dates and status of referred users
+
+### Profile Management System
+
+- **Complete Profile Editing**: Authenticated users can edit and update their profile information including display name, bio, and profile picture
+- **Profile Picture Upload**: Users can upload and update their profile picture with image validation and storage
+- **Display Name Management**: Users can update their display name with validation and real-time UI updates
+- **Bio Management**: Users can add and edit their bio/description with character limits and validation
+- **Single ICP Wallet Integration**: Profile editing interface includes single ICP wallet connection status and unified wallet dashboard access with **properly derived AID in 64-character hexadecimal format as main identifier display** and **PID shown beneath for reference**
+- **Visible Single ICP Wallet Display**: **Profile interface clearly displays single ICP wallet** for authenticated users with proper 64-character hexadecimal AID formatting and reference PID display **prominently visible** in profile view
+- **Newsletter Subscription Management**: Profile interface includes newsletter subscription status and management options
+- **Referral Information Display**: Profile interface includes referral link display and referral statistics
+- **Follow Integration**: Profile interface includes follow/unfollow button and follower/following counts
+- **Real-time Profile Updates**: Profile changes persist in ICP storage and update the UI immediately
+- **Profile Validation**: Input validation for profile fields including display name length, bio character limits, and image file validation
+- **Profile Access**: Profile editing accessible through dedicated "Profile" or "Edit Profile" page
+- **Profile Persistence**: All profile changes are stored persistently in the backend and reflected across the platform
+
+### Feed Sorting System
+
+- **Multiple Sorting Options**: Feed can be sorted by "Latest", "Most Liked", and "Most Commented"
+- **Latest Sorting**: Default chronological sorting with newest posts first
+- **Most Liked Sorting**: Posts sorted by highest like count in descending order
+- **Most Commented Sorting**: Posts sorted by highest comment count in descending order
+- **Sorting Interface**: User-friendly sorting selection interface in the main feed
+- **Real-time Sorting**: Sorting updates reflect current like and comment counts
+
+### Like System
+
+- **Post Likes**: Authenticated users can like or unlike posts with real-time updates
+- **Like Count Display**: Current like count displayed on each post
+- **Like Status Tracking**: Visual indication of whether the current user has liked a post
+- **Real-time Updates**: Like counts update immediately when users interact with posts
+- **Like Button Functionality**: Interactive like buttons with heart icons that toggle like status
+
+### Rating System
+
+- **5-Star Rating**: Authenticated users can rate posts from 0 to 5 stars
+- **Average Rating Display**: Display average rating score on each post card
+- **Rating Count**: Show total number of ratings received for each post
+- **User Rating Status**: Visual indication of the current user's rating for each post
+- **Rating Management**: Users can update their existing ratings or remove them
+- **Rating Statistics**: Track and display rating distribution and statistics
+
+### Comment System
+
+- **Comment Creation**: Authenticated users can add comments under posts
+- **Comment Display**: Comments show commenter's name or identifier, timestamp, and text content
+- **Comment Management**: Users can delete their own comments
+- **Comment Threading**: Comments displayed chronologically under each post
+- **Comment Validation**: Text validation for comment content with appropriate error handling
+
+### Enhanced Tipping System
+
+- **Single ICP Wallet Tipping**: Tipping functionality on every post using single ICP wallets with proper AIDs
+- **ICP Tipping**: Tipping buttons integrated into post display with transaction processing using single ICP wallets with proper AIDs
+- **Token Tipping Support**: **Confirm all users can tip with tokens** using the imported token registry and wallet system
+- **Real-time ICP Balance Updates**: Balance updates after tipping transactions in single ICP wallet system with proper AID tracking
+- **Tip Amount Selection**: Tip amount selection interface for users using single ICP wallets with proper AIDs
+- **Transaction Confirmation**: Transaction confirmation and success feedback for transactions using single ICP wallets with proper AIDs
+- **Tip History**: Tip history and tracking for transparency using single ICP wallets with proper AIDs
+- **Single ICP Wallet Integration**: Tipping system uses single ICP wallets with proper AIDs for all transactions between accounts
+- **Self-Tipping Capability**: Users can tip their own posts for testing purposes and functionality verification
+
+### Chat System
+
+- **Real-time Chat**: Live chat functionality for authenticated users with instant messaging
+- **Chat Rooms**: Multiple chat rooms or channels for different topics and discussions
+- **Message Display**: Chat messages show sender name, timestamp, and message content
+- **Message History**: Persistent chat message history stored in the backend
+- **Chat Notifications**: Real-time notifications for new messages
+- **Private Messaging**: Direct messaging between authenticated users
+- **Chat Moderation**: Admin moderation capabilities for chat content
+- **Message Validation**: Text validation and filtering for chat messages
+
+### Forum System
+
+- **Forum Categories**: Multiple forum categories for organized discussions
+- **Thread Creation**: Users can create new discussion threads with titles and content
+- **Thread Replies**: Users can reply to forum threads with nested comment structure
+- **Forum Moderation**: Admin capabilities to moderate forum content and manage threads
+- **Thread Sorting**: Sort forum threads by latest activity, most replies, or creation date
+- **Thread Search**: Search functionality for finding specific forum threads and topics
+- **Forum Statistics**: Display thread reply counts, view counts, and last activity timestamps
+
+### Comprehensive Paywall System
+
+- **Premium Video Content**: **Video posts can be marked as premium/paywalled content in dedicated paywalled video section** with full restoration of paywall video functionality
+- **Dual Video Sections**: **Each post supports both regular (public) video upload and separate paywalled video section** with complete video handling
+- **Paywall Link Section**: **Creators can attach exclusive, paid-access external links that require payment to unlock** with full paywall link functionality restored
+- **Custom Pricing System**: **Creators can set custom prices on posts or videos** that require payment to unlock with flexible pricing options
+- **Single ICP Wallet Payment Gateway**: Payment system supporting single ICP wallets with proper AIDs for accessing premium videos and paywall links
+- **Content Protection**: Paywalled videos and links are locked until payment is made
+- **Access Management**: Track which users have paid for specific premium content (videos and links)
+- **Preview System**: Show video thumbnails or short previews for paywalled content
+- **Payment Confirmation**: Clear payment confirmation and access granting system for both videos and links using single ICP wallets with proper AIDs
+- **Revenue Tracking**: Track earnings from paywalled content for creators (videos and links) using single ICP wallets with proper AIDs
+- **Paywall Interface**: Clear visual indicators for paywalled content with payment options for both videos and links supporting single ICP wallets with proper AIDs
+- **Multi-format Video Support**: Both public and paywalled video sections support .mp4, .mov, and .webm file types with extension-based detection
+- **Full Playback Support**: Complete video playback functionality after payment unlock for paywalled videos
+- **Single ICP Wallet Integration**: **Paywall unlocking system integrated with the single ICP wallet with proper AID to process payments and reveal protected content**
+- **Post Paywall Integration**: **Paywall features compatible with posts** allowing creators to set custom prices on regular posts that require payment to unlock
+- **Forum Paywall Integration**: **Paywall features compatible with forum submissions** allowing creators to set custom prices on forum threads that require payment to unlock
+- **Existing System Compatibility**: **Paywall system maintains compatibility with existing user tipping systems** without interference or conflicts
+- **Locked Content Display**: **Verify all paywalled content displays with lock overlays and unlock functions** using LockedVideoOverlay and VideoSection components
+- **Premium Media Access**: **Confirm all users can view premium media after rebuild** with proper unlock functionality and payment processing
+
+### User Profiles
+
+- **Enhanced Dual Authentication Profiles**: Profile pages for both Internet Identity and Email users showing comprehensive information
+- **Newsletter Member Profiles**: Profile pages for newsletter members showing comprehensive information as registered users
+- **Profile Information**: Display name, bio, profile picture, single ICP wallet connection status with **properly derived AID in 64-character hexadecimal format as main identifier display** and **PID shown beneath for reference**, joined date, newsletter subscription status, and user's posts
+- **Visible Single ICP Wallet Display**: **Profile clearly displays single ICP wallet** for authenticated users with proper 64-character hexadecimal AID formatting and reference PID display **prominently shown**
+- **Single ICP Wallet Dashboard Access**: Users can access their unified wallet dashboard from their profile with **properly derived AID in 64-character hexadecimal format as main identifier display** and **PID shown beneath for reference**
+- **Newsletter Management**: Users can manage their newsletter subscription status from their profile
+- **Referral Information**: Display user's unique referral link with copy functionality and referral statistics
+- **Referral Dashboard Integration**: Access to referral dashboard showing referral count and unlocked reward videos
+- **Follow Integration**: Follow/unfollow buttons on profiles for authenticated users with follower/following counts
+- **Profile Statistics**: Follower count, following count, total posts, average rating received, total ratings given, and referral statistics
+- **Activity Summary**: Overview of user's platform activity including posts, likes, comments, tips, chat messages, forum participation, and referrals
+- **Profile Management**: Users can edit their own profile information including profile picture, bio, display name, and newsletter preferences
+- **Profile Access**: Accessible via user links and navigation
+
+### Activity Feed
+
+- **Activity Tab**: Dedicated tab displaying user interactions and platform activity
+- **Activity Types**: Track new posts, likes, comments, ratings, tips, chat messages, forum posts, follow actions, and referral activities across the platform
+- **Activity Display**: Show timestamps, user actions, and relevant content previews
+- **Real-time Updates**: Activity feed updates with new interactions as they occur
+- **Activity History**: Chronological display of recent platform activity
+
+## Backend Data Storage
+
+- **Enhanced Dual Authentication**: Store both Internet Identity principals and Email authentication credentials with unified user management
+- **Email Authentication Data**: Store email addresses, hashed passwords, email verification status, password reset tokens, and registration approval status
+- **Working Admin Approval Data**: Store pending email registrations with approval status, admin approval timestamps, and rejection reasons with **functional approve/reject processing**
+- **Functional Registration Status Data**: Store registration status tracking (pending, approved, rejected) for email sign-ups with **working status change processing** when admin uses approve/reject functionality
+- **User Management Data**: Store user account information including registration timestamps, profile data, account status, approval status, and administrative notes
+- **Enhanced User Profiles**: Store comprehensive user profile information for authenticated users including newsletter members as registered users including display name, bio, profile picture, single ICP wallet connection status with **properly derived AID in 64-character hexadecimal format as main identifier** and **PID shown beneath for reference**, joined date, newsletter subscription status, and profile data with complete profile editing capabilities
+- **Newsletter Subscription Data**: Store newsletter subscriber information including email addresses, subscription preferences, subscription timestamps, and subscription status with **successful subscription processing**
+- **Newsletter Member Data**: Store newsletter member records as registered users with generated user identities, authentication credentials, and member status for platform access
+- **Newsletter Content Storage**: Store newsletter content, composition history, send timestamps, and delivery status
+- **Profile Management Data**: Store profile editing history, profile picture blob references, display name updates, bio updates, newsletter preference updates, and profile validation data
+- **Version 68 Compatible Single ICP Wallet Data**: Store single ICP wallet connection information for all authenticated users including newsletter members as registered users including **properly derived Account ID (AID) in 64-character hexadecimal format calculated using official CRC32 + SHA-224 algorithm from Principal ID** identical to `faa31ce80a1ae772f2cb4cfe261c5e67117f7fa93e686be4bcf189d8b09f1bfd`, **Principal ID (PID) shown beneath for reference**, and ICP balance with transaction history without any prefix formatting
+- **Transaction History Data**: Store complete transaction history for single ICP wallets including tips sent, tips received, paywall payments, ICP transfers, amounts, timestamps, and transaction references using proper AIDs
+- **Newsletter Member Single ICP Wallet Data**: Store generated user identities and single ICP wallet functionality with proper AID derivation for newsletter subscribers as registered users
+- **Comprehensive Token Import Data**: **Store imported token canister addresses, token metadata (name, symbol, decimals), user token balances, and token management preferences** for comprehensive wallet functionality with persistent token storage and real-time balance tracking
+- **Token Canister Data**: **Store validated token canister addresses** with associated token metadata and user-specific token balance information
+- **Token Metadata Storage**: **Store fetched token metadata including token name, symbol, decimal places, and balance information** retrieved from token canisters via ICP canister calls
+- **Persistent Token Management**: **Store user's imported token list** with canister addresses, metadata, and balance tracking for persistent display in wallet dashboard
+- **Token Import History**: **Store token import history** including import timestamps, user identification, canister addresses, and import status
+- **Token Balance Cache**: **Store cached token balance information** with timestamps to optimize performance and reduce redundant canister calls
+- **Follow Relationships Data**: Store follow/unfollow relationships between authenticated users with follower and following lists, follow timestamps, and relationship status
+- **Follow Count Data**: Store accurate follower and following counts for each user with real-time updates
+- **Follow Status Data**: Store follow relationship status between users for display and validation
+- **Referral System Data**: Store unique referral links for each authenticated user, referral tracking records, unlockable reward video counts, referral history, and referral validation data
+- **Referral Link Generation**: Store generated unique referral links mapped to user principals with creation timestamps
+- **Referral Tracking Records**: Store referral registration events including referrer principal, referred user principal, registration timestamp, and reward status
+- **Reward Video Management**: Store unlockable reward video counts and access records for each user earned through referrals
+- **Enhanced Posts**: Store post content, author information, creation timestamps, attached media blob references with file extensions, links, **paywall links with pricing**, hashtags, like counts, rating statistics (average rating, total ratings), tip totals received, comment counts, paywall status for premium content, and **dual video section data (public and paywalled videos)**
+- **Restored Paywall Data**: **Store complete paywall content data including paywall links, video paywall information, pricing settings, and access records** for comprehensive paywall functionality
+- **Video Upload Data**: **Store both public and paywalled video upload data** with proper blob references and file extension information for dual video sections
+- **Paywall Link Data**: **Store paywall link information including URLs, pricing, access records, and payment tracking** for exclusive paid-access external links
+- **Likes**: Store like information including user identifiers, post references, and timestamps
+- **Ratings**: Store rating information including user identifiers, post references, star ratings (0-5), and timestamps
+- **Comments**: Store comment content, author information, post references, creation timestamps, and commenter identifiers
+- **Media Blobs**: Store uploaded images and videos using persistent blob storage with asset key references and file extension information for publicly accessible blob URL generation, and profile pictures
+- **Single ICP Wallet Tips**: Store tipping transactions with sender information, recipient information, post references, tip amounts in ICP, single ICP wallet information with proper AIDs, and timestamps
+- **Activity**: Store activity records including user actions (posts, likes, comments, ratings, tips, follows, chat messages, forum posts, referrals), timestamps, and relevant content references
+- **Hashtags**: Store hashtag information, associated posts, and usage statistics
+- **Admin Data**: Store admin principal information, admin action logs, and newsletter management data
+- **Comprehensive Admin Moderation Data**: **Store complete post moderation data** including post status (normal, flagged, reported, deleted), moderation history, admin actions, flagging timestamps, report details, and resolution records
+- **Post Status Tracking**: **Store post status information** including current status, status change history, and status change timestamps with admin identification
+- **Post Flagging Data**: **Store post flagging information** including flag status, flagging timestamps, admin who flagged, and flagging reasons
+- **Post Reporting Data**: **Store post report information** including reporter details, report categories, report timestamps, report descriptions, and report status
+- **Moderation History Data**: **Store complete moderation history** for each post including all admin actions, timestamps, admin identification, and action details
+- **Admin Role Data**: **Store admin role verification data** ensuring proper admin authentication and permission validation for moderation actions
+- **Moderation Statistics**: **Store moderation statistics** including total posts moderated, reports processed, flags applied, and admin activity metrics
+- **Initialization Data**: Store essential application initialization data including system status, configuration settings, and health check information
+- **Chat Messages**: Store chat message content, sender information, chat room/channel references, timestamps, and message history
+- **Forum Data**: Store forum categories, thread information, thread replies, author information, timestamps, and forum statistics
+- **Enhanced Single ICP Wallet Paywall Data**: Store premium content access records, payment transactions for both videos and paywall links using single ICP wallets with proper AIDs, content pricing, paywall link information, dual video section data, and user access permissions
+- **Custom Pricing Data**: Store **custom pricing information set by creators on posts or videos** with flexible pricing options and payment tracking
+- **Paywall Integration Data**: Store **paywall unlocking system integration data with single ICP wallet payment processing using proper AIDs** and content reveal tracking
+- **Post Paywall Data**: Store **paywall compatibility data for posts** including custom pricing and payment unlock records
+- **Forum Paywall Data**: Store **paywall compatibility data for forum submissions** including custom pricing and payment unlock records
+- **System Compatibility Data**: Store **paywall system compatibility data with existing user tipping systems** ensuring no interference or conflicts
+- **ICP Canister Email Storage**: Store email addresses in ICP canister for newsletter management through admin dashboard
+- **Wallet Regeneration Data**: Store wallet regeneration history, deleted wallet entries, and regenerated wallet information with proper AID derivation for specific users
+- **User Data Reset Records**: Store user data reset operations including wallet deletion, profile data reset, and regeneration timestamps while maintaining authentication credentials
+- **Wallet Synchronization Data**: Store wallet synchronization verification records ensuring regenerated wallets properly integrate with the unified single-wallet system
+
+## Backend Operations
+
+- **Enhanced Initialization Operations**: Backend initialization verification endpoints with retry logic for canister connection failures and Internet Computer initialization to ensure system readiness before frontend rendering
+- **React Router Operations**: Backend operations that support proper React Router functionality and prevent routing-related blank screens
+- **Backend Actor Operations**: Reliable backend actor initialization operations with proper error handling and retry mechanisms for canister connections
+- **Error Boundary Operations**: Backend operations that support comprehensive error boundary functionality with graceful error responses
+- **Safe Backend Connection Operations**: Backend operations that safely handle Chrpz canister connections with proper error handling and fallback mechanisms
+- **Home Feed Fallback Operations**: Backend operations that provide home feed data even when identity initialization is delayed
+- **Health Check Operations**: System health check endpoints with retry capability to verify backend connectivity and data availability
+- **Connection Retry Operations**: Backend operations that support retry logic for failed connections with exponential backoff and maximum retry attempts
+- **Essential Data Preloading**: Operations to preload critical data including authentication status, user profiles, initial feed content, chat messages, and forum posts with retry capability
+- **Graceful Error Handling**: Backend error handling operations that provide meaningful error responses for frontend error boundaries and initialization failures
+- **Fallback Data Operations**: Backend operations that provide minimal essential data when full initialization fails
+- **Reliable UI Operations**: Backend operations that ensure UI components reliably display content instead of showing blank screens
+- **Partial Data Loading Operations**: Backend operations that allow UI to render with partial data when some backend calls fail
+- **Enhanced Dual Authentication Operations**: User authentication for both Internet Identity and Email with newsletter subscription option, newsletter member authentication as registered users, and admin authentication
+- **Email Authentication Operations**: Email-based sign-up and sign-in operations with email validation, password hashing, password reset, and secure session management
+- **Working Admin Approval Operations**: **Functional backend operations** for managing email registration approvals including pending registration storage, **working approval processing with functional approve/reject buttons**, and notification handling
+- **Functional Registration Status Operations**: **Working operations** to track and manage registration status (pending, approved, rejected) for email sign-ups with **proper status updates when admin uses approve/reject functionality**
+- **User Management Operations**: Backend operations for managing users including account creation, profile management, account deletion, and administrative operations
+- **Session Management**: User session handling for both Internet Identity and Email authentication including newsletter members as registered users with secure token management
+- **Version 68 Compatible Single ICP Wallet Operations**: Complete single ICP wallet operations that generate and manage **properly derived Account ID (AID) in 64-character hexadecimal format calculated using official CRC32 + SHA-224 algorithm from Principal ID** identical to `faa31ce80a1ae772f2cb4cfe261c5e67117f7fa93e686be4bcf189d8b09f1bfd` and **Principal ID (PID) shown beneath for reference** for all users including admin without any prefix formatting
+- **Transaction History Operations**: Operations to track and retrieve complete transaction history for single ICP wallets including tips, paywall payments, ICP transfers, and balance changes using proper AIDs
+- **Newsletter Member Single ICP Wallet Operations**: Operations to generate and assign user identities and single ICP wallet functionality with proper AID derivation to newsletter subscribers as registered users
+- **Automatic Single ICP Wallet Assignment Operations**: Automatic single ICP wallet assignment operations with proper AID derivation for all authenticated users including newsletter members as registered users
+- **Comprehensive Token Import Operations**: **Operations for importing and managing token references using canister addresses** including **canister address validation, automatic token metadata fetching, token balance retrieval via ICP canister calls, and persistent token storage** for comprehensive wallet functionality
+- **Token Canister Validation Operations**: **Operations to validate pasted canister addresses** ensuring they follow correct canister ID format before attempting metadata retrieval
+- **Token Metadata Fetching Operations**: **Operations to automatically fetch token metadata from valid canister addresses** including token name, symbol, decimal places, and current user balance via ICP canister calls
+- **Token Balance Operations**: **Operations to fetch and update token balances in real-time** via ICP canister calls for all imported tokens ensuring accurate balance display
+- **Persistent Token Storage Operations**: **Operations to persistently store imported tokens** with canister addresses, metadata, and balance information for display in wallet dashboard
+- **Token Management Operations**: **Operations for managing imported tokens including adding, removing, and updating token information** within the user's wallet interface
+- **Token Import History Operations**: **Operations to track and manage token import history** including import timestamps, user identification, and import status
+- **Token Balance Caching Operations**: **Operations for efficient token balance caching** to optimize performance and reduce redundant canister calls
+- **Profile Management Operations**: Complete profile editing operations including display name updates, bio management, profile picture upload and storage, newsletter preference management, profile validation, and real-time profile data persistence
+- **Profile Picture Operations**: Profile picture upload, validation, storage, retrieval, and update operations with blob storage integration
+- **Enhanced Single ICP Wallet Operations**: Automatic single ICP wallet connection management with proper AID derivation, balance updates, transaction processing, and wallet persistence for all authenticated users including newsletter members as registered users
+- **Single ICP Wallet Balance Operations**: Balance management and transaction processing for single ICP wallets with proper AIDs with real-time updates and transaction history tracking
+- **ICP Send/Receive Operations**: Complete ICP transaction operations for sending and receiving between users with proper AIDs with proper validation and confirmation
+- **Follow Operations**: Follow/unfollow relationship management, follower/following count calculation, follow status checking, and mutual follow updates
+- **Follow Validation Operations**: Operations to prevent users from following themselves and validate follow relationships
+- **Follow Count Operations**: Operations to maintain accurate follower and following counts with real-time updates
+- **Referral System Operations**: Unique referral link generation for authenticated users, referral tracking and validation, reward video credit management, referral history tracking, and referral dashboard data retrieval
+- **Referral Link Operations**: Generate and manage unique referral links for each authenticated user with proper validation and tracking
+- **Referral Tracking Operations**: Track referral registrations, validate referral credits, and manage reward video distribution
+- **Reward Video Operations**: Manage unlockable reward video counts, track earned rewards, and handle reward video access
+- **Enhanced Profile Operations**: Profile creation, retrieval, and updates for authenticated users including newsletter members as registered users including profile picture management, display name management, bio management, single ICP wallet connection status with **properly derived AID in 64-character hexadecimal format as main identifier display** and **PID shown beneath for reference**, newsletter subscription management, referral information display, follow integration, and statistics calculation
+- **Like Operations**: Like creation, removal, like count retrieval, and like status checking for authenticated users with real-time updates
+- **Rating Operations**: Rating creation, update, removal, average rating calculation, and rating statistics management for authenticated users
+- **Comment Operations**: Comment creation, retrieval, deletion, and validation for authenticated users
+- **Activity Operations**: Enhanced activity record creation, retrieval, and management for tracking all user interactions including chat, forum, follow, and referral activity
+- **Comprehensive Admin Moderation Operations**: **Complete admin moderation operations** including post status management, flagging operations, report processing, moderation history tracking, and admin role verification
+- **Post Status Management Operations**: **Operations to manage post status** including setting status to normal, flagged, reported, or deleted with proper status tracking and history
+- **Post Flagging Operations**: **Operations for admins to flag or unflag posts** with proper status updates, flagging timestamps, and admin identification
+- **Post Report Processing Operations**: **Operations to process and manage post reports** including report creation, report review, report resolution, and report status updates
+- **Moderation History Operations**: **Operations to track and manage complete moderation history** for each post including all admin actions, timestamps, and action details
+- **Admin Role Verification Operations**: **Operations to verify admin role permissions** ensuring only authenticated admin users can perform moderation actions
+- **Post Filtering Operations**: **Operations to filter posts by status** including All, Reported, Flagged, and other criteria for efficient admin moderation
+- **Bulk Moderation Operations**: **Operations for performing bulk moderation actions** on multiple posts including bulk deletion, bulk flagging, and bulk status updates
+- **Moderation Statistics Operations**: **Operations to calculate and track moderation statistics** including posts moderated, reports processed, and admin activity metrics
+- **Enhanced Admin Operations**: Comprehensive admin authentication verification, user management, user account deletion and newsletter management, centralized newsletter management including creation, editing, scheduling, sending, subscriber management, and analytics, **comprehensive post moderation with filtering, flagging, and reporting capabilities**, rating management, follow relationship monitoring, chat moderation, forum moderation, enhanced paywall management for both videos and links, single ICP wallet management with **properly derived AID in 64-character hexadecimal format as main identifier display** and **PID shown beneath for reference**, referral system management, and advanced content moderation tools
+- **Working Post Deletion Operations**: **Functional admin operations** to successfully delete any post on the platform through the UI with proper backend integration, **working delete processing**, and data cleanup
+- **Functional Post Management Operations**: **Working post management operations** including creation, retrieval, updating, **functional deletion with working delete buttons**, and moderation with proper validation and error handling
+- **Post Sorting Operations**: Post retrieval with sorting by latest (chronological), most liked (by like count), and most commented (by comment count)
+- **Enhanced Post Creation**: **Post creation with text, media uploads, links, paywall links with pricing, hashtags, dual video sections (public and paywalled), and paywall options** for authenticated users with restored video upload functionality
+- **Restored Video Upload Operations**: **Complete video upload operations for both public and paywalled video sections** using current blob upload logic from mediaUpload.ts
+- **Paywall Content Operations**: **Operations for managing paywall links, video paywalls, pricing settings, and access control** with full paywall functionality restoration
+- **Enhanced Link Management Operations**: Link validation, storage, and retrieval for both regular links and paywall links with pricing information
+- **Enhanced Extension-Based Video Upload**: Video upload validation with file extension checking for .mp4, .mov, .webm formats, format verification, size limits, and persistent blob storage
+- **Public Video Blob Serving**: Video blob storage and retrieval operations with publicly accessible URL generation for .mp4, .mov, .webm and other video formats
+- **Reliable Blob URL Generation**: Enhanced blob URL generation and validation with proper video serving capabilities for direct access
+- **Enhanced Single ICP Wallet Tipping Operations**: ICP tip processing, balance transfers between users using single ICP wallets with proper AIDs, and transaction recording with transaction history tracking
+- **Self-Tipping Operations**: Operations to allow users to tip their own posts for testing purposes and functionality verification
+- **Enhanced Extension-Based Media Validation**: Media file validation and processing for supported formats (.mp4, .mov, .webm for videos) with extension-based detection only
+- **Enhanced Media Processing**: Enhanced media processing logic ensuring reliable video serving with publicly accessible URLs for dual video sections
+- **Hashtag Operations**: Hashtag creation, management, and association with posts
+- **User Authentication Operations**: User authentication and authorization for both Internet Identity and Email including newsletter members as registered users
+- **Chat Operations**: Chat message creation, retrieval, real-time message delivery, chat room management, and message history operations
+- **Forum Operations**: Forum thread creation, reply management, thread sorting, forum category management, and forum statistics operations
+- **Enhanced Single ICP Wallet Paywall Operations**: Premium content management for both videos and paywall links, payment processing using single ICP wallets with proper AIDs, access verification, revenue tracking, paywall link management with pricing, and dual video section management
+- **Custom Pricing Operations**: Operations for **creators to set custom prices on posts or videos** with flexible pricing management and payment tracking
+- **Paywall Integration Operations**: Operations for **paywall unlocking system integration with single ICP wallet payment processing using proper AIDs** and content reveal functionality
+- **Post Paywall Operations**: Operations for **paywall compatibility with posts** including custom pricing and payment unlock processing
+- **Forum Paywall Operations**: Operations for **paywall compatibility with forum submissions** including custom pricing and payment unlock processing
+- **System Compatibility Operations**: Operations ensuring **paywall system compatibility with existing user tipping systems** without interference or conflicts
+- **ICP Canister Email Operations**: Operations to store and manage email addresses in ICP canister for newsletter management through admin dashboard
+- **Wallet Regeneration Operations**: Backend operations to delete existing wallet entries and profile data for specific users and regenerate new wallets with valid ICP Account ID (AID) in 64-character hexadecimal format derived from their Principal ID
+- **User Data Reset Operations**: Operations to reset user wallet and profile data while maintaining authentication credentials and regenerating proper wallet connections with unified single-wallet system synchronization
+- **Wallet Synchronization Operations**: Operations to verify that regenerated wallets properly synchronize with the unified single-wallet system and display correctly in both admin panel and user profiles with proper AID and PID formatting
+- **Wallet Receive Operations**: Operations for wallet receive functionality including address display, copy functionality, QR code generation, and deposit tracking
+
+## User Interface Design
+
+- Modern glassmorphism design aesthetic with clean, translucent interface elements
+- **Global Dark Theme with Dark Reddish Outlines**: Complete dark theme implementation across the entire UI with dark reddish accent colors and outlines for improved contrast and readability
+- Prominent "Chrpz" branding with distinctive "C" logo in cosmic-themed containers
+- **Enhanced Initialization Loading Interface**: Comprehensive loading interface during app initialization with progress indicators, status messages, retry logic, and manual retry button to prevent blank screens
+- **React Router Interface**: Proper React Router interface setup to ensure navigation works correctly and prevents blank screens
+- **Backend Actor Interface**: Reliable backend actor interface with proper error handling and retry mechanisms
+- **Error Boundary Interface**: User-friendly error boundary interface with retry options and fallback content for handling initialization and component failures
+- **Connection Error Interface**: Clear connection error interface with retry mechanisms, troubleshooting guidance, and manual retry capability
+- **Fallback UI Components**: Comprehensive fallback UI components for graceful degradation when features fail to load
+- **Progressive Loading Interface**: Progressive loading interface that shows critical components first, then loads secondary features with retry capability
+- **Manual Retry Interface**: Visual retry button on loading screen for users to manually reload connection when initialization fails
+- **Initialization Error Display**: Console error logging display and user-friendly error messages for debugging initialization issues
+- **Reliable UI Display Interface**: Interface components that reliably display content instead of showing blank screens
+- **Component Error Boundaries**: Individual error boundary interfaces around major components to prevent single component failures from crashing the entire application
+- **Partial Data Loading Interface**: Interface that allows UI to render with partial data when some backend calls fail
+- **Dual Authentication Interface**: Clean authentication interface with options for both Internet Identity and Email authentication methods
+- **Email Authentication Interface**: Email sign-up and sign-in interface with email validation, password management, and newsletter subscription option
+- **Internet Identity Authentication Interface**: Internet Identity sign-in interface with newsletter subscription option
+- **Authentication Method Selection**: User interface for choosing between Internet Identity and Email authentication methods
+- **Working Admin Approval Interface**: **Functional interface** for displaying pending registration status and admin approval notifications with **working approve/reject buttons**
+- **Functional Pending Registration Interface**: **Working admin interface** for viewing and managing pending email registrations with **functional approve and reject buttons** that properly process registration decisions
+- **Registration Status Interface**: Interface for displaying registration status (pending, approved, rejected) to users
+- **Newsletter Subscription Interface**: Optional newsletter subscription checkbox during both Internet Identity and Email sign-in with clear opt-in messaging and automatic user registration
+- **Newsletter Member Authentication Interface**: Authentication interface for newsletter members as registered users using generated credentials with proper validation and error handling
+- **Registration Success Interface**: Success confirmation interface with automatic single ICP wallet linking notification, newsletter subscription confirmation, automatic user registration notification, and profile initialization
+- **Comprehensive Admin Moderation Interface**: **Complete admin moderation interface** with comprehensive post management tools including post filtering (All, Reported, Flagged), individual post actions (Delete, Flag/Unflag, Review Reports), and proper admin role permissions
+- **Restored Post Management Interface**: **Re-enabled post moderation tools interface in AdminPanel** to list, flag, unflag, and delete posts with full functionality restoration
+- **Post Management Dashboard**: **Admin interface displaying complete list of posts** with filtering options, status indicators, and individual post management actions
+- **Post Filtering Interface**: **Advanced filtering interface** allowing admins to filter posts by All Posts, Reported Posts, Flagged Posts, and other criteria
+- **Individual Post Actions Interface**: **Direct action interface** for each post including Delete button, Flag/Unflag toggle, and Review Reports option
+- **Post Status Indicators**: **Visual status indicators** for posts showing normal, flagged, reported, and deleted states with appropriate styling
+- **Report Review Interface**: **Interface for reviewing post reports** with report details, reporter information, and resolution actions
+- **Moderation History Interface**: **Interface displaying moderation history** for posts including all admin actions, timestamps, and action details
+- **Admin Role Verification Interface**: **Interface elements that verify admin role** ensuring only authenticated admin users can access moderation features
+- **Bulk Moderation Interface**: **Interface for performing bulk operations** on multiple posts with selection checkboxes and bulk action buttons
+- **Moderation Statistics Interface**: **Dashboard interface showing moderation statistics** including posts moderated, reports processed, and admin activity metrics
+- **Enhanced Admin Panel Interface**: Advanced admin management dashboard with comprehensive moderation tools including centralized newsletter management dashboard, referral system management, **comprehensive post moderation with filtering, flagging, and reporting capabilities**, **functional pending registration management with working approve/reject buttons**, and user management
+- **User Management Interface**: Admin interface for viewing and managing authenticated users with account management tools and deletion capabilities
+- **User Deletion Interface**: Admin interface for deleting user accounts with proper confirmation dialogs and data cleanup procedures
+- **Centralized Newsletter Management Interface**: Comprehensive admin interface for centralized newsletter management including creation, editing, scheduling, sending, and analytics dashboard
+- **Newsletter Creation Interface**: Admin interface for creating new newsletters with rich text editing, subject lines, content formatting, and preview functionality
+- **Newsletter Editing Interface**: Admin interface for editing existing newsletter drafts and templates with version control and save functionality
+- **Newsletter Scheduling Interface**: Admin interface for scheduling newsletter sends with date/time selection, timezone handling, and automated delivery
+- **Newsletter Sending Interface**: Admin controls for sending newsletters immediately or on schedule with delivery confirmation and status tracking
+- **Newsletter Analytics Interface**: Analytics dashboard for newsletter performance including open rates, click rates, and subscriber engagement metrics
+- **Subscriber Management Interface**: Comprehensive interface for viewing, filtering, and managing newsletter subscribers with bulk operations and search functionality
+- **Subscriber Filtering Interface**: Advanced filtering interface for subscribers by subscription date, status, engagement level, and other criteria
+- **Subscriber Removal Interface**: Interface for removing subscribers with confirmation dialogs and bulk removal options
+- **Comprehensive Token Import Interface**: **Working token import interface within the wallet dashboard** allowing users to paste valid token canister addresses, automatically fetch token metadata, and manage imported tokens
+- **Token Canister Address Input Interface**: **Input field interface for pasting token canister addresses** with validation feedback, format checking, and error handling
+- **Token Metadata Display Interface**: **Interface to display fetched token metadata** including token name, symbol, decimals, and current balance after successful validation
+- **Imported Token List Interface**: **Display interface for all imported tokens** showing token information, current balances, and management options below the main ICP wallet
+- **Token Balance Display Interface**: **Real-time token balance display interface** with automatic updates and refresh functionality for all imported tokens
+- **Token Management Controls Interface**: **Interface controls for managing imported tokens** including remove token options, balance refresh functionality, and token details
+- **Token Import History Interface**: **Interface displaying token import history** including import timestamps, canister addresses, and import status
+- **Token Error Handling Interface**: **Error handling interface for token import failures** with clear error messages and retry options
+- **Profile Management Interface**: Complete profile editing interface with display name input, bio textarea, profile picture upload, single ICP wallet dashboard access with **properly derived AID in 64-character hexadecimal format as main identifier display** and **PID shown beneath for reference**, newsletter subscription management, referral information display, and follow integration
+- **Visible Single ICP Wallet Interface**: **Profile interface clearly displaying single ICP wallet** for authenticated users with proper 64-character hexadecimal AID formatting and reference PID display **prominently shown**
+- **Newsletter Management Interface**: Interface for managing newsletter subscription status with subscribe/unsubscribe options
+- **Profile Picture Upload Interface**: Profile picture upload component with image preview, validation feedback, and upload progress
+- **Display Name Editor**: Input field for editing display name with validation and character limits
+- **Bio Editor**: Textarea for editing user bio with character count and validation
+- **Follow Interface**: Follow/unfollow button interface on user profiles with follower/following count display and follow status indication
+- **Follow Button Display**: Clear follow/unfollow button visible on all user profiles for authenticated users
+- **Follow Count Display**: Display of accurate follower and following counts on user profiles with real-time updates
+- **Referral Dashboard Interface**: Interface for displaying user's unique referral link with copy functionality and referral statistics including referral count and unlocked reward videos
+- **Referral Link Display**: Clear display of user's unique referral link with copy button and sharing options
+- **Reward Video Counter**: Display of unlocked reward videos earned through referrals with access management
+- **Profile Editing Page**: Dedicated "Profile" or "Edit Profile" page with comprehensive profile management capabilities including newsletter subscription management, referral information, and follow integration
+- **Real-time Profile Updates**: Profile changes reflect immediately in the UI across all components
+- **Single ICP Wallet Dashboard**: Clean unified wallet dashboard displaying single ICP wallet with **properly derived AID in 64-character hexadecimal format as main identifier display** with deposit/copy buttons, **PID shown beneath for reference**, transaction history, refresh capabilities, and **imported token display section** with **dark theme and dark reddish outlines**
+- **Transaction History Interface**: Interface displaying complete transaction history for single ICP wallets including tips, paywall payments, ICP transfers, amounts, and timestamps
+- **ICP Send/Receive Interface**: Interface for sending and receiving ICP transactions between users with amount input and confirmation
+- **Feed Sorting Interface**: Sorting selection interface with options for Latest, Most Liked, and Most Commented
+- **Like Interface**: Interactive like buttons with heart icons and like count display on every post with real-time updates
+- **Rating Interface**: 5-star rating component with interactive stars and average rating display on every post
+- **Enhanced Single ICP Wallet Tipping Interface**: Integrated tipping buttons on every post using single ICP wallets with proper AIDs
+- **Self-Tipping Interface**: Interface allowing users to tip their own posts for testing purposes and functionality verification
+- **Comment Interface**: Comment sections under each post with add comment functionality and comment display
+- **Enhanced Activity Interface**: Activity tab with chronological feed of user interactions including ratings, follows, chat, forum, and referral activity
+- **Enhanced Link Management Interface**: Dynamic link addition interface with "+" button for adding new link inputs and separate paywall link section during post creation
+- **Restored Paywall Interface**: **Paywall link interface for adding and managing paywall links** with pricing settings and full paywall functionality restoration
+- **Restored Video Upload Interface**: **Dual video upload interface with separate upload areas for regular (public) videos and paywalled videos** within post creation with complete video handling
+- **Enhanced Profile Interface**: Comprehensive profile pages for authenticated users including newsletter members as registered users with statistics, activity summary, **visible single ICP wallet dashboard access** with **properly derived AID in 64-character hexadecimal format as main identifier display** and **PID shown beneath for reference**, newsletter subscription status, referral information display, profile editing access, and follow functionality
+- **Chat Interface**: Real-time chat interface with message display, input fields, chat rooms, and notification system
+- **Forum Interface**: Forum interface with thread display, reply functionality, category navigation, and thread creation
+- **Enhanced Single ICP Wallet Paywall Interface**: Enhanced paywall interface with payment options for both videos and paywall links using single ICP wallets with proper AIDs, premium content indicators, access management, and revenue display
+- **Locked Content Display Interface**: **Interface to verify all paywalled content displays with lock overlays and unlock functions** using LockedVideoOverlay and VideoSection components
+- **Premium Media Interface**: **Interface to confirm all users can view premium media after rebuild** with proper unlock functionality and payment processing
+- **Custom Pricing Interface**: Interface for **creators to set custom prices on posts or videos** with flexible pricing options and payment tracking
+- **Paywall Integration Interface**: Interface for **paywall unlocking system integration with single ICP wallet payment processing using proper AIDs** and content reveal functionality
+- **Post Paywall Interface**: Interface for **paywall compatibility with posts** including custom pricing and payment unlock display
+- **Forum Paywall Interface**: Interface for **paywall compatibility with forum submissions** including custom pricing and payment unlock display
+- **System Compatibility Interface**: Interface ensuring **paywall system compatibility with existing user tipping systems** without visual interference or conflicts
+- **Dark Theme Color Palette**: Dark background colors with dark reddish accent colors (#dc2626, #b91c1c, #991b1b) for outlines, borders, and highlights
+- **Dark Reddish Accent Colors**: Dark red accent colors for buttons, links, active states, and interactive elements
+- Responsive design optimized for desktop, tablet, and mobile devices
+- Top header navigation with unified wallet balance display and authentication status
+- **Enhanced Tab Navigation**: Navigation tabs including Home feed, Activity feed, Chat, and Forum
+- Main content area with clean post display, likes, ratings, comments, tipping elements, chat, and forum
+- **Enhanced Post Creation Modal**: **Post creation modal with media upload, link addition, paywall link section, dual video upload areas, hashtag input, and paywall options** with restored video upload functionality
+- **Enhanced Media Upload Interface**: Media upload interface with progress tracking and extension-based feedback for dual video sections
+- **Improved Video Display**: Video displays with proper error handling and retry functionality instead of generic "Failed to load media" messages
+- **Enhanced Video Interface**: Video playback interface with proper URL handling, error recovery, and user-friendly fallback messages for both public and paywalled videos
+- **Single ICP Wallet Tipping Success Feedback**: Visual feedback for successful tip transactions and balance updates using single ICP wallets with proper AIDs
+- **Enhanced Single ICP Wallet Paywall Visual Indicators**: Clear visual indicators for premium/paywalled content (videos and links) with payment buttons and access status using single ICP wallets with proper AIDs
+- **Wallet Regeneration Interface**: Admin interface for deleting existing wallet entries and regenerating new wallets with valid ICP Account ID (AID) in 64-character hexadecimal format derived from Principal ID
+- **User Data Reset Interface**: Admin interface for resetting user wallet and profile data while maintaining authentication credentials and regenerating proper wallet connections
+- **Wallet Synchronization Interface**: Admin interface to verify that regenerated wallets properly synchronize with the unified single-wallet system and display correctly in both admin panel and user profiles
+- **Wallet Receive Interface**: Interface for receiving ICP/tokens including address display, copy functionality, and QR code generation for easy deposits
+- **Wallet Address Copy Interface**: One-click copy functionality for the 64-character hexadecimal Account ID with visual feedback
+- **QR Code Display Interface**: QR code generation and display interface for wallet address to facilitate mobile deposits and transfers
+
+### Navigation System
+
+- Top header with logo, brand name, unified wallet balance display, and authentication status
+- **Enhanced Tab Navigation**: Navigation tabs including Home feed, Activity feed, Chat, and Forum
+- **Dual Authentication Integration**: Sign-in/sign-out functionality integrated into header navigation for both Internet Identity and Email authentication including newsletter member authentication as registered users
+- **Single ICP Wallet Integration**: Wallet balances prominently displayed in header navigation for authenticated users including newsletter members as registered users with automatic single ICP wallets and **properly derived AID in 64-character hexadecimal format as main identifier display** and **PID shown beneath for reference**
+- **Profile Navigation**: Profile access links for authenticated users including newsletter members as registered users with follow functionality, **visible single ICP wallet dashboard access** with **properly derived AID in 64-character hexadecimal format as main identifier display** and **PID shown beneath for reference**, newsletter subscription management, referral information display, and profile editing access
+- **Admin Navigation**: Enhanced admin panel access for designated admin users with centralized newsletter management dashboard, user management, **comprehensive post moderation with filtering, flagging, and reporting capabilities**, **functional pending registration management**, and advanced content moderation tools
+- **Chat Navigation**: Navigation to chat rooms and direct messaging
+- **Forum Navigation**: Navigation to forum categories and threads
+- Clean, minimal navigation without overwhelming interface elements
+- Mobile-responsive header that adapts to smaller screen sizes
+- Consistent navigation patterns throughout the application
+
+### Component Architecture
+
+- **Enhanced AppInitializer**: Main initialization component with retry logic for backend canister connection failures and Internet Computer initialization that ensures backend data loads before rendering UI components, safely connects to Chrpz canister, and displays home feed even if identity is delayed
+- **ReactRouterSetup**: Proper React Router setup component to ensure routing works correctly and prevents blank screens
+- **BackendActorInitializer**: Reliable backend actor initialization component with proper error handling and retry mechanisms
+- **ErrorBoundary**: Comprehensive error boundary component for catching and handling component failures gracefully with retry buttons
+- **LoadingFallback**: Loading fallback component for displaying loading states during initialization with retry capability
+- **ConnectionErrorHandler**: Component for handling backend connection errors with retry functionality and manual retry options
+- **ProgressiveLoader**: Component for progressive loading of application features with retry logic
+- **ManualRetryButton**: Visual retry button component for manual connection reload when initialization fails
+- **InitializationErrorLogger**: Component for logging initialization errors to console for debugging purposes
+- **SafeFallbackUI**: Component that provides limited access when initialization fails completely
+- **ReliableUIDisplay**: Component that ensures UI reliably displays content instead of showing blank screens
+- **ComponentErrorBoundary**: Individual error boundary components around major components to prevent single component failures from crashing the entire application
+- **PartialDataLoader**: Component that allows UI to render with partial data when some backend calls fail
+- **DualAuthentication**: Dual authentication component supporting both Internet Identity and Email authentication with newsletter subscription option
+- **EmailAuthentication**: Email sign-up and sign-in component with email validation, password management, and newsletter subscription option
+- **InternetIdentityAuthentication**: Internet Identity authentication component with newsletter subscription option
+- **AuthenticationMethodSelector**: Component for choosing between Internet Identity and Email authentication methods
+- **WorkingAdminApprovalInterface**: **Functional component** for displaying pending registration status and admin approval notifications with **working approve/reject buttons**
+- **FunctionalPendingRegistrationManager**: **Working admin component** for viewing and managing pending email registrations with **functional approve and reject buttons** that properly process registration decisions
+- **RegistrationStatusDisplay**: Component for displaying registration status (pending, approved, rejected) to users
+- **NewsletterSubscriptionOption**: Component for optional newsletter subscription during both Internet Identity and Email sign-in with automatic user registration
+- **NewsletterMemberAuth**: Authentication component for newsletter members as registered users using generated credentials with validation and error handling
+- **RegistrationSuccess**: Success confirmation component with automatic single ICP wallet linking notification, newsletter subscription confirmation, automatic user registration notification, and profile initialization
+- **ComprehensiveAdminModerationPanel**: **Complete admin moderation component** with comprehensive post management tools including post filtering, individual post actions, and proper admin role permissions
+- **RestoredPostModerationTools**: **Re-enabled post moderation tools component in AdminPanel** to list, flag, unflag, and delete posts with full functionality restoration
+- **PostManagementDashboard**: **Admin component displaying complete list of posts** with filtering options, status indicators, and individual post management actions
+- **PostFilteringInterface**: **Advanced filtering component** allowing admins to filter posts by All Posts, Reported Posts, Flagged Posts, and other criteria
+- **IndividualPostActions**: **Direct action component** for each post including Delete button, Flag/Unflag toggle, and Review Reports option
+- **PostStatusIndicators**: **Visual status indicator components** for posts showing normal, flagged, reported, and deleted states with appropriate styling
+- **ReportReviewInterface**: **Component for reviewing post reports** with report details, reporter information, and resolution actions
+- **ModerationHistoryInterface**: **Component displaying moderation history** for posts including all admin actions, timestamps, and action details
+- **AdminRoleVerification**: **Component that verifies admin role** ensuring only authenticated admin users can access moderation features
+- **BulkModerationInterface**: **Component for performing bulk operations** on multiple posts with selection checkboxes and bulk action buttons
+- **ModerationStatisticsDashboard**: **Dashboard component showing moderation statistics** including posts moderated, reports processed, and admin activity metrics
+- **EnhancedAdminPanel**: Advanced admin management dashboard with comprehensive moderation tools including centralized newsletter management dashboard, referral system management, **comprehensive post moderation with filtering, flagging, and reporting capabilities**, **functional pending registration management with working approve/reject buttons**, and user management
+- **UserManagementTab**: Admin component for viewing and managing authenticated users with account management tools and deletion capabilities
+- **UserDeletion**: Admin component for deleting user accounts with proper confirmation dialogs and data cleanup procedures
+- **CentralizedNewsletterDashboard**: Comprehensive admin component for centralized newsletter management including creation, editing, scheduling, sending, and analytics
+- **NewsletterCreationInterface**: Admin component for creating new newsletters with rich text editing and preview functionality
+- **NewsletterEditingInterface**: Admin component for editing existing newsletter drafts and templates with version control
+- **NewsletterSchedulingInterface**: Admin component for scheduling newsletter delivery with date/time management and timezone handling
+- **NewsletterSendingInterface**: Admin component for sending newsletters with delivery confirmation and status tracking
+- **NewsletterAnalyticsInterface**: Component for newsletter performance analytics including open rates, click rates, and engagement metrics
+- **SubscriberManagementInterface**: Comprehensive component for viewing, filtering, and managing newsletter subscribers with bulk operations
+- **SubscriberFilteringInterface**: Component for filtering subscribers by various criteria including subscription date and engagement level
+- **SubscriberRemovalInterface**: Component for removing subscribers with confirmation dialogs and bulk removal options
+- **ComprehensiveTokenImportInterface**: **Working token import component within the wallet dashboard** allowing users to paste token canister addresses, validate addresses, fetch metadata, and manage imported tokens
+- **TokenCanisterAddressInput**: **Input component for pasting token canister addresses** with validation feedback, format checking, and error handling
+- **TokenMetadataDisplay**: **Component to display fetched token metadata** including name, symbol, decimals, and balance after successful validation
+- **ImportedTokenList**: **Component for displaying all imported tokens** with token information, balances, and management controls below the main ICP wallet
+- **TokenBalanceUpdater**: **Component for real-time token balance updates** via ICP canister calls with automatic refresh functionality
+- **TokenManagementControls**: **Component for managing imported tokens** including remove token functionality, balance refresh controls, and token details
+- **TokenImportHistory**: **Component displaying token import history** including import timestamps, canister addresses, and import status
+- **TokenErrorHandler**: **Component for handling token import errors** with clear error messages and retry options
+- **ProfileEditingPage**: Complete profile editing page with display name, bio, profile picture, **visible single ICP wallet dashboard access** with **properly derived AID in 64-character hexadecimal format as main identifier display** and **PID shown beneath for reference**, newsletter subscription management, referral information display, and follow integration
+- **VisibleSingleICPWalletDisplay**: **Component for clearly displaying single ICP wallet** for authenticated users with proper 64-character hexadecimal AID formatting and reference PID display **prominently shown**
+- **NewsletterManagement**: Component for managing newsletter subscription status with subscribe/unsubscribe functionality
+- **ProfilePictureUpload**: Component for uploading and managing profile pictures with validation and preview
+- **DisplayNameEditor**: Component for editing display name with validation and real-time updates
+- **BioEditor**: Component for editing user bio with character limits and validation
+- **FollowButton**: Follow/unfollow button component for user profiles with follow status indication and count updates
+- **FollowCountDisplay**: Component for displaying accurate follower and following counts with real-time updates
+- **FollowStatusIndicator**: Component for showing follow relationship status between users
+- **ReferralDashboard**: Component for displaying referral statistics, unique referral link, and unlocked reward videos
+- **ReferralLinkDisplay**: Component for displaying and copying user's unique referral link
+- **RewardVideoCounter**: Component for displaying and managing unlocked reward videos earned through referrals
+- **ProfileManagementInterface**: Comprehensive profile management interface integrating all profile editing capabilities including newsletter subscription management, referral information, and follow integration
+- **TopHeader**: Main navigation with logo, branding, unified wallet balance display, authentication status, and profile/admin links
+- **EnhancedTabNavigation**: Enhanced tab navigation component for switching between Home, Activity, Chat, and Forum
+- **FeedSortingSelector**: Sorting selection component for choosing Latest, Most Liked, or Most Commented sorting
+- **MainContent**: Central content area with post creation and feed display
+- **ActivityFeed**: Enhanced activity tab component displaying user interactions including referral and follow activity
+- **PostCard**: Individual post display with media, links, hashtags, like buttons, rating component, tipping buttons, comments section, paywall indicators, and author information
+- **LikeButton**: Interactive like component with heart icon, like count display, and like/unlike functionality with real-time updates
+- **RatingComponent**: Interactive 5-star rating component with star selection, average rating display, and rating count
+- **CommentSection**: Comment display and creation interface for each post
+- **CommentCard**: Individual comment display with author, timestamp, and content
+- **AddCommentForm**: Comment creation form for authenticated users
+- **EnhancedUserProfile**: Comprehensive profile page component for authenticated users including newsletter members as registered users with statistics, **visible single ICP wallet dashboard access** with **properly derived AID in 64-character hexadecimal format as main identifier display** and **PID shown beneath for reference**, newsletter subscription status, referral information display, profile editing access, and follow functionality
+- **SingleICPWalletDashboard**: Component for displaying unified wallet dashboard with single ICP wallet **properly derived AID in 64-character hexadecimal format as main identifier display** with deposit/copy buttons, **PID shown beneath for reference**, transaction history, refresh capabilities, and **imported token display section** with **dark theme and dark reddish outlines**
+- **TransactionHistory**: Component for displaying complete transaction history for single ICP wallets including tips, paywall payments, ICP transfers, and timestamps
+- **ICPSendReceiveInterface**: Component for sending and receiving ICP transactions between users with amount input and confirmation
+- **ProfileEditor**: Enhanced profile editing interface for authenticated users including newsletter members as registered users including profile picture upload, display name editing, bio editing, **visible single ICP wallet dashboard access** with **properly derived AID in 64-character hexadecimal format as main identifier display** and **PID shown beneath for reference**, newsletter subscription management, referral information display, and follow integration
+- **EnhancedSingleICPWalletTippingButton**: Interactive tipping component with ICP transaction processing for posts using single ICP wallets with proper AIDs
+- **SelfTippingButton**: Component allowing users to tip their own posts for testing purposes and functionality verification
+- **EnhancedSingleICPWalletDisplay**: Component showing current ICP balance for authenticated users including newsletter members as registered users with automatic single ICP wallets and **properly derived AID in 64-character hexadecimal format as main identifier display** and **PID shown beneath for reference**
+- **SingleICPWalletTipAmountModal**: Modal for selecting tip amounts and confirming transactions for posts using single ICP wallets with proper AIDs
+- **EnhancedLinkManager**: Component for dynamically adding and managing both regular links and paywall links during post creation
+- **RestoredPaywallLinkSection**: **Component for adding and managing paywall links** with pricing settings and full paywall functionality restoration
+- **RestoredDualVideoUpload**: **Component for managing both public and paywalled video upload sections** with complete video handling and restoration
+- **CreatePostModal**: **Post creation modal with restored video upload functionality, media upload, link addition, paywall link section, dual video upload areas, hashtag input, and paywall options**
+- **EditPostModal**: **Post editing modal with restored video upload functionality** for both public and paywalled video sections
+- **PaywallTab**: **Restored PaywallTab component** for managing paywall content and settings
+- **VideoPaywallUploader**: **Restored VideoPaywallUploader component** for uploading paywalled video content
+- **EnhancedPostMedia**: Component for displaying images and videos in posts with proper video URL handling and enhanced error recovery for dual video sections
+- **ReliableVideoPlayer**: Component for video rendering with proper src URL derivation from backend blob URLs and comprehensive error handling for both public and paywalled videos
+- **PublicBlobURLManager**: Component for managing publicly accessible blob URL access with reliable video serving
+- **UploadProgress**: Component for tracking and displaying upload progress with extension-based feedback
+- **HashtagsDisplay**: Component for displaying post hashtags with clickable links
+- **EnhancedMediaErrorHandler**: Component for handling media load failures with retry options and user-friendly fallback messages
+- **FollowersList**: Component for displaying follower/following lists on profiles
+- **ProfileStatistics**: Component for displaying comprehensive profile statistics and activity summary including referral and follow statistics
+- **ChatInterface**: Real-time chat component with message display, input, and room management
+- **ChatRoom**: Individual chat room component with message history and real-time updates
+- **MessageCard**: Individual chat message display component
+- **ForumInterface**: Forum component with thread display, category navigation, and thread creation
+- **ForumThread**: Individual forum thread component with replies and interaction
+- **ThreadReply**: Individual forum reply component
+- **EnhancedSingleICPWalletPaywallInterface**: Enhanced paywall component with payment processing using single ICP wallets with proper AIDs and access management for both videos and paywall links
+- **PaywallVideoPlayer**: Protected video player component for premium content
+- **PaywallLinkAccess**: Component for managing access to paywall links after payment
+- **SingleICPWalletPaymentModal**: Payment processing modal for accessing premium content (videos and links) using single ICP wallets with proper AIDs
+- **LockedVideoOverlay**: **Component for displaying lock overlays on paywalled content** with unlock functions and payment processing
+- **VideoSection**: **Component for managing video sections** with lock overlays and unlock functionality for paywalled content
+- **Custom Pricing Interface**: Component for **creators to set custom prices on posts or videos** with flexible pricing options and payment tracking
+- **Paywall Integration Interface**: Component for **paywall unlocking system integration with single ICP wallet payment processing using proper AIDs** and content reveal functionality
+- **Post Paywall Interface**: Component for **paywall compatibility with posts** including custom pricing and payment unlock display
+- **Forum Paywall Interface**: Component for **paywall compatibility with forum submissions** including custom pricing and payment unlock display
+- **System Compatibility Interface**: Component ensuring **paywall system compatibility with existing user tipping systems** without visual interference or conflicts
+- **WalletRegenerationInterface**: Admin component for deleting existing wallet entries and regenerating new wallets with valid ICP Account ID (AID) in 64-character hexadecimal format derived from Principal ID
+- **UserDataResetInterface**: Admin component for resetting user wallet and profile data while maintaining authentication credentials and regenerating proper wallet connections
+- **WalletSynchronizationInterface**: Admin component to verify that regenerated wallets properly synchronize with the unified single-wallet system and display correctly in both admin panel and user profiles
+- **WalletReceiveInterface**: Component for receiving ICP/tokens including address display, copy functionality, and QR code generation
+- **WalletAddressCopy**: Component for one-click copying of the 64-character hexadecimal Account ID with visual feedback
+- **QRCodeDisplay**: Component for generating and displaying QR codes for wallet addresses to facilitate mobile deposits
+
+## Mobile Responsive Design
+
+- Touch-optimized interface elements with appropriate tap targets for mobile interaction
+- Responsive navigation that adapts to mobile screen sizes with unified wallet balance display and authentication status
+- Mobile-first design approach ensuring optimal experience on smaller screens
+- Optimized typography and spacing for readability on mobile devices
+- **Mobile Dark Theme Interface**: Mobile-optimized dark theme interface with dark reddish outlines and proper contrast for mobile viewing
+- **Mobile Initialization Interface**: Mobile-optimized initialization loading interface with touch-friendly retry options and manual retry button
+- **Mobile Error Handling**: Mobile-friendly error boundary interface with appropriate touch targets and clear messaging
+- **Mobile Connection Error Interface**: Mobile-optimized connection error interface with touch-friendly retry mechanisms
+- **Mobile Fallback UI**: Mobile-friendly fallback UI components for graceful degradation
+- **Mobile Reliable UI Display**: Mobile-optimized interface that ensures UI reliably displays content instead of showing blank screens
+- **Mobile Dual Authentication Interface**: Mobile-optimized dual authentication interface with touch-friendly inputs for both Internet Identity and Email authentication with newsletter subscription option
+- **Mobile Email Authentication Interface**: Mobile-friendly email sign-up and sign-in interface with touch-optimized inputs and validation
+- **Mobile Working Admin Approval Interface**: **Mobile-optimized functional admin approval interface** with touch-friendly controls for managing pending registrations with **working approve/reject buttons**
+- **Mobile Newsletter Subscription Interface**: Mobile-friendly newsletter subscription option during both Internet Identity and Email sign-in
+- **Mobile Newsletter Member Auth**: Mobile-friendly newsletter member authentication interface as registered users with touch-optimized controls
+- **Mobile Registration Success**: Mobile-optimized success confirmation with clear automatic single ICP wallet linking notification, newsletter subscription confirmation, and automatic user registration notification
+- **Mobile Comprehensive Admin Moderation Interface**: **Mobile-optimized complete admin moderation interface** with touch-friendly controls for post management, filtering, flagging, and reporting capabilities
+- **Mobile Restored Post Moderation Interface**: **Mobile-optimized re-enabled post moderation tools interface** with touch-friendly controls for listing, flagging, unflagging, and deleting posts
+- **Mobile Post Management Dashboard**: **Mobile-friendly admin interface for post management** with touch-optimized filtering options, status indicators, and individual post actions
+- **Mobile Post Filtering Interface**: **Mobile-optimized post filtering interface** with touch-friendly criteria selection for All, Reported, Flagged posts
+- **Mobile Individual Post Actions Interface**: **Mobile-friendly direct post action interface** with touch-optimized Delete, Flag/Unflag, and Review Reports buttons
+- **Mobile Report Review Interface**: **Mobile-optimized report review interface** with touch-friendly report details and resolution actions
+- **Mobile Moderation History Interface**: **Mobile-friendly moderation history interface** with touch-optimized display of admin actions and timestamps
+- **Mobile Bulk Moderation Interface**: **Mobile-optimized bulk operations interface** with touch-friendly selection and bulk action controls
+- **Mobile Moderation Statistics Interface**: **Mobile-friendly moderation statistics dashboard** with touch-optimized data visualization and navigation
+- **Mobile Admin Panel Interface**: Mobile-optimized admin management dashboard with touch-friendly controls for user management, newsletter management, moderation tools, **comprehensive post moderation with filtering, flagging, and reporting capabilities**, **functional pending registration management with working approve/reject buttons**, and user management
+- **Mobile User Management**: Mobile-friendly user management interface with touch-optimized account management and deletion capabilities
+- **Mobile Newsletter Management Dashboard**: Mobile-optimized centralized newsletter management dashboard with touch-friendly controls for creation, editing, scheduling, and sending
+- **Mobile Newsletter Creation Interface**: Mobile-friendly newsletter creation interface with touch-optimized rich text editing and preview functionality
+- **Mobile Newsletter Analytics Interface**: Mobile-optimized newsletter analytics dashboard with touch-friendly navigation and data visualization
+- **Mobile Subscriber Management Interface**: Mobile-friendly subscriber management interface with touch-optimized filtering, search, and bulk operations
+- **Mobile Comprehensive Token Import Interface**: **Mobile-optimized working token import interface** with touch-friendly canister address input, validation feedback, and token management controls
+- **Mobile Token Canister Address Input**: **Mobile-friendly input for pasting token canister addresses** with touch-optimized keyboard, validation feedback, and error handling
+- **Mobile Token Metadata Display**: **Mobile-optimized display for token metadata** with touch-friendly layout and clear information presentation
+- **Mobile Imported Token List**: **Mobile-friendly display for imported tokens** with touch-optimized controls and responsive layout below the main ICP wallet
+- **Mobile Token Balance Display**: **Mobile-optimized real-time token balance display** with touch-friendly refresh controls and clear balance information
+- **Mobile Token Management Controls**: **Mobile-friendly token management interface** with touch-optimized controls for removing tokens, refreshing balances, and viewing token details
+- **Mobile Token Import History**: **Mobile-optimized token import history interface** with touch-friendly navigation and import status display
+- **Mobile Token Error Handling**: **Mobile-friendly token error handling interface** with touch-optimized error messages and retry options
+- **Mobile Profile Management**: Mobile-optimized profile editing interface with touch-friendly inputs for display name, bio, profile picture upload, **visible single ICP wallet dashboard access** with **properly derived AID in 64-character hexadecimal format as main identifier display** and **PID shown beneath for reference**, newsletter subscription management, referral information display, and follow integration
+- **Mobile Visible Single ICP Wallet Interface**: **Mobile-friendly interface for clearly displaying single ICP wallet** for authenticated users with proper 64-character hexadecimal AID formatting and reference PID display **prominently shown**
+- **Mobile Newsletter Management**: Mobile-friendly newsletter subscription management with touch-optimized controls
+- **Mobile Profile Picture Upload**: Mobile-friendly profile picture upload with camera access and gallery selection
+- **Mobile Profile Editing**: Mobile-optimized profile editing page with responsive layout and touch-friendly controls
+- **Mobile Follow Interface**: Mobile-optimized follow/unfollow buttons and follower count display with touch-friendly interaction
+- **Mobile Follow Button Display**: Mobile-friendly follow/unfollow button visible on user profiles with touch-optimized controls
+- **Mobile Follow Count Display**: Mobile-optimized display of follower and following counts with touch-friendly navigation
+- **Mobile Referral Dashboard**: Mobile-friendly referral dashboard with touch-optimized referral link copying and reward video management
+- **Mobile Referral Interface**: Mobile-optimized referral link display and sharing with touch-friendly controls
+- Mobile-optimized user interface patterns for post creation, media upload, link management, **paywall link management**, **dual video upload**, liking, rating, following, tipping, commenting, feed sorting, wallet management, chat, forum, enhanced paywall, referral system, newsletter management, and authentication
+- **Enhanced Responsive Media Display**: Responsive media display with proper video URL handling and error recovery on mobile devices for dual video sections
+- **Mobile Single ICP Wallet Dashboard**: Mobile-friendly unified wallet dashboard with touch-optimized interface for single ICP wallet **properly derived AID in 64-character hexadecimal format as main identifier display** with deposit/copy buttons, **PID shown beneath for reference**, transaction history, refresh capabilities, and **imported token display section** with **dark theme and dark reddish outlines**
+- **Mobile Transaction History Interface**: Mobile-optimized transaction history display with touch-friendly navigation and transaction details
+- **Mobile ICP Send/Receive Interface**: Mobile-optimized interface for sending and receiving ICP transactions with touch-friendly amount input and confirmation
+- **Mobile Like Interface**: Mobile-optimized like buttons and interaction feedback with real-time updates
+- **Mobile Rating Interface**: Mobile-optimized 5-star rating component with touch-friendly star selection
+- **Mobile Activity Interface**: Mobile-friendly activity feed with touch-optimized navigation including referral and follow activity
+- **Enhanced Mobile Link Management**: Mobile-optimized link addition and management interface for both regular and paywall links
+- **Mobile Restored Paywall Interface**: **Mobile-friendly paywall link management** with touch-optimized pricing settings and full paywall functionality restoration
+- **Mobile Restored Video Upload Interface**: **Mobile-optimized dual video upload interface** with touch-friendly controls for both public and paywalled video sections
+- **Mobile Comment Interface**: Mobile-optimized comment creation and display
+- **Mobile Feed Sorting Interface**: Mobile-friendly sorting selection for Latest, Most Liked, and Most Commented
+- **Enhanced Mobile Profile Interface**: Mobile-friendly comprehensive profile pages with statistics, **visible single ICP wallet dashboard access** with **properly derived AID in 64-character hexadecimal format as main identifier display** and **PID shown beneath for reference**, newsletter subscription status, referral information display, profile editing access, and follow functionality
+- **Mobile Chat Interface**: Mobile-optimized chat interface with touch-friendly messaging and room navigation
+- **Mobile Forum Interface**: Mobile-friendly forum interface with touch-optimized thread navigation and reply functionality
+- **Enhanced Mobile Single ICP Wallet Paywall Interface**: Mobile-optimized enhanced paywall interface with touch-friendly payment processing using single ICP wallets with proper AIDs for both videos and paywall links
+- **Mobile Locked Content Display Interface**: **Mobile-optimized interface for paywalled content with lock overlays and unlock functions** using touch-friendly controls
+- **Mobile Premium Media Interface**: **Mobile-friendly interface for viewing premium media after unlock** with touch-optimized playback controls
+- **Mobile Single ICP Wallet Tipping Interface**: Mobile-optimized ICP tipping interface with touch-friendly amount input and transaction processing using single ICP wallets with proper AIDs
+- **Mobile Self-Tipping Interface**: Mobile-optimized interface allowing users to tip their own posts for testing purposes with touch-friendly controls
+- **Mobile Custom Pricing Interface**: Mobile-optimized interface for **creators to set custom prices on posts or videos** with touch-friendly pricing options and payment tracking
+- **Mobile Paywall Integration Interface**: Mobile-friendly interface for **paywall unlocking system integration with single ICP wallet payment processing using proper AIDs** and content reveal functionality
+- **Mobile Post Paywall Interface**: Mobile-optimized interface for **paywall compatibility with posts** including custom pricing and payment unlock display
+- **Mobile Forum Paywall Interface**: Mobile-friendly interface for **paywall compatibility with forum submissions** including custom pricing and payment unlock display
+- **Mobile System Compatibility Interface**: Mobile-optimized interface ensuring **paywall system compatibility with existing user tipping systems** without visual interference or conflicts
+- Mobile-friendly forms and input handling with appropriate keyboard types
+- Touch-friendly media upload, link management, **paywall link management**, **dual video upload**, liking, rating, following, tipping, commenting, feed sorting, wallet management, profile editing, chat, forum, enhanced paywall, referral system, newsletter management, and authentication interfaces
+- **Reliable Mobile Video Upload**: Mobile-optimized video upload with extension-based detection and progress tracking for dual video sections
+- **Enhanced Mobile Video Playback**: Mobile-optimized video playback with proper URL handling and comprehensive error recovery for both public and paywalled videos
+- **Mobile Wallet Regeneration Interface**: Mobile-optimized admin interface for deleting existing wallet entries and regenerating new wallets with touch-friendly controls and confirmation dialogs
+- **Mobile User Data Reset Interface**: Mobile-friendly admin interface for resetting user wallet and profile data with touch-optimized controls and proper confirmation
+- **Mobile Wallet Synchronization Interface**: Mobile-optimized admin interface to verify wallet synchronization with touch-friendly verification controls
+- **Mobile Wallet Receive Interface**: Mobile-optimized interface for receiving ICP/tokens with touch-friendly address display, copy functionality, and QR code generation
+- **Mobile Wallet Address Copy**: Mobile-optimized one-click copy functionality for wallet addresses with touch-friendly feedback
+- **Mobile QR Code Display**: Mobile-friendly QR code generation and display for wallet addresses with touch-optimized sharing
+
+## Performance and Optimization
+
+- Optimized React Query implementation with intelligent caching and background updates
+- Debounced search and validation queries to reduce backend load
+- Efficient component architecture with reusable UI elements and minimal re-renders
+- Blob storage-based media handling for improved performance
+- Smart data fetching with proper loading states and error handling
+- Optimistic UI updates for likes, ratings, follows, tips, comments, profile updates, chat messages, forum posts, referral activities, newsletter subscriptions, and other user interactions
+- Enhanced media loading for improved initial page load performance
+- Clean component separation for maintainable and scalable codebase
+- **Enhanced Initialization Performance**: Optimized app initialization with efficient backend data preloading, retry logic, and minimal render blocking
+- **React Router Performance**: Optimized React Router implementation to ensure fast navigation and prevent blank screens
+- **Backend Actor Performance**: Optimized backend actor initialization with efficient canister connections and proper error handling
+- **Error Boundary Performance**: Efficient error boundary implementation with minimal performance impact and retry capability
+- **Safe Backend Connection Performance**: Optimized backend connection performance with safe Chrpz canister connections and proper error handling
+- **Home Feed Fallback Performance**: Optimized home feed fallback performance ensuring quick access even when identity is delayed
+- **Progressive Loading Performance**: Optimized progressive loading system that prioritizes critical components with retry logic
+- **Connection Retry Performance**: Efficient retry logic with exponential backoff and maximum retry limits to prevent excessive backend load
+- **Reliable UI Performance**: Optimized UI display performance ensuring content reliably appears instead of blank screens
+- **Component Error Boundary Performance**: Efficient individual error boundary implementation with minimal performance impact
+- **Partial Data Loading Performance**: Optimized partial data loading system that allows UI to render efficiently with available data
+- **Dual Authentication Performance**: Optimized dual authentication processing with efficient session management and automatic single ICP wallet linking with proper AID derivation
+- **Email Authentication Performance**: Optimized email authentication operations with efficient password hashing, validation, and session management
+- **Working Admin Approval Performance**: **Optimized functional admin approval operations** with efficient pending registration management, **working approval processing with functional approve/reject buttons**, and notification processing
+- **Comprehensive Admin Moderation Performance**: **Optimized complete admin moderation operations** with efficient post management, filtering, flagging, reporting, and bulk operations
+- **Restored Post Moderation Performance**: **Optimized re-enabled post moderation operations** with efficient listing, flagging, unflagging, and deleting functionality
+- **Post Management Performance**: **Optimized post management operations** with efficient filtering, status tracking, and individual post actions
+- **Post Filtering Performance**: **Optimized post filtering operations** with efficient criteria-based searching and status-based filtering
+- **Individual Post Actions Performance**: **Optimized individual post action operations** including efficient delete, flag/unflag, and report review processing
+- **Report Review Performance**: **Optimized report review operations** with efficient report processing and resolution actions
+- **Moderation History Performance**: **Optimized moderation history operations** with efficient tracking and retrieval of admin actions
+- **Bulk Moderation Performance**: **Optimized bulk moderation operations** with efficient multi-post processing and status updates
+- **Moderation Statistics Performance**: **Optimized moderation statistics operations** with efficient calculation and display of moderation metrics
+- **Newsletter Management Performance**: Optimized centralized newsletter management operations with efficient creation, editing, scheduling, sending, and analytics processing
+- **Subscriber Management Performance**: Optimized subscriber management operations with efficient filtering, search, bulk operations, and data handling
+- **Newsletter Performance**: Optimized newsletter subscription management with efficient email validation, subscription processing, and automatic user registration
+- **Newsletter Member Performance**: Optimized newsletter member authentication as registered users and single ICP wallet assignment with proper AID derivation with efficient user identity generation
+- **Comprehensive Token Import Performance**: **Optimized token import operations** with efficient canister address validation, token metadata fetching via ICP canister calls, balance retrieval, and persistent token storage
+- **Token Canister Validation Performance**: **Optimized canister address validation** with efficient format checking and error handling
+- **Token Metadata Fetching Performance**: **Optimized automatic token metadata fetching** with efficient ICP canister calls and caching
+- **Token Balance Update Performance**: **Optimized real-time token balance updates** with efficient ICP canister calls and minimal backend load
+- **Persistent Token Storage Performance**: **Optimized token storage operations** with efficient data management and retrieval
+- **Token Import History Performance**: **Optimized token import history operations** with efficient tracking and retrieval of import records
+- **Token Balance Caching Performance**: **Optimized token balance caching** with efficient cache management and automatic refresh
+- **Profile Update Performance**: Optimized profile editing with real-time updates and efficient data persistence
+- **Profile Picture Performance**: Optimized profile picture upload and display with efficient blob storage and caching
+- **Follow System Performance**: Optimized follow/unfollow operations with efficient relationship management, count updates, and real-time UI updates
+- **Follow Count Performance**: Optimized follower and following count calculations with efficient caching and real-time updates
+- **Referral System Performance**: Optimized referral link generation, tracking, and reward management with efficient data operations
+- **Version 68 Compatible Single ICP Wallet Performance**: Optimized automatic single ICP wallet operations with proper AID derivation matching Version 68 specifications with efficient balance management, transaction processing, and transaction history tracking
+- **Transaction History Performance**: Optimized transaction history retrieval and display with efficient data management and caching
+- **ICP Send/Receive Performance**: Optimized ICP transaction processing with proper AIDs with efficient validation, confirmation, and balance updates
+- **Reliable Video Loading**: Enhanced video loading with proper URL generation and comprehensive error handling for dual video sections
+- **Optimized Media Performance**: Optimized media processing ensuring reliable video serving with publicly accessible URLs for both public and paywalled videos
+- **Enhanced Blob Access**: Enhanced blob URL access with proper video serving and error recovery
+- **Restored Video Upload Performance**: **Optimized video upload performance for both public and paywalled video sections** using current blob upload logic from mediaUpload.ts
+- **Paywall Content Performance**: **Optimized paywall content operations** with efficient link management, video paywall processing, and access control
+- **Efficient Sorting Performance**: Optimized post sorting operations for Latest, Most Liked, and Most Commented views
+- **Chat Performance**: Optimized real-time chat with efficient message loading and caching
+- **Forum Performance**: Optimized forum thread loading and reply management
+- **Enhanced Single ICP Wallet Paywall Performance**: Optimized paywall processing and premium content delivery for both videos and paywall links using single ICP wallets with proper AIDs
+- **Locked Content Performance**: **Optimized performance for paywalled content with lock overlays and unlock functions** ensuring smooth user experience
+- **Premium Media Performance**: **Optimized performance for premium media viewing after unlock** with efficient playback and access management
+- **Custom Pricing Performance**: Optimized performance for **creators to set custom prices on posts or videos** with efficient pricing management and payment tracking
+- **Paywall Integration Performance**: Optimized performance for **paywall unlocking system integration with single ICP wallet payment processing using proper AIDs** and content reveal functionality
+- **Post Paywall Performance**: Optimized performance for **paywall compatibility with posts** including custom pricing and payment unlock processing
+- **Forum Paywall Performance**: Optimized performance for **paywall compatibility with forum submissions** including custom pricing and payment unlock processing
+- **System Compatibility Performance**: Optimized performance ensuring **paywall system compatibility with existing user tipping systems** without performance interference or conflicts
+- **Single ICP Wallet Connection Performance**: Optimized automatic single ICP wallet connection operations with proper AID derivation with efficient linking and balance management for users including newsletter members as registered users
+- **Self-Tipping Performance**: Optimized self-tipping operations allowing users to tip their own posts with efficient transaction processing
+- **Wallet Regeneration Performance**: Optimized wallet regeneration operations with efficient deletion, regeneration, and synchronization processing
+- **User Data Reset Performance**: Optimized user data reset operations with efficient wallet deletion, profile reset, and regeneration processing while maintaining authentication credentials
+- **Wallet Synchronization Performance**: Optimized wallet synchronization verification with efficient system integration checks and display updates
+
+## Design System
+
+- **Global Dark Theme with Dark Reddish Outlines**: Complete dark theme design system with dark background colors (#1a1a1a, #2d2d2d, #3d3d3d) and dark reddish accent colors (#dc2626, #b91c1c, #991b1b) for outlines, borders, highlights, and interactive elements
+- **Dark Reddish Accent System**: Consistent dark red accent color palette for buttons, links, active states, hover effects, and focus indicators
+- **Dark Theme Typography**: Typography system optimized for dark backgrounds with proper contrast ratios and readability
+- **Dark Theme Component Styling**: All UI components styled with dark theme colors and dark reddish accents for consistent visual hierarchy
+- Minimalistic design approach with clean layouts and cosmic-themed elements
+- Clean typography with proper hierarchy and readability
+- Glass-morphism effects with subtle transparency and backdrop blur adapted for dark theme
+- Cosmic gradient containers for logo and brand elements adapted for dark theme
+- Consistent spacing and padding throughout the interface
+- Professional user experience with intuitive interaction patterns
+- **Enhanced Initialization UI Elements**: Loading, initialization, and retry interface elements integrated seamlessly with dark theme design language
+- **React Router UI Elements**: React Router interface elements integrated seamlessly with dark theme design language
+- **Backend Actor UI Elements**: Backend actor interface elements integrated seamlessly with dark theme design language
+- **Error Boundary UI Elements**: Error handling and fallback interface elements integrated seamlessly with dark theme design language
+- **Connection Error UI Elements**: Connection error interface elements with retry functionality integrated seamlessly with dark theme design language
+- **Manual Retry UI Elements**: Manual retry button and interface elements integrated seamlessly with dark theme design language
+- **Reliable UI Elements**: UI elements that ensure content reliably displays instead of showing blank screens integrated seamlessly with dark theme design language
+- **Component Error Boundary UI Elements**: Individual error boundary interface elements integrated seamlessly with dark theme design language
+- **Partial Data Loading UI Elements**: Partial data loading interface elements integrated seamlessly with dark theme design language
+- **Dual Authentication UI Elements**: Dual authentication interface elements for both Internet Identity and Email authentication including newsletter subscription option integrated seamlessly with dark theme design language
+- **Email Authentication UI Elements**: Email sign-up and sign-in interface elements with validation and password management integrated seamlessly with dark theme design language
+- **Working Admin Approval UI Elements**: **Functional admin approval interface elements** for managing pending registrations with **working approve/reject buttons** integrated seamlessly with dark theme design language
+- **Newsletter Member Auth UI Elements**: Newsletter member authentication interface elements as registered users integrated seamlessly with dark theme design language
+- **Newsletter Subscription UI Elements**: Newsletter subscription interface elements with automatic user registration integrated seamlessly with dark theme design language
+- **Registration Success UI Elements**: Registration success confirmation elements integrated seamlessly with dark theme design language
+- **Comprehensive Admin Moderation UI Elements**: **Complete admin moderation interface elements** including post management, filtering, flagging, reporting, and bulk operations integrated seamlessly with dark theme design language
+- **Restored Post Moderation UI Elements**: **Re-enabled post moderation tools interface elements** for listing, flagging, unflagging, and deleting posts integrated seamlessly with dark theme design language
+- **Post Management Dashboard UI Elements**: **Admin interface elements for post management** with filtering options, status indicators, and individual post actions integrated seamlessly with dark theme design language
+- **Post Filtering UI Elements**: **Advanced post filtering interface elements** with criteria selection integrated seamlessly with dark theme design language
+- **Individual Post Actions UI Elements**: **Direct post action interface elements** including Delete, Flag/Unflag, and Review Reports buttons integrated seamlessly with dark theme design language
+- **Post Status Indicator UI Elements**: **Visual status indicator elements** for posts showing normal, flagged, reported, and deleted states integrated seamlessly with dark theme design language
+- **Report Review UI Elements**: **Report review interface elements** with report details and resolution actions integrated seamlessly with dark theme design language
+- **Moderation History UI Elements**: **Moderation history interface elements** displaying admin actions and timestamps integrated seamlessly with dark theme design language
+- **Bulk Moderation UI Elements**: **Bulk operations interface elements** with selection and bulk action controls integrated seamlessly with dark theme design language
+- **Moderation Statistics UI Elements**: **Moderation statistics dashboard elements** with data visualization integrated seamlessly with dark theme design language
+- **Enhanced Admin Panel UI Elements**: Advanced admin management dashboard elements including centralized newsletter management dashboard, referral system management, **comprehensive post moderation with filtering, flagging, and reporting capabilities**, **functional pending registration management with working approve/reject buttons**, and user management integrated seamlessly with dark theme design language
+- **User Management UI Elements**: User management interface elements including account management tools and deletion capabilities integrated seamlessly with dark theme design language
+- **Centralized Newsletter Management UI Elements**: Newsletter management dashboard interface elements including creation, editing, scheduling, sending, and analytics integrated seamlessly with dark theme design language
+- **Newsletter Creation UI Elements**: Newsletter creation interface elements with rich text editing and preview integrated seamlessly with dark theme design language
+- **Newsletter Analytics UI Elements**: Newsletter analytics dashboard elements integrated seamlessly with dark theme design language
+- **Subscriber Management UI Elements**: Subscriber management interface elements including filtering, search, and bulk operations integrated seamlessly with dark theme design language
+- **Comprehensive Token Import UI Elements**: **Working token import interface elements** including canister address input, validation feedback, token metadata display, imported token list, and management controls integrated seamlessly with dark theme design language
+- **Token Canister Address Input UI Elements**: **Input field components for pasting token canister addresses** with validation feedback and format checking integrated seamlessly with dark theme design language
+- **Token Metadata Display UI Elements**: **Components for displaying fetched token metadata** including name, symbol, decimals, and balance integrated seamlessly with dark theme design language
+- **Imported Token List UI Elements**: **Display components for all imported tokens** with token information, balances, and management controls integrated seamlessly with dark theme design language
+- **Token Balance Display UI Elements**: **Real-time token balance display components** with automatic updates and refresh functionality integrated seamlessly with dark theme design language
+- **Token Management Control UI Elements**: **Token management interface components** including remove token options, balance refresh controls, and token details integrated seamlessly with dark theme design language
+- **Token Import History UI Elements**: **Token import history interface elements** with import timestamps and status display integrated seamlessly with dark theme design language
+- **Token Error Handling UI Elements**: **Token error handling interface elements** with clear error messages and retry options integrated seamlessly with dark theme design language
+- **Profile Management UI Elements**: Profile editing interface elements including form inputs, upload components, newsletter management, follow integration, and validation feedback integrated seamlessly with dark theme design language
+- **Visible Single ICP Wallet UI Elements**: **Single ICP wallet display components for authenticated users** with proper 64-character hexadecimal AID formatting and reference PID display **prominently shown** integrated seamlessly with dark theme design language
+- **Newsletter Management UI Elements**: Newsletter subscription management components integrated seamlessly with dark theme design language
+- **Profile Picture UI Elements**: Profile picture upload and display components integrated seamlessly with dark theme design language
+- **Display Name UI Elements**: Display name editing components integrated seamlessly with dark theme design language
+- **Bio UI Elements**: Bio editing components with character count integrated seamlessly with dark theme design language
+- **Follow UI Elements**: Follow/unfollow button and count display components integrated seamlessly with dark theme design language
+- **Follow Button UI Elements**: Follow/unfollow button components with status indication integrated seamlessly with dark theme design language
+- **Follow Count UI Elements**: Follower and following count display components integrated seamlessly with dark theme design language
+- **Referral System UI Elements**: Referral dashboard, link display, and reward counter components integrated seamlessly with dark theme design language
+- **Authentication UI Elements**: Sign-in interface elements including newsletter member authentication as registered users integrated seamlessly with dark theme design language
+- **Single ICP Wallet Dashboard UI Elements**: Single ICP wallet dashboard and automatic linking interface elements with **properly derived AID in 64-character hexadecimal format as main identifier display** with deposit/copy buttons and **PID shown beneath for reference** and **imported token display section** integrated seamlessly with **dark theme and dark reddish outlines** design language
+- **Transaction History UI Elements**: Transaction history display components with timestamps and transaction details integrated seamlessly with dark theme design language
+- **ICP Send/Receive UI Elements**: ICP transaction interface elements with amount input and confirmation integrated seamlessly with dark theme design language
+- **Like UI Elements**: Like button and count display with real-time updates integrated seamlessly with dark theme design language
+- **Rating UI Elements**: 5-star rating component with gold accent colors integrated seamlessly with dark theme design language
+- **Enhanced Activity UI Elements**: Activity feed interface elements including referral and follow activity integrated seamlessly with dark theme design language
+- **Enhanced Link Management UI**: Link addition and management interface elements for both regular and paywall links integrated seamlessly with dark theme design language
+- **Restored Paywall UI Elements**: **Paywall link section interface elements** with pricing settings and full paywall functionality restoration integrated seamlessly with dark theme design language
+- **Restored Video Upload UI Elements**: **Dual video upload interface elements** for public and paywalled sections with complete video handling integrated seamlessly with dark theme design language
+- **Enhanced Single ICP Wallet Tipping UI Elements**: ICP tipping interface elements for transactions using single ICP wallets with proper AIDs integrated seamlessly with dark theme design language
+- **Self-Tipping UI Elements**: Self-tipping interface elements allowing users to tip their own posts integrated seamlessly with dark theme design language
+- **Single ICP Wallet UI Components**: Single ICP wallet balance and dashboard display components with **properly derived AID in 64-character hexadecimal format as main identifier display** with deposit/copy buttons and **PID shown beneath for reference** and **imported token display section** consistent with **dark theme and dark reddish outlines** overall design
+- **Feed Sorting UI Elements**: Sorting selection interface elements integrated seamlessly with dark theme design language
+- **Comment UI Elements**: Comment interface elements integrated seamlessly with dark theme design language
+- **Enhanced Profile UI Components**: Comprehensive profile page and editing UI components with **visible single ICP wallet dashboard access** with **properly derived AID in 64-character hexadecimal format as main identifier display** and **PID shown beneath for reference**, newsletter subscription management, referral information display, follow functionality, and profile management consistent with dark theme overall design
+- **Enhanced Error UI**: User-friendly error handling UI with retry options and clear fallback messages for media failures integrated seamlessly with dark theme design language
+- **Chat UI Elements**: Chat interface elements including message bubbles, input fields, and room navigation integrated seamlessly with dark theme design language
+- **Forum UI Elements**: Forum interface elements including thread cards, reply components, and category navigation integrated seamlessly with dark theme design language
+- **Enhanced Single ICP Wallet Paywall UI Elements**: Enhanced paywall interface elements including payment buttons using single ICP wallets with proper AIDs for both videos and paywall links, premium indicators, and access status integrated seamlessly with dark theme design language
+- **Locked Content UI Elements**: **Paywall content interface elements with lock overlays and unlock functions** using LockedVideoOverlay and VideoSection components integrated seamlessly with dark theme design language
+- **Premium Media UI Elements**: **Premium media interface elements for viewing content after unlock** with proper playback controls integrated seamlessly with dark theme design language
+- **Custom Pricing UI Elements**: **Custom pricing interface elements for creators to set custom prices on posts or videos** with flexible pricing options and payment tracking integrated seamlessly with dark theme design language
+- **Paywall Integration UI Elements**: **Paywall unlocking system integration UI elements with single ICP wallet payment processing using proper AIDs** and content reveal functionality integrated seamlessly with dark theme design language
+- **Post Paywall UI Elements**: **Paywall compatibility UI elements for posts** including custom pricing and payment unlock display integrated seamlessly with dark theme design language
+- **Forum Paywall UI Elements**: **Paywall compatibility UI elements for forum submissions** including custom pricing and payment unlock display integrated seamlessly with dark theme design language
+- **System Compatibility UI Elements**: **Paywall system compatibility UI elements with existing user tipping systems** ensuring no visual interference or conflicts integrated seamlessly with dark theme design language
+- **Wallet Regeneration UI Elements**: Wallet regeneration interface elements for deleting existing wallet entries and regenerating new wallets integrated seamlessly with dark theme design language
+- **User Data Reset UI Elements**: User data reset interface elements for resetting wallet and profile data while maintaining authentication credentials integrated seamlessly with dark theme design language
+- **Wallet Synchronization UI Elements**: Wallet synchronization interface elements for verifying proper system integration and display integrated seamlessly with dark theme design language
+- **Wallet Receive UI Elements**: Wallet receive interface elements including address display, copy functionality, and QR code generation integrated seamlessly with dark theme design language
+- **Wallet Address Copy UI Elements**: Wallet address copy interface elements with one-click functionality and visual feedback integrated seamlessly with dark theme design language
+- **QR Code Display UI Elements**: QR code generation and display interface elements for wallet addresses integrated seamlessly with dark theme design language
+
+## Technical Implementation
+
+- **Frontend**: React with TypeScript, TanStack Query for data management, Tailwind CSS for styling with **dark theme and dark reddish accent colors**
+- **Backend**: Motoko persistent actor with transient maps for efficient data management and persistent blob storage for media files with publicly accessible URL serving
+- **Enhanced Initialization System**: Robust app initialization system with retry logic for backend canister connection failures, Internet Computer initialization, backend data preloading, health checks, progressive loading, safe Chrpz canister connection, and home feed fallback when identity is delayed
+- **React Router System**: Proper React Router implementation to ensure routing works correctly and prevents blank screens during navigation
+- **Backend Actor System**: Reliable backend actor initialization system with proper error handling and retry mechanisms for canister connections
+- **Error Boundary System**: Comprehensive error boundary implementation with graceful fallback UI, error recovery mechanisms, and retry buttons
+- **Connection Retry System**: Automatic retry mechanism for failed backend connections with exponential backoff, maximum retry attempts, and manual retry capability
+- **Connection Management**: Backend connection management with retry mechanisms, graceful degradation, and safe fallback
+- **Reliable UI System**: System that ensures UI components reliably display content instead of showing blank screens
+- **Component Error Boundary System**: Individual error boundary system around major components to prevent single component failures from crashing the entire application
+- **Partial Data Loading System**: System that allows UI to render with partial data when some backend calls fail, ensuring users always see functional interface elements
+- **Dual Authentication System**: Dual authentication system supporting both Internet Identity and Email authentication with newsletter subscription option, newsletter member authentication as registered users with generated user identities, validation, error handling, automatic single ICP wallet linking with proper AID derivation, newsletter subscription handling, and admin authentication
+- **Email Authentication System**: Email-based sign-up and sign-in system with email validation, password hashing, password reset, and secure session management
+- **Working Admin Approval System**: **Functional admin approval system** for email registrations with pending registration management, **working approval processing with functional approve/reject buttons**, and notification handling
+- **User Management System**: User account management system including account creation, profile management, account deletion, and administrative operations
+- **Comprehensive Admin Moderation System**: **Complete admin moderation system** including post status management, filtering capabilities, flagging operations, report processing, moderation history tracking, and admin role verification
+- **Restored Post Moderation System**: **Re-enabled post moderation system** with comprehensive listing, flagging, unflagging, and deleting functionality for posts
+- **Post Management System**: **Post management system** with comprehensive filtering options, status tracking, and individual post actions including delete, flag/unflag, and report review
+- **Post Filtering System**: **Advanced post filtering system** allowing admins to filter posts by All Posts, Reported Posts, Flagged Posts, and other criteria
+- **Individual Post Actions System**: **Direct post action system** for each post including Delete functionality, Flag/Unflag operations, and Review Reports capability
+- **Post Status Tracking System**: **System to track and manage post status** including normal, flagged, reported, and deleted states with proper status indicators
+- **Report Review System**: **System for reviewing post reports** with report details, reporter information, and resolution actions
+- **Moderation History System**: **System to track moderation history** for posts including all admin actions, timestamps, and action details
+- **Admin Role Verification System**: **System to verify admin role permissions** ensuring only authenticated admin users can perform moderation actions
+- **Bulk Moderation System**: **System for performing bulk operations** on multiple posts including bulk deletion, bulk flagging, and bulk status updates
+- **Moderation Statistics System**: **System to calculate and track moderation statistics** including posts moderated, reports processed, and admin activity metrics
+- **Centralized Newsletter Management System**: Complete centralized newsletter management system with creation, editing, scheduling, sending, analytics, and subscriber management capabilities
+- **Subscriber Management System**: Comprehensive subscriber management system with viewing, filtering, removing, bulk operations, and analytics functionality
+- **Newsletter System**: Comprehensive newsletter subscription and management system with opt-in during sign-in, subscription management, email validation, automatic user registration with identity generation, newsletter composition, analytics, and **successful newsletter subscription processing**
+- **Newsletter Member System**: Newsletter member authentication system as registered users with generated user identities, authentication credentials, and single ICP wallet functionality with proper AID derivation
+- **Comprehensive Token Support System**: **Complete token support system** allowing users to import tokens by pasting canister addresses, automatically fetch and store token metadata, and display imported tokens with current balances and management options
+- **Token Import System**: **Working token import system supporting canister addresses** with canister address validation, automatic token metadata fetching via ICP canister calls, real-time balance updates, and persistent token storage
+- **Token Canister Integration**: **System integration with token canisters** for fetching metadata including token name, symbol, decimals, and user balance via ICP canister calls
+- **Token Validation System**: **Canister address validation system** ensuring pasted addresses follow correct canister ID format before attempting metadata retrieval
+- **Token Metadata Management**: **System for managing fetched token metadata** with persistent storage and real-time updates for comprehensive token functionality
+- **Token Balance Management**: **System for real-time token balance updates** via ICP canister calls with automatic refresh and efficient caching
+- **Token Import History System**: **System to track token import history** including import timestamps, user identification, canister addresses, and import status
+- **Token Management Interface System**: **System for managing imported tokens** including adding, removing, updating token information, and balance refresh functionality
+- **Profile Management**: Complete profile editing system with display name updates, bio management, profile picture upload and storage, **visible single ICP wallet dashboard access** with **properly derived AID in 64-character hexadecimal format as main identifier display** and **PID shown beneath for reference**, newsletter subscription management, referral information display, follow integration, and real-time UI updates
+- **Profile Storage**: Profile data persistence with blob storage for profile pictures and efficient profile data management
+- **Follow System Implementation**: Comprehensive follow system with follow/unfollow functionality, follower/following count management, follow status tracking, and mutual follow updates
+- **Follow Relationship Management**: Follow relationship storage and management with real-time count updates and status validation
+- **Referral System Implementation**: Comprehensive referral system with unique link generation, tracking, reward management, and dashboard functionality
+- **Version 68 Compatible Single ICP Wallet System**: Single ICP wallet system for all authenticated users including newsletter members as registered users with **properly derived Account ID (AID) in 64-character hexadecimal format calculated using official CRC32 + SHA-224 algorithm from Principal ID** identical to `faa31ce80a1ae772f2cb4cfe261c5e67117f7fa93e686be4bcf189d8b09f1bfd` and **Principal ID (PID) shown beneath for reference** without any prefix formatting
+- **Transaction History System**: Complete transaction history system for single ICP wallets including tips sent, tips received, paywall payments, ICP transfers, amounts, and timestamps using proper AIDs
+- **Newsletter Member Single ICP Wallet System**: System to generate and assign user identities and single ICP wallet functionality with proper AID derivation to newsletter subscribers as registered users
+- **Storage**: Optimized media storage using persistent blob storage with asset key references and publicly accessible URL generation for video files, and profile pictures
+- **State Management**: React Query for server state, React hooks for local state
+- **Validation**: Media file validation with extension-based detection (.mp4, .mov, .webm for videos) and proper error handling, plus profile data validation, newsletter subscription validation, follow relationship validation, single ICP wallet address format validation with proper AID derivation, and **token canister address validation**
+- **Sorting**: Multiple sorting options (Latest, Most Liked, Most Commented) with efficient backend sorting operations
+- **Enhanced Media Processing**: **Enhanced media upload, storage, and retrieval with publicly accessible video URL generation for dual video sections** (.mp4, .mov, .webm support) and comprehensive error handling, and profile pictures
+- **Restored Video Upload System**: **Complete video upload system for both public and paywalled video sections** using current blob upload logic from mediaUpload.ts with proper file handling and storage
+- **Paywall Content System**: **Complete paywall content system including paywall links, video paywalls, pricing settings, and access control** with full paywall functionality restoration
+- **Dual Authentication System**: Secure user authentication with session management, credential validation, newsletter subscription handling, and newsletter member authentication as registered users
+- **Like System**: Like tracking and management with real-time count updates and user status tracking
+- **Rating System**: 5-star rating tracking and management with average calculation and statistics
+- **Enhanced Activity System**: Activity tracking and feed management with real-time updates including referral and follow activities
+- **Enhanced Link Management**: Dynamic link addition and validation with individual input field management for both regular links and paywall links with pricing
+- **Enhanced Single ICP Wallet Tipping System**: ICP transaction processing with automatic single ICP wallet balance management with proper AIDs, wallet recognition, and tip recording for authenticated users including newsletter members as registered users with transaction history tracking
+- **Self-Tipping System**: System allowing users to tip their own posts for testing purposes and functionality verification
+- **Comment System**: Comment creation, storage, and retrieval with proper validation and user identification
+- **Enhanced Profile System**: Comprehensive user profile management for authenticated users including newsletter members as registered users with statistics, **visible single ICP wallet dashboard access** with **properly derived AID in 64-character hexadecimal format as main identifier display** and **PID shown beneath for reference**, complete profile editing capabilities, newsletter subscription management, referral information display, and follow functionality
+- **Enhanced Admin System**: Advanced admin authentication and management capabilities with comprehensive moderation tools including enhanced paywall management, **visible single ICP wallet management** with **properly derived AID in 64-character hexadecimal format as main identifier display** and **PID shown beneath for reference**, centralized newsletter management dashboard, user management with account deletion capabilities, referral system management, **comprehensive post moderation with filtering, flagging, and reporting capabilities**, **functional pending registration management with working approve/reject buttons**, and advanced content moderation tools
+- **Newsletter Management System**: Newsletter subscription management, composition, sending, analytics, subscriber management, and member management as registered users with email validation and user identity generation
+- **Enhanced Video Handling**: **Reliable video upload with extension-based validation (.mp4, .mov, .webm) and proper URL serving for playback in dual video sections** with restored video upload functionality
+- **Comprehensive Error Recovery**: Enhanced error handling for media access failures with retry functionality and user-friendly messages
+- **Public Blob URL Management**: Reliable blob URL access with proper video serving and comprehensive error handling
+- **Enhanced Single ICP Wallet Integration**: Single ICP wallet functionality with automatic assignment with proper AID derivation, balance tracking, transaction processing, tip management for authenticated users including newsletter members as registered users, transaction history management, and ICP send/receive operations
+- **Enhanced Media Management**: **Reliable client-side media handling with proper video URL derivation and comprehensive error recovery for dual video sections**, and profile pictures
+- **Chat System**: Real-time chat functionality with message persistence, room management, and notification system
+- **Forum System**: Forum thread and reply management with category organization and moderation capabilities
+- **Enhanced Single ICP Wallet Paywall System**: **Premium content management with payment processing using single ICP wallets with proper AIDs for both videos and paywall links**, access control, revenue tracking, dual video section support, and paywall link management with pricing
+- **Locked Content System**: **System to verify all paywalled content displays with lock overlays and unlock functions** using LockedVideoOverlay and VideoSection components
+- **Premium Media System**: **System to confirm all users can view premium media after rebuild** with proper unlock functionality and payment processing
+- **Custom Pricing System**: System for **creators to set custom prices on posts or videos** with flexible pricing management and payment tracking
+- **Paywall Integration System**: System for **paywall unlocking system integration with single ICP wallet payment processing using proper AIDs** and content reveal functionality
+- **Post Paywall System**: System for **paywall compatibility with posts** including custom pricing and payment unlock processing
+- **Forum Paywall System**: System for **paywall compatibility with forum submissions** including custom pricing and payment unlock processing
+- **System Compatibility Management**: System ensuring **paywall system compatibility with existing user tipping systems** without interference or conflicts
+- **ICP Canister Email Integration**: System to store and manage email addresses in ICP canister for newsletter management through admin dashboard
+- **Wallet Regeneration System**: System to delete existing wallet entries and profile data for specific users and regenerate new wallets with valid ICP Account ID (AID) in 64-character hexadecimal format derived from their Principal ID
+- **User Data Reset System**: System to reset user wallet and profile data while maintaining authentication credentials and regenerating proper wallet connections with unified single-wallet system synchronization
+- **Wallet Synchronization System**: System to verify that regenerated wallets properly synchronize with the unified single-wallet system and display correctly in both admin panel and user profiles with proper AID and PID formatting
+- **Wallet Receive System**: System for receiving ICP/tokens including address display, copy functionality, QR code generation, and deposit tracking
+- **Wallet Address Copy System**: One-click copy functionality system for the 64-character hexadecimal Account ID with visual feedback and clipboard integration
+- **QR Code Generation System**: QR code generation system for wallet addresses to facilitate easy mobile deposits and transfers
