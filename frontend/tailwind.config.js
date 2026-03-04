@@ -51,10 +51,10 @@ export default {
         sm: "calc(var(--radius) - 4px)",
       },
       boxShadow: {
-        glow: "0 10px 15px -3px rgba(220, 38, 38, 0.3), 0 4px 6px -2px rgba(220, 38, 38, 0.2)",
+        glow: "0 10px 15px -3px rgba(178, 34, 52, 0.35), 0 4px 6px -2px rgba(178, 34, 52, 0.2)",
+        "glow-navy": "0 10px 15px -3px rgba(60, 59, 110, 0.4), 0 4px 6px -2px rgba(60, 59, 110, 0.25)",
       },
     },
   },
   plugins: [],
 };
-

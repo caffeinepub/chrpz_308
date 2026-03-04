@@ -1,0 +1,38 @@
+{
+  "schemaVersion": "1.0.0",
+  "projectStateVersion": 3,
+  "summary": "Chrpz Social Media Platform - a lightweight ICP-based social media app currently in draft mode. After repeated build failures due to size/complexity limits, the project has been stripped down to core features: Internet Identity authentication, post creation and viewing, user profiles, and admin moderation. Wallet, tipping, paywalls, token import, and email login have all been removed. The user is unable to publish due to App Market publishing not being available yet on Caffeine. Latest request is to change the color scheme to USA colors.",
+  "architectural_notes": [
+    "App is built on Internet Computer Protocol (ICP) using Motoko backend and React/Vite frontend",
+    "Publishing to App Market is not yet available on Caffeine for any user tier",
+    "Build repeatedly fails when exceeding complexity/size limits - keep features minimal",
+    "Current stable feature set: Internet Identity auth, posts, user profiles, admin moderation only"
+  ],
+  "known_issues": [
+    "App can only be deployed as a draft; live/production publishing via App Market not yet enabled on Caffeine",
+    "Build generation repeatedly fails with complexity errors - token import, wallet, tipping, paywalls all removed to reduce size"
+  ],
+  "isFixRequest": false,
+  "existing_features": [
+    {
+      "id": "feature-update-the-app-s-color-scheme-to-use-usa-themed-colors-red-b22234-or-similar-patriotic-red-white-ffffff-and-blue-3c3b6e-or-similar-patriotic-navy-blue-apply-these-consistently-across-backgrounds-text-buttons-accents-borders-and-interactive-elements-throughout-the-entire-frontend-replace-the-current-reddish-dark-theme-css-variables-in-index-css-and-tailwind-config-js-with-the-new-usa-color-palette",
+      "title": "Update the app's color scheme to use USA-themed colors: red (#B22234 or similar patriotic red), white (#FFFFFF), and blue (#3C3B6E or similar patriotic navy blue). Apply these consistently across backgrounds, text, buttons, accents, borders, and interactive elements throughout the entire frontend. Replace the current reddish/dark theme CSS variables in index.css and tailwind.config.js with the new USA color palette.",
+      "reqIds": [
+        "REQ-1"
+      ],
+      "version": 1
+    }
+  ],
+  "new_feature_requests": [
+    {
+      "id": "AR-1",
+      "summary": "Change color scheme to USA colors (red, white, blue)",
+      "reqIds": [],
+      "status": "pending"
+    }
+  ],
+  "gameProjectType": "none",
+  "projectName": "Chrpz",
+  "clarification_mode": "instant",
+  "clarification_rounds": 0
+}

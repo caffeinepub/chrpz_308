@@ -6,25 +6,30 @@
 
 @layer base {
   :root {
-    --background: 220 15% 8%;
-    --foreground: 0 0% 95%;
-    --card: 220 15% 10%;
-    --card-foreground: 0 0% 95%;
-    --popover: 220 15% 10%;
-    --popover-foreground: 0 0% 95%;
-    --primary: 0 72% 51%;
+    /* USA Color Scheme
+       Navy Blue:   #3C3B6E  → hsl(241 30% 33%)
+       Patriotic Red: #B22234 → hsl(351 68% 42%)
+       White:       #FFFFFF  → hsl(0 0% 100%)
+    */
+    --background: 241 35% 12%;
+    --foreground: 0 0% 97%;
+    --card: 241 32% 16%;
+    --card-foreground: 0 0% 97%;
+    --popover: 241 32% 16%;
+    --popover-foreground: 0 0% 97%;
+    --primary: 351 68% 42%;
     --primary-foreground: 0 0% 100%;
-    --secondary: 220 15% 15%;
-    --secondary-foreground: 0 0% 95%;
-    --muted: 220 15% 15%;
-    --muted-foreground: 0 0% 65%;
-    --accent: 0 72% 51%;
+    --secondary: 241 28% 22%;
+    --secondary-foreground: 0 0% 97%;
+    --muted: 241 28% 22%;
+    --muted-foreground: 241 15% 65%;
+    --accent: 351 68% 42%;
     --accent-foreground: 0 0% 100%;
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
-    --border: 0 50% 35%;
-    --input: 0 50% 35%;
-    --ring: 0 72% 51%;
+    --border: 241 30% 28%;
+    --input: 241 30% 28%;
+    --ring: 351 68% 42%;
     --radius: 0.5rem;
   }
 
@@ -55,7 +60,7 @@
   /* Custom Scrollbar for Virtual Lists */
   .custom-scrollbar {
     scrollbar-width: thin;
-    scrollbar-color: rgba(220, 38, 38, 0.5) transparent;
+    scrollbar-color: rgba(178, 34, 52, 0.5) transparent;
   }
 
   .custom-scrollbar::-webkit-scrollbar {
@@ -67,109 +72,109 @@
   }
 
   .custom-scrollbar::-webkit-scrollbar-thumb {
-    background: rgba(220, 38, 38, 0.5);
+    background: rgba(178, 34, 52, 0.5);
     border-radius: 3px;
   }
 
   .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-    background: rgba(220, 38, 38, 0.7);
+    background: rgba(178, 34, 52, 0.75);
   }
 
-  /* Advanced Glassmorphism System - Dark Theme with Reddish Accents */
+  /* Advanced Glassmorphism System - Navy Blue Theme with Red Accents */
   .glass {
-    background: rgba(20, 20, 25, 0.8);
+    background: rgba(18, 18, 50, 0.8);
     backdrop-filter: blur(24px);
-    border: 1px solid rgba(220, 38, 38, 0.3);
+    border: 1px solid rgba(178, 34, 52, 0.3);
     box-shadow:
       0 8px 32px rgba(0, 0, 0, 0.6),
-      inset 0 1px 0 rgba(220, 38, 38, 0.2),
-      inset 0 -1px 0 rgba(220, 38, 38, 0.1);
+      inset 0 1px 0 rgba(255, 255, 255, 0.1),
+      inset 0 -1px 0 rgba(178, 34, 52, 0.1);
   }
 
   .glass-premium {
     backdrop-filter: blur(32px);
-    border: 2px solid rgba(220, 38, 38, 0.4);
+    border: 2px solid rgba(178, 34, 52, 0.45);
     box-shadow:
       0 25px 50px -12px rgba(0, 0, 0, 0.8),
-      0 12px 40px rgba(220, 38, 38, 0.3),
-      0 4px 16px rgba(220, 38, 38, 0.2),
-      inset 0 2px 0 rgba(220, 38, 38, 0.3),
-      inset 0 -2px 0 rgba(220, 38, 38, 0.1);
+      0 12px 40px rgba(178, 34, 52, 0.25),
+      0 4px 16px rgba(60, 59, 110, 0.4),
+      inset 0 2px 0 rgba(255, 255, 255, 0.12),
+      inset 0 -2px 0 rgba(178, 34, 52, 0.1);
     background: linear-gradient(
       135deg,
-      rgba(30, 30, 35, 0.9) 0%,
-      rgba(20, 20, 25, 0.85) 50%,
-      rgba(15, 15, 20, 0.8) 100%
+      rgba(28, 28, 70, 0.9) 0%,
+      rgba(20, 20, 55, 0.85) 50%,
+      rgba(15, 15, 45, 0.8) 100%
     );
   }
 
   .glass-subtle {
-    background: rgba(25, 25, 30, 0.7);
+    background: rgba(22, 22, 58, 0.7);
     backdrop-filter: blur(16px);
-    border: 1px solid rgba(220, 38, 38, 0.25);
+    border: 1px solid rgba(178, 34, 52, 0.25);
     box-shadow:
       0 4px 20px rgba(0, 0, 0, 0.5),
-      inset 0 0.5px 0 rgba(220, 38, 38, 0.15);
+      inset 0 0.5px 0 rgba(255, 255, 255, 0.08);
   }
 
   /* Progressive Blur Effects */
   .glass-progressive {
     background: linear-gradient(
       135deg,
-      rgba(30, 30, 35, 0.85) 0%,
-      rgba(25, 25, 30, 0.8) 50%,
-      rgba(20, 20, 25, 0.75) 100%
+      rgba(28, 28, 70, 0.85) 0%,
+      rgba(22, 22, 58, 0.8) 50%,
+      rgba(18, 18, 50, 0.75) 100%
     );
     backdrop-filter: blur(20px) saturate(180%);
-    border: 1px solid rgba(220, 38, 38, 0.35);
+    border: 1px solid rgba(178, 34, 52, 0.35);
     box-shadow:
       0 16px 64px rgba(0, 0, 0, 0.7),
-      0 8px 32px rgba(220, 38, 38, 0.2),
-      inset 0 2px 0 rgba(220, 38, 38, 0.25);
+      0 8px 32px rgba(178, 34, 52, 0.15),
+      inset 0 2px 0 rgba(255, 255, 255, 0.1);
   }
 
-  /* Dark Mode Glassmorphism with Reddish Accents */
+  /* Dark Mode Glassmorphism with USA Accents */
   .glass-dark {
-    border: 2px solid rgba(220, 38, 38, 0.4);
+    border: 2px solid rgba(178, 34, 52, 0.4);
     background: linear-gradient(
       135deg,
-      rgba(30, 30, 35, 0.9) 0%,
-      rgba(25, 25, 30, 0.85) 50%,
-      rgba(20, 20, 25, 0.8) 100%
+      rgba(28, 28, 70, 0.9) 0%,
+      rgba(22, 22, 58, 0.85) 50%,
+      rgba(18, 18, 50, 0.8) 100%
     );
     backdrop-filter: blur(24px) saturate(120%);
     box-shadow:
       0 12px 48px rgba(0, 0, 0, 0.8),
-      0 4px 16px rgba(220, 38, 38, 0.3),
-      inset 0 1px 0 rgba(220, 38, 38, 0.3),
-      inset 0 -1px 0 rgba(220, 38, 38, 0.15);
+      0 4px 16px rgba(178, 34, 52, 0.2),
+      inset 0 1px 0 rgba(255, 255, 255, 0.12),
+      inset 0 -1px 0 rgba(178, 34, 52, 0.15);
   }
 
   .glass-dark-premium {
     background: linear-gradient(
       135deg,
-      rgba(35, 35, 40, 0.95) 0%,
-      rgba(28, 28, 33, 0.9) 50%,
-      rgba(22, 22, 27, 0.85) 100%
+      rgba(32, 32, 78, 0.95) 0%,
+      rgba(26, 26, 65, 0.9) 50%,
+      rgba(20, 20, 55, 0.85) 100%
     );
     backdrop-filter: blur(32px) saturate(150%);
-    border: 2px solid rgba(220, 38, 38, 0.5);
+    border: 2px solid rgba(178, 34, 52, 0.5);
     box-shadow:
       0 20px 64px rgba(0, 0, 0, 0.9),
-      0 8px 32px rgba(220, 38, 38, 0.4),
-      inset 0 2px 0 rgba(220, 38, 38, 0.4),
-      inset 0 -2px 0 rgba(220, 38, 38, 0.2);
+      0 8px 32px rgba(178, 34, 52, 0.3),
+      inset 0 2px 0 rgba(255, 255, 255, 0.15),
+      inset 0 -2px 0 rgba(178, 34, 52, 0.2);
   }
 
   /* Glass Cards with depth */
   .glass-card {
-    background: rgba(25, 25, 30, 0.8);
+    background: rgba(22, 22, 58, 0.8);
     backdrop-filter: blur(24px);
-    border: 1px solid rgba(220, 38, 38, 0.3);
+    border: 1px solid rgba(178, 34, 52, 0.3);
     box-shadow:
       0 8px 32px rgba(0, 0, 0, 0.6),
-      inset 0 1px 0 rgba(220, 38, 38, 0.2),
-      inset 0 -1px 0 rgba(220, 38, 38, 0.1);
+      inset 0 1px 0 rgba(255, 255, 255, 0.1),
+      inset 0 -1px 0 rgba(178, 34, 52, 0.1);
     border-radius: 1rem;
     transform: translateZ(0);
     will-change: transform;
@@ -177,18 +182,18 @@
 
   .glass-card-elevated {
     backdrop-filter: blur(32px);
-    border: 2px solid rgba(220, 38, 38, 0.4);
+    border: 2px solid rgba(178, 34, 52, 0.4);
     box-shadow:
       0 25px 50px -12px rgba(0, 0, 0, 0.8),
-      0 12px 40px rgba(220, 38, 38, 0.3),
-      0 4px 16px rgba(220, 38, 38, 0.2),
-      inset 0 2px 0 rgba(220, 38, 38, 0.3),
-      inset 0 -2px 0 rgba(220, 38, 38, 0.15);
+      0 12px 40px rgba(178, 34, 52, 0.2),
+      0 4px 16px rgba(60, 59, 110, 0.3),
+      inset 0 2px 0 rgba(255, 255, 255, 0.12),
+      inset 0 -2px 0 rgba(178, 34, 52, 0.15);
     background: linear-gradient(
       135deg,
-      rgba(30, 30, 35, 0.9) 0%,
-      rgba(25, 25, 30, 0.85) 50%,
-      rgba(20, 20, 25, 0.8) 100%
+      rgba(28, 28, 70, 0.9) 0%,
+      rgba(22, 22, 58, 0.85) 50%,
+      rgba(18, 18, 50, 0.8) 100%
     );
     border-radius: 1.5rem;
     transform: translateZ(0) translateY(-2px);
@@ -197,11 +202,11 @@
 
   .glass-card-elevated:hover {
     transform: translateZ(0) translateY(-8px);
-    border-color: rgba(220, 38, 38, 0.6);
+    border-color: rgba(178, 34, 52, 0.65);
     box-shadow:
       0 24px 80px rgba(0, 0, 0, 0.9),
-      0 12px 48px rgba(220, 38, 38, 0.4),
-      inset 0 2px 0 rgba(220, 38, 38, 0.4);
+      0 12px 48px rgba(178, 34, 52, 0.35),
+      inset 0 2px 0 rgba(255, 255, 255, 0.15);
   }
 
   /* Custom scrollbar */
@@ -210,17 +215,17 @@
   }
 
   .custom-scrollbar::-webkit-scrollbar-track {
-    background: rgba(30, 30, 35, 0.5);
+    background: rgba(22, 22, 58, 0.5);
     border-radius: 9999px;
   }
 
   .custom-scrollbar::-webkit-scrollbar-thumb {
-    background: rgba(220, 38, 38, 0.5);
+    background: rgba(178, 34, 52, 0.5);
     border-radius: 9999px;
   }
 
   .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-    background: rgba(220, 38, 38, 0.7);
+    background: rgba(178, 34, 52, 0.75);
   }
 
   /* Micro-interactions */
@@ -232,7 +237,7 @@
     transform: translateY(-0.25rem);
     box-shadow:
       0 10px 15px -3px rgba(0, 0, 0, 0.5),
-      0 4px 6px -2px rgba(220, 38, 38, 0.3);
+      0 4px 6px -2px rgba(178, 34, 52, 0.3);
   }
 
   .hover-glow {
@@ -242,8 +247,8 @@
   .hover-glow:hover {
     box-shadow:
       0 10px 15px -3px rgba(0, 0, 0, 0.5),
-      0 4px 6px -2px rgba(220, 38, 38, 0.3),
-      0 0 0 3px rgba(220, 38, 38, 0.4);
+      0 4px 6px -2px rgba(178, 34, 52, 0.3),
+      0 0 0 3px rgba(178, 34, 52, 0.35);
   }
 
   .hover-glass {
@@ -252,18 +257,18 @@
 
   .hover-glass:hover {
     backdrop-filter: blur(40px);
-    border-color: rgba(220, 38, 38, 0.5);
+    border-color: rgba(178, 34, 52, 0.55);
   }
 
-  /* Advanced Gradient Systems - Dark with Red Accents */
+  /* Advanced Gradient Systems - Navy Blue with Red Accents */
   .gradient-aurora {
     background: linear-gradient(
       135deg,
-      #dc2626 0%,
-      #991b1b 25%,
-      #7f1d1d 50%,
-      #450a0a 75%,
-      #1c1917 100%
+      #b22234 0%,
+      #8b1a28 25%,
+      #3c3b6e 50%,
+      #2a2950 75%,
+      #1a1935 100%
     );
     background-size: 400% 400%;
     animation: aurora 8s ease-in-out infinite;
@@ -272,11 +277,11 @@
   .gradient-cosmic {
     background: linear-gradient(
       135deg,
-      #dc2626 0%,
-      #b91c1c 25%,
-      #991b1b 50%,
-      #7f1d1d 75%,
-      #450a0a 100%
+      #b22234 0%,
+      #3c3b6e 25%,
+      #2a2950 50%,
+      #8b1a28 75%,
+      #1a1935 100%
     );
     background-size: 300% 300%;
     animation: cosmic 12s ease-in-out infinite;
@@ -285,24 +290,24 @@
   .gradient-glass {
     background: linear-gradient(
       135deg,
-      rgba(30, 30, 35, 0.9) 0%,
-      rgba(25, 25, 30, 0.8) 25%,
-      rgba(20, 20, 25, 0.7) 50%,
-      rgba(18, 18, 23, 0.6) 75%,
-      rgba(15, 15, 20, 0.5) 100%
+      rgba(28, 28, 70, 0.9) 0%,
+      rgba(22, 22, 58, 0.8) 25%,
+      rgba(18, 18, 50, 0.7) 50%,
+      rgba(15, 15, 42, 0.6) 75%,
+      rgba(12, 12, 35, 0.5) 100%
     );
   }
 
   /* Typography enhancements */
   .text-gradient {
-    background: linear-gradient(to right, #dc2626, #991b1b);
+    background: linear-gradient(to right, #b22234, #e63950);
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent;
   }
 
   .text-gradient-aurora {
-    background: linear-gradient(135deg, #dc2626, #b91c1c, #991b1b);
+    background: linear-gradient(135deg, #b22234, #e63950, #ffffff);
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
@@ -313,12 +318,12 @@
   .text-holographic {
     background: linear-gradient(
       45deg,
-      #dc2626,
-      #ef4444,
-      #f87171,
-      #fca5a5,
-      #fecaca,
-      #fee2e2
+      #b22234,
+      #e63950,
+      #ffffff,
+      #3c3b6e,
+      #5a59a0,
+      #ffffff
     );
     -webkit-background-clip: text;
     background-clip: text;
@@ -327,7 +332,7 @@
     animation: holographic 4s ease-in-out infinite;
   }
 
-  /* 2025 UI Trends - Dark Theme */
+  /* 2025 UI Trends - Navy Theme */
   .bento-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
@@ -337,8 +342,8 @@
 
   .bento-item {
     backdrop-filter: blur(20px);
-    background: rgba(25, 25, 30, 0.8);
-    border: 1px solid rgba(220, 38, 38, 0.3);
+    background: rgba(22, 22, 58, 0.8);
+    border: 1px solid rgba(178, 34, 52, 0.3);
     border-radius: 1.5rem;
     padding: 1.5rem;
     transition: all 0.3s ease;
@@ -346,8 +351,8 @@
 
   .bento-item:hover {
     transform: translateY(-4px);
-    background: rgba(30, 30, 35, 0.85);
-    border-color: rgba(220, 38, 38, 0.5);
+    background: rgba(28, 28, 70, 0.85);
+    border-color: rgba(178, 34, 52, 0.55);
   }
 
   /* Neural network inspired animations */
@@ -366,7 +371,7 @@
     background: linear-gradient(
       90deg,
       transparent,
-      rgba(220, 38, 38, 0.3),
+      rgba(178, 34, 52, 0.25),
       transparent
     );
     animation: neuralSweep 3s ease-in-out infinite;
@@ -384,7 +389,7 @@
 
   /* Modern focus states */
   .focus-ring:focus {
-    outline: 2px solid rgba(220, 38, 38, 0.6);
+    outline: 2px solid rgba(178, 34, 52, 0.65);
     outline-offset: 2px;
   }
 
@@ -405,7 +410,7 @@
   .smooth-scroll {
     scroll-behavior: smooth;
     scrollbar-width: thin;
-    scrollbar-color: rgba(220, 38, 38, 0.4) transparent;
+    scrollbar-color: rgba(178, 34, 52, 0.4) transparent;
   }
 }
 
@@ -573,7 +578,7 @@
   .glass-premium,
   .glass-subtle {
     border-width: 2px;
-    border-color: rgba(220, 38, 38, 0.8);
+    border-color: rgba(178, 34, 52, 0.9);
   }
 }
 
@@ -599,4 +604,3 @@
     transform: none;
   }
 }
-

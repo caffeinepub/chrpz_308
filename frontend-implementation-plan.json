@@ -1,0 +1,62 @@
+{
+  "kind": "implementation_plan",
+  "version": "1.0",
+  "title": "Change color scheme to USA colors (red, white, blue)",
+  "requirements": [
+    {
+      "id": "REQ-1",
+      "summary": "Update the app's color scheme to use USA-themed colors throughout the entire frontend",
+      "acceptanceCriteria": [
+        "Primary accent color uses a patriotic red (e.g., #B22234)",
+        "Background or secondary surfaces use navy blue (e.g., #3C3B6E)",
+        "Text and contrast elements use white (#FFFFFF)",
+        "CSS custom properties in index.css are updated to reflect the USA palette",
+        "Tailwind config color tokens are updated to match",
+        "Buttons, headers, cards, and interactive elements all reflect the new palette consistently",
+        "No remnants of the old dark reddish theme remain"
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/index.css",
+          "operation": "modify",
+          "description": "Replace all CSS custom properties (--primary, --background, --card, --accent, --border, --input, --ring, --foreground, --muted, --destructive, etc.) with the USA color palette. Set primary/accent to patriotic red (#B22234), backgrounds to navy blue (#3C3B6E), and text/foreground to white (#FFFFFF). Ensure all variants (hover, active, muted) use appropriate shades of red, white, and blue. Remove any old reddish/dark theme color values completely."
+        },
+        {
+          "path": "frontend/tailwind.config.js",
+          "operation": "modify",
+          "description": "Update the Tailwind color configuration to use USA-themed colors. Map the color tokens (primary, background, card, accent, border, etc.) to the new red/white/blue palette using CSS variables. Ensure the red glow utility (box-shadow) is updated to use the patriotic red color. Verify all color references point to the new USA palette and remove any old theme remnants."
+        },
+        {
+          "path": "frontend/src/components/Header.tsx",
+          "operation": "modify",
+          "description": "Review and update any inline styles or hardcoded color classes to use the new USA color scheme. Ensure buttons, navigation elements, and backgrounds reflect the patriotic red, white, and navy blue palette consistently."
+        },
+        {
+          "path": "frontend/src/components/PostCard.tsx",
+          "operation": "modify",
+          "description": "Update card backgrounds, borders, and interactive elements to use the new USA color scheme. Ensure action buttons, borders, and hover states reflect the red, white, and blue palette."
+        },
+        {
+          "path": "frontend/src/components/MainContent.tsx",
+          "operation": "modify",
+          "description": "Update the main feed container, sort buttons, and create-post button to use the USA color scheme. Ensure backgrounds, text colors, and interactive states match the new patriotic palette."
+        },
+        {
+          "path": "frontend/src/components/AdminPanel.tsx",
+          "operation": "modify",
+          "description": "Update tab styles, buttons, and panel backgrounds to use the USA color scheme. Ensure moderation controls and user management UI elements reflect the red, white, and blue palette."
+        },
+        {
+          "path": "frontend/src/components/CreatePostModal.tsx",
+          "operation": "modify",
+          "description": "Update modal backgrounds, input fields, tabs, and buttons to use the USA color scheme. Ensure form elements and interactive controls reflect the patriotic palette."
+        },
+        {
+          "path": "frontend/src/components/WalletDashboard.tsx",
+          "operation": "modify",
+          "description": "Update wallet dashboard backgrounds, cards, buttons, and text colors to use the USA color scheme. Ensure QR code container and token management UI reflect the red, white, and blue palette."
+        }
+      ]
+    }
+  ]
+}

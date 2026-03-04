@@ -1,0 +1,44 @@
+{
+  "kind": "build_request",
+  "title": "Change color scheme to USA colors (red, white, blue)",
+  "projectName": "Chrpz",
+  "priority": "normal",
+  "requirements": [
+    {
+      "id": "REQ-1",
+      "text": "Update the app's color scheme to use USA-themed colors: red (#B22234 or similar patriotic red), white (#FFFFFF), and blue (#3C3B6E or similar patriotic navy blue). Apply these consistently across backgrounds, text, buttons, accents, borders, and interactive elements throughout the entire frontend. Replace the current reddish/dark theme CSS variables in index.css and tailwind.config.js with the new USA color palette.",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-20"
+        ],
+        "quotes": [
+          "change the color scheme to usa colors"
+        ]
+      },
+      "acceptanceCriteria": [
+        "Primary accent color uses a patriotic red (e.g., #B22234)",
+        "Background or secondary surfaces use navy blue (e.g., #3C3B6E)",
+        "Text and contrast elements use white (#FFFFFF)",
+        "CSS custom properties in index.css are updated to reflect the USA palette",
+        "Tailwind config color tokens are updated to match",
+        "Buttons, headers, cards, and interactive elements all reflect the new palette consistently",
+        "No remnants of the old dark reddish theme remain"
+      ]
+    }
+  ],
+  "constraints": [
+    "Do not modify files under frontend/src/hooks/useInternetIdentity.ts, frontend/src/hooks/useActor.ts, frontend/src/main.tsx, or frontend/src/components/ui",
+    "Do not add, remove, or change any backend logic or data models",
+    "Do not re-introduce wallet, tipping, paywall, or token import features"
+  ],
+  "nonGoals": [
+    "Adding or restoring any previously removed features (wallet, tipping, paywalls, email login)",
+    "Backend changes of any kind",
+    "Publishing or deploying to live/production (not yet supported on Caffeine)"
+  ],
+  "imageRequirements": {
+    "required": [],
+    "edits": []
+  }
+}
