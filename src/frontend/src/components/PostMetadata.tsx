@@ -1,6 +1,6 @@
-import React from 'react';
-import { ExternalLink, Hash } from 'lucide-react';
-import { Badge } from './ui/badge';
+import { ExternalLink, Hash } from "lucide-react";
+import React from "react";
+import { Badge } from "./ui/badge";
 
 interface PostMetadataProps {
   links: string[];
@@ -17,7 +17,7 @@ export default function PostMetadata({ links, tags }: PostMetadataProps) {
         <div className="space-y-2">
           {links.map((link, index) => (
             <a
-              key={index}
+              key={link || index}
               href={link}
               target="_blank"
               rel="noopener noreferrer"
@@ -34,9 +34,9 @@ export default function PostMetadata({ links, tags }: PostMetadataProps) {
       {tags.length > 0 && (
         <div className="flex flex-wrap gap-2">
           {tags.map((tag, index) => (
-            <Badge key={index} variant="secondary" className="text-xs">
+            <Badge key={tag || index} variant="secondary" className="text-xs">
               <Hash className="w-3 h-3 mr-1" />
-              {tag.replace('#', '')}
+              {tag.replace("#", "")}
             </Badge>
           ))}
         </div>

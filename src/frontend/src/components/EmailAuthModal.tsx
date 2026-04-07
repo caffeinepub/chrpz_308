@@ -1,16 +1,22 @@
-import React, { useState } from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from './ui/dialog';
-import { Button } from './ui/button';
-import { Input } from './ui/input';
-import { Label } from './ui/label';
-import { Checkbox } from './ui/checkbox';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
-import { Alert, AlertDescription } from './ui/alert';
-import { Loader2, Mail, Lock, User, AlertCircle } from 'lucide-react';
-import { toast } from 'sonner';
-import { useActor } from '../hooks/useActor';
-import { hashPassword, isStrongPassword } from '../lib/passwordHash';
-import { Principal } from '@icp-sdk/core/principal';
+import type { Principal } from "@icp-sdk/core/principal";
+import { AlertCircle, Loader2, Lock, Mail, User } from "lucide-react";
+import React, { useState } from "react";
+import { toast } from "sonner";
+import { useActor } from "../hooks/useActor";
+import { hashPassword, isStrongPassword } from "../lib/passwordHash";
+import { Alert, AlertDescription } from "./ui/alert";
+import { Button } from "./ui/button";
+import { Checkbox } from "./ui/checkbox";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "./ui/dialog";
+import { Input } from "./ui/input";
+import { Label } from "./ui/label";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
 
 interface EmailAuthModalProps {
   isOpen: boolean;
@@ -18,37 +24,41 @@ interface EmailAuthModalProps {
   onSuccess?: (principal: Principal) => void;
 }
 
-export default function EmailAuthModal({ isOpen, onClose, onSuccess }: EmailAuthModalProps) {
+export default function EmailAuthModal({
+  isOpen,
+  onClose,
+  onSuccess: _onSuccess,
+}: EmailAuthModalProps) {
   const { actor } = useActor();
-  const [activeTab, setActiveTab] = useState<'signin' | 'register'>('signin');
+  const [activeTab, setActiveTab] = useState<"signin" | "register">("signin");
   const [isLoading, setIsLoading] = useState(false);
 
   // Sign In State
-  const [signInEmail, setSignInEmail] = useState('');
-  const [signInPassword, setSignInPassword] = useState('');
+  const [signInEmail, setSignInEmail] = useState("");
+  const [signInPassword, setSignInPassword] = useState("");
 
   // Registration State
-  const [regEmail, setRegEmail] = useState('');
-  const [regPassword, setRegPassword] = useState('');
-  const [regConfirmPassword, setRegConfirmPassword] = useState('');
-  const [regName, setRegName] = useState('');
-  const [regBio, setRegBio] = useState('');
+  const [regEmail, setRegEmail] = useState("");
+  const [regPassword, setRegPassword] = useState("");
+  const [regConfirmPassword, setRegConfirmPassword] = useState("");
+  const [regName, setRegName] = useState("");
+  const [regBio, setRegBio] = useState("");
   const [regNewsletter, setRegNewsletter] = useState(false);
 
   const handleSignIn = async () => {
     if (!signInEmail || !signInPassword) {
-      toast.error('Please fill in all fields');
+      toast.error("Please fill in all fields");
       return;
     }
 
     setIsLoading(true);
     try {
-      if (!actor) throw new Error('Actor not available');
-      
-      toast.error('Email authentication not implemented in backend');
+      if (!actor) throw new Error("Actor not available");
+
+      toast.error("Email authentication not implemented in backend");
       // Backend implementation required
     } catch (error: any) {
-      toast.error(error.message || 'Sign in failed');
+      toast.error(error.message || "Sign in failed");
     } finally {
       setIsLoading(false);
     }
@@ -56,28 +66,30 @@ export default function EmailAuthModal({ isOpen, onClose, onSuccess }: EmailAuth
 
   const handleRegister = async () => {
     if (!regEmail || !regPassword || !regConfirmPassword || !regName) {
-      toast.error('Please fill in all required fields');
+      toast.error("Please fill in all required fields");
       return;
     }
 
     if (regPassword !== regConfirmPassword) {
-      toast.error('Passwords do not match');
+      toast.error("Passwords do not match");
       return;
     }
 
     if (!isStrongPassword(regPassword)) {
-      toast.error('Password must be at least 8 characters with uppercase, lowercase, and number');
+      toast.error(
+        "Password must be at least 8 characters with uppercase, lowercase, and number",
+      );
       return;
     }
 
     setIsLoading(true);
     try {
-      if (!actor) throw new Error('Actor not available');
+      if (!actor) throw new Error("Actor not available");
 
-      toast.error('Email registration not implemented in backend');
+      toast.error("Email registration not implemented in backend");
       // Backend implementation required
     } catch (error: any) {
-      toast.error(error.message || 'Registration failed');
+      toast.error(error.message || "Registration failed");
     } finally {
       setIsLoading(false);
     }
@@ -87,18 +99,26 @@ export default function EmailAuthModal({ isOpen, onClose, onSuccess }: EmailAuth
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-md glass-dark border-2">
         <DialogHeader>
-          <DialogTitle className="text-foreground">Email Authentication</DialogTitle>
-          <DialogDescription>Sign in or register with your email</DialogDescription>
+          <DialogTitle className="text-foreground">
+            Email Authentication
+          </DialogTitle>
+          <DialogDescription>
+            Sign in or register with your email
+          </DialogDescription>
         </DialogHeader>
 
         <Alert className="border-amber-500/50 bg-amber-950/20">
           <AlertCircle className="w-4 h-4 text-amber-500" />
           <AlertDescription className="text-amber-200">
-            Email authentication requires backend implementation. The UI is ready but backend methods are not yet available.
+            Email authentication requires backend implementation. The UI is
+            ready but backend methods are not yet available.
           </AlertDescription>
         </Alert>
 
-        <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as 'signin' | 'register')}>
+        <Tabs
+          value={activeTab}
+          onValueChange={(v) => setActiveTab(v as "signin" | "register")}
+        >
           <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger value="signin">Sign In</TabsTrigger>
             <TabsTrigger value="register">Register</TabsTrigger>
@@ -106,7 +126,9 @@ export default function EmailAuthModal({ isOpen, onClose, onSuccess }: EmailAuth
 
           <TabsContent value="signin" className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="signin-email" className="text-foreground">Email</Label>
+              <Label htmlFor="signin-email" className="text-foreground">
+                Email
+              </Label>
               <div className="relative">
                 <Mail className="absolute left-3 top-3 w-4 h-4 text-muted-foreground" />
                 <Input
@@ -121,7 +143,9 @@ export default function EmailAuthModal({ isOpen, onClose, onSuccess }: EmailAuth
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="signin-password" className="text-foreground">Password</Label>
+              <Label htmlFor="signin-password" className="text-foreground">
+                Password
+              </Label>
               <div className="relative">
                 <Lock className="absolute left-3 top-3 w-4 h-4 text-muted-foreground" />
                 <Input
@@ -146,14 +170,16 @@ export default function EmailAuthModal({ isOpen, onClose, onSuccess }: EmailAuth
                   Signing in...
                 </>
               ) : (
-                'Sign In'
+                "Sign In"
               )}
             </Button>
           </TabsContent>
 
           <TabsContent value="register" className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="reg-email" className="text-foreground">Email *</Label>
+              <Label htmlFor="reg-email" className="text-foreground">
+                Email *
+              </Label>
               <div className="relative">
                 <Mail className="absolute left-3 top-3 w-4 h-4 text-muted-foreground" />
                 <Input
@@ -168,7 +194,9 @@ export default function EmailAuthModal({ isOpen, onClose, onSuccess }: EmailAuth
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="reg-name" className="text-foreground">Display Name *</Label>
+              <Label htmlFor="reg-name" className="text-foreground">
+                Display Name *
+              </Label>
               <div className="relative">
                 <User className="absolute left-3 top-3 w-4 h-4 text-muted-foreground" />
                 <Input
@@ -182,7 +210,9 @@ export default function EmailAuthModal({ isOpen, onClose, onSuccess }: EmailAuth
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="reg-password" className="text-foreground">Password *</Label>
+              <Label htmlFor="reg-password" className="text-foreground">
+                Password *
+              </Label>
               <div className="relative">
                 <Lock className="absolute left-3 top-3 w-4 h-4 text-muted-foreground" />
                 <Input
@@ -197,7 +227,9 @@ export default function EmailAuthModal({ isOpen, onClose, onSuccess }: EmailAuth
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="reg-confirm-password" className="text-foreground">Confirm Password *</Label>
+              <Label htmlFor="reg-confirm-password" className="text-foreground">
+                Confirm Password *
+              </Label>
               <div className="relative">
                 <Lock className="absolute left-3 top-3 w-4 h-4 text-muted-foreground" />
                 <Input
@@ -212,7 +244,9 @@ export default function EmailAuthModal({ isOpen, onClose, onSuccess }: EmailAuth
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="reg-bio" className="text-foreground">Bio (Optional)</Label>
+              <Label htmlFor="reg-bio" className="text-foreground">
+                Bio (Optional)
+              </Label>
               <Input
                 id="reg-bio"
                 value={regBio}
@@ -226,9 +260,14 @@ export default function EmailAuthModal({ isOpen, onClose, onSuccess }: EmailAuth
               <Checkbox
                 id="reg-newsletter"
                 checked={regNewsletter}
-                onCheckedChange={(checked) => setRegNewsletter(checked as boolean)}
+                onCheckedChange={(checked) =>
+                  setRegNewsletter(checked as boolean)
+                }
               />
-              <Label htmlFor="reg-newsletter" className="text-sm text-foreground cursor-pointer">
+              <Label
+                htmlFor="reg-newsletter"
+                className="text-sm text-foreground cursor-pointer"
+              >
                 Subscribe to newsletter
               </Label>
             </div>
@@ -244,7 +283,7 @@ export default function EmailAuthModal({ isOpen, onClose, onSuccess }: EmailAuth
                   Registering...
                 </>
               ) : (
-                'Register'
+                "Register"
               )}
             </Button>
           </TabsContent>

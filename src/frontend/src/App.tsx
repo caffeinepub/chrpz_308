@@ -1,56 +1,48 @@
-import React from 'react';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { RouterProvider, createRouter, createRootRoute, createRoute, Outlet } from '@tanstack/react-router';
-import { ThemeProvider } from 'next-themes';
-import { Toaster } from './components/ui/sonner';
-import { InternetIdentityProvider } from './hooks/useInternetIdentity';
-import HomePage from './pages/HomePage';
-import ProfileEditPage from './components/ProfileEditPage';
-import WalletDashboard from './components/WalletDashboard';
-import { ErrorBoundary } from './components/ErrorBoundary';
-import AppInitializer from './components/AppInitializer';
+import {
+  Outlet,
+  RouterProvider,
+  createRootRoute,
+  createRoute,
+  createRouter,
+} from "@tanstack/react-router";
+import { Suspense, lazy } from "react";
+import { Toaster } from "./components/ui/sonner";
 
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      staleTime: 1000 * 60 * 5,
-      refetchOnWindowFocus: false,
-      retry: 1,
-    },
-  },
-});
+const HomePage = lazy(() => import("./pages/HomePage"));
+const ProfilePage = lazy(() => import("./pages/ProfilePage"));
+const AdminPage = lazy(() => import("./pages/AdminPage"));
 
 const rootRoute = createRootRoute({
   component: () => (
-    <ErrorBoundary>
+    <Suspense fallback={<div className="min-h-screen bg-background" />}>
       <Outlet />
-    </ErrorBoundary>
+    </Suspense>
   ),
 });
 
 const indexRoute = createRoute({
   getParentRoute: () => rootRoute,
-  path: '/',
+  path: "/",
   component: HomePage,
 });
 
 const profileRoute = createRoute({
   getParentRoute: () => rootRoute,
-  path: '/profile',
-  component: ProfileEditPage,
+  path: "/profile",
+  component: ProfilePage,
 });
 
-const walletRoute = createRoute({
+const adminRoute = createRoute({
   getParentRoute: () => rootRoute,
-  path: '/wallet',
-  component: WalletDashboard,
+  path: "/admin",
+  component: AdminPage,
 });
 
-const routeTree = rootRoute.addChildren([indexRoute, profileRoute, walletRoute]);
+const routeTree = rootRoute.addChildren([indexRoute, profileRoute, adminRoute]);
 
 const router = createRouter({ routeTree });
 
-declare module '@tanstack/react-router' {
+declare module "@tanstack/react-router" {
   interface Register {
     router: typeof router;
   }
@@ -58,15 +50,9 @@ declare module '@tanstack/react-router' {
 
 export default function App() {
   return (
-    <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
-      <QueryClientProvider client={queryClient}>
-        <InternetIdentityProvider>
-          <AppInitializer>
-            <RouterProvider router={router} />
-            <Toaster />
-          </AppInitializer>
-        </InternetIdentityProvider>
-      </QueryClientProvider>
-    </ThemeProvider>
+    <>
+      <RouterProvider router={router} />
+      <Toaster />
+    </>
   );
 }

@@ -1,10 +1,13 @@
-import React from 'react';
-import { Card, CardContent } from './ui/card';
-import { Button } from './ui/button';
-import { Lock, Loader2 } from 'lucide-react';
-import { useUnlockPaywallContent, useGetCallerWallet } from '../hooks/useQueries';
-import { useInternetIdentity } from '../hooks/useInternetIdentity';
-import { toast } from 'sonner';
+import { Loader2, Lock } from "lucide-react";
+import React from "react";
+import { toast } from "sonner";
+import { useInternetIdentity } from "../hooks/useInternetIdentity";
+import {
+  useGetCallerWallet,
+  useUnlockPaywallContent,
+} from "../hooks/useQueries";
+import { Button } from "./ui/button";
+import { Card, CardContent } from "./ui/card";
 
 interface LockedVideoOverlayProps {
   postId: bigint;
@@ -14,12 +17,12 @@ interface LockedVideoOverlayProps {
   onUnlocked: () => void;
 }
 
-export default function LockedVideoOverlay({ 
-  postId, 
-  contentIndex, 
-  price, 
+export default function LockedVideoOverlay({
+  postId,
+  contentIndex,
+  price,
   description,
-  onUnlocked 
+  onUnlocked,
 }: LockedVideoOverlayProps) {
   const { identity } = useInternetIdentity();
   const unlockContent = useUnlockPaywallContent();
@@ -32,25 +35,27 @@ export default function LockedVideoOverlay({
 
   const handleUnlock = async () => {
     if (!isAuthenticated) {
-      toast.error('Please sign in to unlock content');
+      toast.error("Please sign in to unlock content");
       return;
     }
 
     if (balance < price) {
-      toast.error(`Insufficient balance. You need ${priceICP.toFixed(4)} ICP but have ${balanceICP.toFixed(4)} ICP`);
+      toast.error(
+        `Insufficient balance. You need ${priceICP.toFixed(4)} ICP but have ${balanceICP.toFixed(4)} ICP`,
+      );
       return;
     }
 
     try {
       await unlockContent.mutateAsync({
         postId,
-        contentType: 'video',
+        contentType: "video",
         contentIndex: BigInt(contentIndex),
       });
-      toast.success('Video unlocked!');
+      toast.success("Video unlocked!");
       onUnlocked();
     } catch (error: any) {
-      toast.error(error.message || 'Failed to unlock video');
+      toast.error(error.message || "Failed to unlock video");
     }
   };
 
@@ -62,7 +67,7 @@ export default function LockedVideoOverlay({
             <Lock className="w-10 h-10 text-amber-500" />
           </div>
         </div>
-        
+
         <div className="space-y-2">
           <h3 className="text-2xl font-bold text-foreground">Premium Video</h3>
           {description && (

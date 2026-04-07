@@ -1,14 +1,19 @@
-import React, { useEffect, useState } from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from './ui/dialog';
-import { Card, CardContent } from './ui/card';
-import { Button } from './ui/button';
-import { Badge } from './ui/badge';
-import { User, Calendar, Star, Users, Loader2 } from 'lucide-react';
-import { Principal } from '@icp-sdk/core/principal';
-import { useGetUserProfile, useFollowUser, useUnfollowUser, useIsFollowing } from '../hooks/useQueries';
-import type { UserProfile } from '../types';
-import { toast } from 'sonner';
-import { useInternetIdentity } from '../hooks/useInternetIdentity';
+import type { Principal } from "@icp-sdk/core/principal";
+import { Calendar, Loader2, Star, User, Users } from "lucide-react";
+import React, { useEffect, useState } from "react";
+import { toast } from "sonner";
+import { useInternetIdentity } from "../hooks/useInternetIdentity";
+import {
+  useFollowUser,
+  useGetUserProfileMutation,
+  useIsFollowing,
+  useUnfollowUser,
+} from "../hooks/useQueries";
+import type { UserProfile } from "../types";
+import { Badge } from "./ui/badge";
+import { Button } from "./ui/button";
+import { Card, CardContent } from "./ui/card";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "./ui/dialog";
 
 interface UserProfilePageProps {
   isOpen: boolean;
@@ -16,13 +21,17 @@ interface UserProfilePageProps {
   userPrincipal: Principal;
 }
 
-export default function UserProfilePage({ isOpen, onClose, userPrincipal }: UserProfilePageProps) {
+export default function UserProfilePage({
+  isOpen,
+  onClose,
+  userPrincipal,
+}: UserProfilePageProps) {
   const { identity } = useInternetIdentity();
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [isFollowing, setIsFollowing] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
-  const getUserProfile = useGetUserProfile();
+  const getUserProfile = useGetUserProfileMutation();
   const followUser = useFollowUser();
   const unfollowUser = useUnfollowUser();
   const checkFollowing = useIsFollowing();
@@ -31,12 +40,15 @@ export default function UserProfilePage({ isOpen, onClose, userPrincipal }: User
     if (isOpen) {
       loadProfile();
     }
-  }, [isOpen, userPrincipal]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isOpen]);
 
   const loadProfile = async () => {
     setIsLoading(true);
     try {
-      const profileData = await getUserProfile.mutateAsync(userPrincipal);
+      const profileData = await getUserProfile.mutateAsync(
+        userPrincipal.toString(),
+      );
       setProfile(profileData);
 
       if (identity) {
@@ -44,8 +56,8 @@ export default function UserProfilePage({ isOpen, onClose, userPrincipal }: User
         setIsFollowing(following);
       }
     } catch (error: any) {
-      console.error('Failed to load profile:', error);
-      toast.error(error.message || 'Backend not implemented');
+      console.error("Failed to load profile:", error);
+      toast.error(error.message || "Backend not implemented");
     } finally {
       setIsLoading(false);
     }
@@ -53,7 +65,7 @@ export default function UserProfilePage({ isOpen, onClose, userPrincipal }: User
 
   const handleFollow = async () => {
     if (!identity) {
-      toast.error('Please sign in to follow users');
+      toast.error("Please sign in to follow users");
       return;
     }
 
@@ -61,19 +73,20 @@ export default function UserProfilePage({ isOpen, onClose, userPrincipal }: User
       if (isFollowing) {
         await unfollowUser.mutateAsync(userPrincipal);
         setIsFollowing(false);
-        toast.success('Unfollowed user');
+        toast.success("Unfollowed user");
       } else {
         await followUser.mutateAsync(userPrincipal);
         setIsFollowing(true);
-        toast.success('Following user');
+        toast.success("Following user");
       }
       await loadProfile();
     } catch (error: any) {
-      toast.error(error.message || 'Failed to update follow status');
+      toast.error(error.message || "Failed to update follow status");
     }
   };
 
-  const isOwnProfile = identity && userPrincipal.toString() === identity.getPrincipal().toString();
+  const isOwnProfile =
+    identity && userPrincipal.toString() === identity.getPrincipal().toString();
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -94,23 +107,33 @@ export default function UserProfilePage({ isOpen, onClose, userPrincipal }: User
                 <User className="w-10 h-10 text-white" />
               </div>
               <div className="flex-1">
-                <h2 className="text-2xl font-bold text-foreground">{profile.name}</h2>
+                <h2 className="text-2xl font-bold text-foreground">
+                  {profile.name}
+                </h2>
                 {profile.bio && (
-                  <p className="text-sm text-muted-foreground mt-1">{profile.bio}</p>
+                  <p className="text-sm text-muted-foreground mt-1">
+                    {profile.bio}
+                  </p>
                 )}
                 <div className="flex items-center gap-4 mt-3">
                   <div className="flex items-center gap-1 text-sm">
                     <Users className="w-4 h-4 text-muted-foreground" />
-                    <span className="font-medium text-foreground">{profile.followerCount.toString()}</span>
+                    <span className="font-medium text-foreground">
+                      {profile.followerCount.toString()}
+                    </span>
                     <span className="text-muted-foreground">followers</span>
                   </div>
                   <div className="flex items-center gap-1 text-sm">
-                    <span className="font-medium text-foreground">{profile.followingCount.toString()}</span>
+                    <span className="font-medium text-foreground">
+                      {profile.followingCount.toString()}
+                    </span>
                     <span className="text-muted-foreground">following</span>
                   </div>
                   <div className="flex items-center gap-1 text-sm">
                     <Star className="w-4 h-4 text-amber-500" />
-                    <span className="font-medium text-foreground">{profile.averageRating.toFixed(1)}</span>
+                    <span className="font-medium text-foreground">
+                      {profile.averageRating.toFixed(1)}
+                    </span>
                   </div>
                 </div>
               </div>
@@ -118,10 +141,14 @@ export default function UserProfilePage({ isOpen, onClose, userPrincipal }: User
                 <Button
                   onClick={handleFollow}
                   disabled={followUser.isPending || unfollowUser.isPending}
-                  variant={isFollowing ? 'outline' : 'default'}
-                  className={!isFollowing ? 'bg-gradient-to-r from-indigo-600 to-purple-600' : ''}
+                  variant={isFollowing ? "outline" : "default"}
+                  className={
+                    !isFollowing
+                      ? "bg-gradient-to-r from-indigo-600 to-purple-600"
+                      : ""
+                  }
                 >
-                  {isFollowing ? 'Unfollow' : 'Follow'}
+                  {isFollowing ? "Unfollow" : "Follow"}
                 </Button>
               )}
             </div>
@@ -135,7 +162,9 @@ export default function UserProfilePage({ isOpen, onClose, userPrincipal }: User
                     <div>
                       <p className="text-xs text-muted-foreground">Joined</p>
                       <p className="text-sm font-medium text-foreground">
-                        {new Date(Number(profile.joinedDate) / 1000000).toLocaleDateString()}
+                        {new Date(
+                          Number(profile.joinedDate) / 1000000,
+                        ).toLocaleDateString()}
                       </p>
                     </div>
                   </div>
@@ -147,7 +176,9 @@ export default function UserProfilePage({ isOpen, onClose, userPrincipal }: User
                   <div className="flex items-center gap-2">
                     <Star className="w-4 h-4 text-amber-500" />
                     <div>
-                      <p className="text-xs text-muted-foreground">Total Ratings</p>
+                      <p className="text-xs text-muted-foreground">
+                        Total Ratings
+                      </p>
                       <p className="text-sm font-medium text-foreground">
                         {profile.totalRatings.toString()}
                       </p>
@@ -160,11 +191,15 @@ export default function UserProfilePage({ isOpen, onClose, userPrincipal }: User
             {/* Wallet Info */}
             <Card className="glass-dark border-2 border-primary/30">
               <CardContent className="pt-4 space-y-2">
-                <p className="text-xs font-medium text-muted-foreground">Account ID (AID)</p>
+                <p className="text-xs font-medium text-muted-foreground">
+                  Account ID (AID)
+                </p>
                 <code className="text-xs bg-background/50 p-2 rounded block break-all font-mono">
                   {profile.accountId}
                 </code>
-                <p className="text-xs font-medium text-muted-foreground mt-3">Principal ID (PID)</p>
+                <p className="text-xs font-medium text-muted-foreground mt-3">
+                  Principal ID (PID)
+                </p>
                 <code className="text-xs bg-background/50 p-2 rounded block break-all font-mono">
                   {profile.principalId}
                 </code>

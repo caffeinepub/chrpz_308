@@ -1,41 +1,47 @@
-import React from 'react';
-import { Button } from './ui/button';
-import { Card, CardContent } from './ui/card';
-import { Lock, ExternalLink, Loader2 } from 'lucide-react';
-import { useUnlockPaywallContent, useHasPaywallAccess } from '../hooks/useQueries';
-import type { PaywallLink } from '../types';
-import { toast } from 'sonner';
+import { ExternalLink, Loader2, Lock } from "lucide-react";
+import React from "react";
+import { toast } from "sonner";
+import {
+  useHasPaywallAccess,
+  useUnlockPaywallContent,
+} from "../hooks/useQueries";
+import type { PaywallLink } from "../types";
+import { Button } from "./ui/button";
+import { Card, CardContent } from "./ui/card";
 
 interface PaywallLinkSectionProps {
   postId: bigint;
   links: PaywallLink[];
 }
 
-export default function PaywallLinkSection({ postId, links }: PaywallLinkSectionProps) {
+export default function PaywallLinkSection({
+  postId,
+  links,
+}: PaywallLinkSectionProps) {
   const unlockContent = useUnlockPaywallContent();
   const checkAccess = useHasPaywallAccess();
 
-  const handleUnlock = async (index: number, price: bigint) => {
+  const handleUnlock = async (index: number, _price: bigint) => {
     try {
       await unlockContent.mutateAsync({
         postId,
-        contentType: 'link',
+        contentType: "link",
         contentIndex: BigInt(index),
       });
-      toast.success('Link unlocked!');
+      toast.success("Link unlocked!");
     } catch (error: any) {
-      toast.error(error.message || 'Failed to unlock link');
+      toast.error(error.message || "Failed to unlock link");
     }
   };
 
-  const checkLinkAccess = async (index: number): Promise<boolean> => {
+  const _checkLinkAccess = async (index: number): Promise<boolean> => {
     try {
       return await checkAccess.mutateAsync({
         postId,
-        contentType: 'link',
+        contentType: "link",
         contentIndex: BigInt(index),
       });
-    } catch (error) {
+    } catch (_error) {
       return false;
     }
   };
@@ -49,11 +55,16 @@ export default function PaywallLinkSection({ postId, links }: PaywallLinkSection
         Premium Links
       </h3>
       {links.map((link, index) => (
-        <Card key={index} className="glass-dark border-2 border-amber-500/30">
+        <Card
+          key={link.url || index}
+          className="glass-dark border-2 border-amber-500/30"
+        >
           <CardContent className="pt-4">
             <div className="flex items-center justify-between">
               <div className="flex-1">
-                <p className="text-sm font-medium text-foreground">{link.description || 'Premium Link'}</p>
+                <p className="text-sm font-medium text-foreground">
+                  {link.description || "Premium Link"}
+                </p>
                 <p className="text-xs text-muted-foreground mt-1">
                   Price: {(Number(link.price) / 100000000).toFixed(8)} ICP
                 </p>

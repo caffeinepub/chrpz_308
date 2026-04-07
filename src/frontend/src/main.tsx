@@ -1,22 +1,33 @@
-import ReactDOM from 'react-dom/client';
-import { InternetIdentityProvider } from './hooks/useInternetIdentity';
-import { initEditor } from './hooks/useEditor';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import App from './App';
-import './index.css';
+import { InternetIdentityProvider } from "@caffeineai/core-infrastructure";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import ReactDOM from "react-dom/client";
+import App from "./App";
+import "./index.css";
 
-const queryClient = new QueryClient();
+BigInt.prototype.toJSON = function () {
+  return this.toString();
+};
 
-if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', () => initEditor());
-} else {
-    initEditor();
+declare global {
+  interface BigInt {
+    toJSON(): string;
+  }
 }
 
-ReactDOM.createRoot(document.getElementById('root')!).render(
-    <QueryClientProvider client={queryClient}>
-        <InternetIdentityProvider>
-            <App />
-        </InternetIdentityProvider>
-    </QueryClientProvider>
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 1000 * 60 * 5,
+      refetchOnWindowFocus: false,
+      retry: 1,
+    },
+  },
+});
+
+ReactDOM.createRoot(document.getElementById("root")!).render(
+  <QueryClientProvider client={queryClient}>
+    <InternetIdentityProvider>
+      <App />
+    </InternetIdentityProvider>
+  </QueryClientProvider>,
 );

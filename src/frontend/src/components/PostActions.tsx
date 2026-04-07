@@ -1,10 +1,10 @@
-import React from 'react';
-import { Button } from './ui/button';
-import { Heart, MessageCircle, DollarSign } from 'lucide-react';
-import { useLikePost, useUnlikePost } from '../hooks/useQueries';
-import { useInternetIdentity } from '../hooks/useInternetIdentity';
-import TipModal from './TipModal';
-import { toast } from 'sonner';
+import { DollarSign, Heart, MessageCircle } from "lucide-react";
+import React from "react";
+import { toast } from "sonner";
+import { useInternetIdentity } from "../hooks/useInternetIdentity";
+import { useLikePost, useUnlikePost } from "../hooks/useQueries";
+import TipModal from "./TipModal";
+import { Button } from "./ui/button";
 
 interface PostActionsProps {
   postId: bigint;
@@ -14,7 +14,13 @@ interface PostActionsProps {
   onCommentClick: () => void;
 }
 
-export default function PostActions({ postId, likeCount, commentCount, tipCount, onCommentClick }: PostActionsProps) {
+export default function PostActions({
+  postId,
+  likeCount,
+  commentCount,
+  tipCount,
+  onCommentClick,
+}: PostActionsProps) {
   const { identity } = useInternetIdentity();
   const likePost = useLikePost();
   const unlikePost = useUnlikePost();
@@ -25,7 +31,7 @@ export default function PostActions({ postId, likeCount, commentCount, tipCount,
 
   const handleLike = async () => {
     if (!isAuthenticated) {
-      toast.error('Please sign in to like posts');
+      toast.error("Please sign in to like posts");
       return;
     }
 
@@ -38,13 +44,13 @@ export default function PostActions({ postId, likeCount, commentCount, tipCount,
         setIsLiked(true);
       }
     } catch (error: any) {
-      toast.error(error.message || 'Failed to update like');
+      toast.error(error.message || "Failed to update like");
     }
   };
 
   const handleComment = () => {
     if (!isAuthenticated) {
-      toast.error('Please sign in to comment');
+      toast.error("Please sign in to comment");
       return;
     }
     onCommentClick();
@@ -52,7 +58,7 @@ export default function PostActions({ postId, likeCount, commentCount, tipCount,
 
   const handleTip = () => {
     if (!isAuthenticated) {
-      toast.error('Please sign in to send tips');
+      toast.error("Please sign in to send tips");
       return;
     }
     setShowTipModal(true);
@@ -66,9 +72,9 @@ export default function PostActions({ postId, likeCount, commentCount, tipCount,
           size="sm"
           onClick={handleLike}
           disabled={likePost.isPending || unlikePost.isPending}
-          className={isLiked ? 'text-red-500' : ''}
+          className={isLiked ? "text-red-500" : ""}
         >
-          <Heart className={`w-4 h-4 mr-1 ${isLiked ? 'fill-current' : ''}`} />
+          <Heart className={`w-4 h-4 mr-1 ${isLiked ? "fill-current" : ""}`} />
           {likeCount}
         </Button>
 

@@ -1,20 +1,40 @@
-import React, { useState } from 'react';
-import { useInternetIdentity } from '../hooks/useInternetIdentity';
-import { useGetAllPosts } from '../hooks/useQueries';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
-import { Button } from './ui/button';
-import { Alert, AlertDescription } from './ui/alert';
-import { AlertCircle, Plus, TrendingUp, MessageSquare, Heart, Clock, Loader2 } from 'lucide-react';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
-import CreatePostModal from './CreatePostModal';
-import PostCard from './PostCard';
+import {
+  AlertCircle,
+  Clock,
+  Heart,
+  Loader2,
+  MessageSquare,
+  Plus,
+  TrendingUp,
+} from "lucide-react";
+import React, { useState } from "react";
+import { useInternetIdentity } from "../hooks/useInternetIdentity";
+import { useGetAllPosts } from "../hooks/useQueries";
+import CreatePostModal from "./CreatePostModal";
+import PostCard from "./PostCard";
+import { Alert, AlertDescription } from "./ui/alert";
+import { Button } from "./ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "./ui/card";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "./ui/select";
 
-type SortOption = 'latest' | 'mostLiked' | 'mostCommented';
+type SortOption = "latest" | "mostLiked" | "mostCommented";
 
 export default function MainContent() {
   const { identity } = useInternetIdentity();
   const { data: posts = [], isLoading: postsLoading } = useGetAllPosts();
-  const [sortBy, setSortBy] = useState<SortOption>('latest');
+  const [sortBy, setSortBy] = useState<SortOption>("latest");
   const [showCreatePost, setShowCreatePost] = useState(false);
 
   const isAuthenticated = !!identity;
@@ -22,11 +42,11 @@ export default function MainContent() {
   // Sort posts based on selected option
   const sortedPosts = [...posts].sort((a, b) => {
     switch (sortBy) {
-      case 'latest':
+      case "latest":
         return Number(b.timestamp - a.timestamp);
-      case 'mostLiked':
+      case "mostLiked":
         return Number(b.likeCount - a.likeCount);
-      case 'mostCommented':
+      case "mostCommented":
         return Number(b.commentCount - a.commentCount);
       default:
         return 0;
@@ -35,11 +55,11 @@ export default function MainContent() {
 
   const getSortIcon = (option: SortOption) => {
     switch (option) {
-      case 'latest':
+      case "latest":
         return <Clock className="w-4 h-4" />;
-      case 'mostLiked':
+      case "mostLiked":
         return <Heart className="w-4 h-4" />;
-      case 'mostCommented':
+      case "mostCommented":
         return <MessageSquare className="w-4 h-4" />;
     }
   };
@@ -77,15 +97,18 @@ export default function MainContent() {
           <h2 className="text-2xl font-bold text-foreground">Content Feed</h2>
           <div className="flex items-center gap-2">
             <span className="text-sm text-muted-foreground">Sort by:</span>
-            <Select value={sortBy} onValueChange={(value) => setSortBy(value as SortOption)}>
+            <Select
+              value={sortBy}
+              onValueChange={(value) => setSortBy(value as SortOption)}
+            >
               <SelectTrigger className="w-[180px] bg-card border-border">
                 <SelectValue>
                   <div className="flex items-center gap-2">
                     {getSortIcon(sortBy)}
                     <span>
-                      {sortBy === 'latest' && 'Latest'}
-                      {sortBy === 'mostLiked' && 'Most Liked'}
-                      {sortBy === 'mostCommented' && 'Most Commented'}
+                      {sortBy === "latest" && "Latest"}
+                      {sortBy === "mostLiked" && "Most Liked"}
+                      {sortBy === "mostCommented" && "Most Commented"}
                     </span>
                   </div>
                 </SelectValue>
@@ -125,19 +148,21 @@ export default function MainContent() {
         ) : sortedPosts.length === 0 ? (
           <Card className="glass-dark border-2">
             <CardHeader>
-              <CardTitle className="text-center text-foreground">No Posts Yet</CardTitle>
+              <CardTitle className="text-center text-foreground">
+                No Posts Yet
+              </CardTitle>
               <CardDescription className="text-center">
                 {isAuthenticated
-                  ? 'Be the first to create a post!'
-                  : 'Sign in to view and create posts'}
+                  ? "Be the first to create a post!"
+                  : "Sign in to view and create posts"}
               </CardDescription>
             </CardHeader>
             <CardContent className="text-center py-8">
               <TrendingUp className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
               <p className="text-muted-foreground">
                 {isAuthenticated
-                  ? 'Share your thoughts, media, and premium content with the community.'
-                  : 'Join the platform to access exclusive content and interact with creators.'}
+                  ? "Share your thoughts, media, and premium content with the community."
+                  : "Join the platform to access exclusive content and interact with creators."}
               </p>
             </CardContent>
           </Card>
@@ -162,7 +187,9 @@ export default function MainContent() {
               </p>
               <ul className="list-disc list-inside space-y-2 text-muted-foreground">
                 <li>Create and share posts with media</li>
-                <li>Interact with content through likes, comments, and ratings</li>
+                <li>
+                  Interact with content through likes, comments, and ratings
+                </li>
                 <li>Send and receive ICP and token tips</li>
                 <li>Access premium paywalled content</li>
                 <li>Build your profile and follow other users</li>
@@ -170,8 +197,8 @@ export default function MainContent() {
               <Alert className="border-primary/50 bg-primary/10">
                 <AlertCircle className="w-4 h-4 text-primary" />
                 <AlertDescription>
-                  Your registration will require admin approval. An ICP wallet will be automatically 
-                  generated for you upon approval.
+                  Your registration will require admin approval. An ICP wallet
+                  will be automatically generated for you upon approval.
                 </AlertDescription>
               </Alert>
             </CardContent>

@@ -1,5 +1,5 @@
-import React from 'react';
-import { ExternalBlob } from '../backend';
+import React from "react";
+import type { ExternalBlob } from "../backend";
 
 interface PostMediaProps {
   media: ExternalBlob[];
@@ -15,7 +15,10 @@ export default function PostMedia({ media, videos }: PostMediaProps) {
       {media.length > 0 && (
         <div className="grid grid-cols-2 gap-2">
           {media.map((blob, index) => (
-            <div key={index} className="rounded-lg overflow-hidden border border-border">
+            <div
+              key={blob.getDirectURL?.() ?? index}
+              className="rounded-lg overflow-hidden border border-border"
+            >
               <img
                 src={blob.getDirectURL()}
                 alt={`Media ${index + 1}`}
@@ -31,13 +34,17 @@ export default function PostMedia({ media, videos }: PostMediaProps) {
       {videos.length > 0 && (
         <div className="space-y-2">
           {videos.map((blob, index) => (
-            <div key={index} className="rounded-lg overflow-hidden border border-border">
+            <div
+              key={blob.getDirectURL?.() ?? index}
+              className="rounded-lg overflow-hidden border border-border"
+            >
               <video
                 src={blob.getDirectURL()}
                 controls
                 className="w-full h-auto"
                 preload="metadata"
               >
+                <track kind="captions" />
                 Your browser does not support the video tag.
               </video>
             </div>

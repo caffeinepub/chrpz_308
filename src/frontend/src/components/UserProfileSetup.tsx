@@ -1,29 +1,36 @@
-import React, { useState } from 'react';
-import { useRegisterUser } from '../hooks/useQueries';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
-import { Button } from './ui/button';
-import { Input } from './ui/input';
-import { Textarea } from './ui/textarea';
-import { Label } from './ui/label';
-import { Checkbox } from './ui/checkbox';
-import { Alert, AlertDescription } from './ui/alert';
-import { Loader2, AlertCircle, Clock } from 'lucide-react';
+import { AlertCircle, Clock, Loader2 } from "lucide-react";
+import type React from "react";
+import { useState } from "react";
+import { useRegisterUser } from "../hooks/useQueries";
+import { Alert, AlertDescription } from "./ui/alert";
+import { Button } from "./ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "./ui/card";
+import { Checkbox } from "./ui/checkbox";
+import { Input } from "./ui/input";
+import { Label } from "./ui/label";
+import { Textarea } from "./ui/textarea";
 
 export default function UserProfileSetup() {
-  const [name, setName] = useState('');
-  const [bio, setBio] = useState('');
+  const [name, setName] = useState("");
+  const [bio, setBio] = useState("");
   const [subscribeToNewsletter, setSubscribeToNewsletter] = useState(false);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
   const [submitted, setSubmitted] = useState(false);
 
   const registerUser = useRegisterUser();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError('');
+    setError("");
 
     if (!name.trim()) {
-      setError('Please enter your name');
+      setError("Please enter your name");
       return;
     }
 
@@ -36,7 +43,7 @@ export default function UserProfileSetup() {
       });
       setSubmitted(true);
     } catch (err: any) {
-      setError(err.message || 'Failed to submit registration');
+      setError(err.message || "Failed to submit registration");
     }
   };
 
@@ -49,14 +56,17 @@ export default function UserProfileSetup() {
               <Clock className="w-6 h-6 text-amber-500" />
               Registration Pending
             </CardTitle>
-            <CardDescription>Your registration is awaiting admin approval</CardDescription>
+            <CardDescription>
+              Your registration is awaiting admin approval
+            </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <Alert className="border-amber-500/50 bg-amber-950/20">
               <AlertCircle className="w-4 h-4 text-amber-500" />
               <AlertDescription className="text-amber-200">
-                Thank you for registering! An administrator will review your registration request shortly.
-                You will be able to access the platform once your registration is approved.
+                Thank you for registering! An administrator will review your
+                registration request shortly. You will be able to access the
+                platform once your registration is approved.
               </AlertDescription>
             </Alert>
             <p className="text-sm text-muted-foreground">
@@ -72,19 +82,26 @@ export default function UserProfileSetup() {
     <div className="fixed inset-0 bg-background/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
       <Card className="w-full max-w-md glass-dark border-2">
         <CardHeader>
-          <CardTitle className="text-foreground">Complete Your Profile</CardTitle>
+          <CardTitle className="text-foreground">
+            Complete Your Profile
+          </CardTitle>
           <CardDescription>Set up your profile to get started</CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
             {error && (
-              <Alert variant="destructive" className="glass-dark border-2 border-destructive">
+              <Alert
+                variant="destructive"
+                className="glass-dark border-2 border-destructive"
+              >
                 <AlertDescription>{error}</AlertDescription>
               </Alert>
             )}
 
             <div className="space-y-2">
-              <Label htmlFor="name" className="text-foreground">Display Name *</Label>
+              <Label htmlFor="name" className="text-foreground">
+                Display Name *
+              </Label>
               <Input
                 id="name"
                 value={name}
@@ -96,7 +113,9 @@ export default function UserProfileSetup() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="bio" className="text-foreground">Bio</Label>
+              <Label htmlFor="bio" className="text-foreground">
+                Bio
+              </Label>
               <Textarea
                 id="bio"
                 value={bio}
@@ -111,9 +130,14 @@ export default function UserProfileSetup() {
               <Checkbox
                 id="newsletter"
                 checked={subscribeToNewsletter}
-                onCheckedChange={(checked) => setSubscribeToNewsletter(checked as boolean)}
+                onCheckedChange={(checked) =>
+                  setSubscribeToNewsletter(checked as boolean)
+                }
               />
-              <Label htmlFor="newsletter" className="text-sm text-foreground cursor-pointer">
+              <Label
+                htmlFor="newsletter"
+                className="text-sm text-foreground cursor-pointer"
+              >
                 Subscribe to newsletter
               </Label>
             </div>
@@ -121,7 +145,8 @@ export default function UserProfileSetup() {
             <Alert className="glass-dark border-2 border-primary/50">
               <AlertCircle className="w-4 h-4 text-primary" />
               <AlertDescription className="text-sm">
-                Your registration will be pending admin approval. Once approved, an ICP wallet will be automatically generated for you.
+                Your registration will be pending admin approval. Once approved,
+                an ICP wallet will be automatically generated for you.
               </AlertDescription>
             </Alert>
 
@@ -136,7 +161,7 @@ export default function UserProfileSetup() {
                   Submitting...
                 </>
               ) : (
-                'Submit Registration'
+                "Submit Registration"
               )}
             </Button>
           </form>

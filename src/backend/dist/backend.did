@@ -1,0 +1,37 @@
+type UserPublic = 
+ record {
+   avatarUrl: text;
+   bio: text;
+   createdAt: int;
+   isAdmin: bool;
+   principalId: text;
+   username: text;
+ };
+type PostPublic = 
+ record {
+   authorId: text;
+   authorName: text;
+   content: text;
+   createdAt: int;
+   deleted: bool;
+   flagged: bool;
+   id: nat;
+   imageUrl: opt text;
+ };
+service : {
+  createPost: (content: text, imageUrl: opt text) -> (PostPublic);
+  deletePost: (postId: nat) -> ();
+  deleteUser: (principalId: text) -> ();
+  editPost: (postId: nat, content: text, imageUrl: opt text) -> (PostPublic);
+  flagPost: (postId: nat) -> ();
+  getAllPostsAdmin: () -> (vec PostPublic) query;
+  getFlaggedPosts: () -> (vec PostPublic) query;
+  getPost: (postId: nat) -> (opt PostPublic) query;
+  getPosts: (page: nat, pageSize: nat) -> (vec PostPublic) query;
+  getUserProfile: (principalId: text) -> (opt UserPublic) query;
+  getUsers: () -> (vec UserPublic) query;
+  isAdmin: () -> (bool) query;
+  registerOrGetUser: () -> (UserPublic);
+  unflagPost: (postId: nat) -> ();
+  updateProfile: (username: text, bio: text, avatarUrl: text) -> (UserPublic);
+}

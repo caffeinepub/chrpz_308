@@ -1,70 +1,75 @@
-import React, { useState, useEffect } from 'react';
-import { Button } from './ui/button';
-import { Textarea } from './ui/textarea';
-import { Card, CardContent } from './ui/card';
-import { Loader2, Trash2, MessageSquare } from 'lucide-react';
-import { useAddComment, useGetCommentsForPost, useDeleteComment } from '../hooks/useQueries';
-import type { Comment } from '../types';
-import { useInternetIdentity } from '../hooks/useInternetIdentity';
-import { toast } from 'sonner';
+import { Loader2, MessageSquare, Trash2 } from "lucide-react";
+import React, { useState, useEffect } from "react";
+import { toast } from "sonner";
+import { useInternetIdentity } from "../hooks/useInternetIdentity";
+import {
+  useAddComment,
+  useDeleteComment,
+  useGetCommentsForPost,
+} from "../hooks/useQueries";
+import type { Comment } from "../types";
+import { Button } from "./ui/button";
+import { Card, CardContent } from "./ui/card";
+import { Textarea } from "./ui/textarea";
 
 interface CommentSectionProps {
   postId: bigint;
 }
 
 export default function CommentSection({ postId }: CommentSectionProps) {
-  const [newComment, setNewComment] = useState('');
+  const [newComment, setNewComment] = useState("");
   const [comments, setComments] = useState<Comment[]>([]);
   const { identity } = useInternetIdentity();
-  
+
   const addComment = useAddComment();
   const getComments = useGetCommentsForPost();
   const deleteComment = useDeleteComment();
 
   useEffect(() => {
     loadComments();
-  }, [postId]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const loadComments = async () => {
     try {
       const result = await getComments.mutateAsync(postId);
       setComments(result);
     } catch (error: any) {
-      console.error('Failed to load comments:', error);
+      console.error("Failed to load comments:", error);
       // Backend not implemented yet
     }
   };
 
   const handleAddComment = async () => {
     if (!newComment.trim()) {
-      toast.error('Please enter a comment');
+      toast.error("Please enter a comment");
       return;
     }
 
     if (!identity) {
-      toast.error('Please sign in to comment');
+      toast.error("Please sign in to comment");
       return;
     }
 
     try {
       await addComment.mutateAsync({ postId, content: newComment.trim() });
-      setNewComment('');
+      setNewComment("");
       await loadComments();
-      toast.success('Comment added');
+      toast.success("Comment added");
     } catch (error: any) {
-      toast.error(error.message || 'Failed to add comment');
+      toast.error(error.message || "Failed to add comment");
     }
   };
 
   const handleDeleteComment = async (commentId: bigint) => {
-    if (!confirm('Delete this comment?')) return;
+    if (!confirm("Delete this comment?")) return;
 
     try {
       await deleteComment.mutateAsync(commentId);
       await loadComments();
-      toast.success('Comment deleted');
+      toast.success("Comment deleted");
     } catch (error: any) {
-      toast.error(error.message || 'Failed to delete comment');
+      toast.error(error.message || "Failed to delete comment");
     }
   };
 
@@ -96,7 +101,7 @@ export default function CommentSection({ postId }: CommentSectionProps) {
                 Posting...
               </>
             ) : (
-              'Post Comment'
+              "Post Comment"
             )}
           </Button>
         </div>
@@ -112,19 +117,25 @@ export default function CommentSection({ postId }: CommentSectionProps) {
                   <div className="flex items-center gap-2 mt-2 text-xs text-muted-foreground">
                     <span>{comment.author.toString().slice(0, 8)}...</span>
                     <span>•</span>
-                    <span>{new Date(Number(comment.timestamp) / 1000000).toLocaleString()}</span>
+                    <span>
+                      {new Date(
+                        Number(comment.timestamp) / 1000000,
+                      ).toLocaleString()}
+                    </span>
                   </div>
                 </div>
-                {identity && comment.author.toString() === identity.getPrincipal().toString() && (
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => handleDeleteComment(comment.id)}
-                    disabled={deleteComment.isPending}
-                  >
-                    <Trash2 className="w-4 h-4 text-red-500" />
-                  </Button>
-                )}
+                {identity &&
+                  comment.author.toString() ===
+                    identity.getPrincipal().toString() && (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => handleDeleteComment(comment.id)}
+                      disabled={deleteComment.isPending}
+                    >
+                      <Trash2 className="w-4 h-4 text-red-500" />
+                    </Button>
+                  )}
               </div>
             </CardContent>
           </Card>

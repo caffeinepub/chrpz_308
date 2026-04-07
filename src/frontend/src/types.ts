@@ -1,36 +1,13 @@
-// Import all types from the backend interface
-import type { 
-  Post, 
-  UserProfile, 
-  Wallet, 
-  Tip, 
-  PaywallLink, 
-  PaywalledVideo,
-  PostUpdatePayload,
-  UserApprovalInfo,
-  ApprovalStatus,
-  UserRole
-} from './backend';
+// Re-export all types from types/index.ts
+export type { UserProfile, Post, UserRole } from "./types/index";
 
-// Re-export for convenience
-export type { 
-  Post, 
-  UserProfile, 
-  Wallet, 
-  Tip, 
-  PaywallLink, 
-  PaywalledVideo,
-  PostUpdatePayload,
-  UserApprovalInfo,
-  ApprovalStatus,
-  UserRole
-};
+// Legacy types for backward compatibility with old components
+export type { Principal } from "@icp-sdk/core/principal";
 
-// Additional types not in backend
 export interface Comment {
   id: bigint;
   postId: bigint;
-  author: import('@icp-sdk/core/principal').Principal;
+  author: import("@icp-sdk/core/principal").Principal;
   content: string;
   timestamp: bigint;
 }
@@ -38,7 +15,7 @@ export interface Comment {
 export interface PostReport {
   id: bigint;
   postId: bigint;
-  reporter: import('@icp-sdk/core/principal').Principal;
+  reporter: import("@icp-sdk/core/principal").Principal;
   category: string;
   reason: string;
   timestamp: bigint;
@@ -50,12 +27,11 @@ export interface TokenRegistryEntry {
   name: string;
   symbol: string;
   decimals: bigint;
-  addedBy: import('@icp-sdk/core/principal').Principal;
+  addedBy: import("@icp-sdk/core/principal").Principal;
   timestamp: bigint;
   verified: boolean;
 }
 
-// ImportedToken type for frontend use (backend returns string[])
 export interface ImportedToken {
   canisterId: string;
   name: string;
@@ -63,4 +39,45 @@ export interface ImportedToken {
   decimals: bigint;
   balance: bigint;
   metadataFetched: boolean;
+}
+
+export interface Wallet {
+  owner: import("@icp-sdk/core/principal").Principal;
+  balance: bigint;
+  accountId: string;
+  transactionHistory: Tip[];
+}
+
+export interface Tip {
+  sender: import("@icp-sdk/core/principal").Principal;
+  recipient: import("@icp-sdk/core/principal").Principal;
+  amount: bigint;
+  tokenType: string;
+  transactionHash: string;
+  timestamp: bigint;
+}
+
+export interface PaywallLink {
+  url: string;
+  price: bigint;
+  description: string;
+  isActive: boolean;
+}
+
+export interface PaywalledVideo {
+  price: bigint;
+  description: string;
+  isActive: boolean;
+}
+
+export interface UserApprovalInfo {
+  principal: import("@icp-sdk/core/principal").Principal;
+  status: string;
+}
+
+export type ApprovalStatus = "pending" | "approved" | "rejected";
+
+export interface PostUpdatePayload {
+  content?: string;
+  imageUrl?: string;
 }

@@ -1,9 +1,13 @@
-import React, { useEffect, useState } from 'react';
-import { useActor } from '../hooks/useActor';
-import { useInternetIdentity } from '../hooks/useInternetIdentity';
-import { useGetCallerUserProfile, useEnsureWalletExists } from '../hooks/useQueries';
-import { Loader2, AlertCircle } from 'lucide-react';
-import { Button } from './ui/button';
+import { AlertCircle, Loader2 } from "lucide-react";
+import type React from "react";
+import { useEffect, useRef, useState } from "react";
+import { useActor } from "../hooks/useActor";
+import { useInternetIdentity } from "../hooks/useInternetIdentity";
+import {
+  useEnsureWalletExists,
+  useGetCallerUserProfile,
+} from "../hooks/useQueries";
+import { Button } from "./ui/button";
 
 interface AppInitializerProps {
   children: React.ReactNode;
@@ -12,8 +16,11 @@ interface AppInitializerProps {
 export default function AppInitializer({ children }: AppInitializerProps) {
   const { actor, isFetching: actorFetching } = useActor();
   const { identity, isInitializing: iiInitializing } = useInternetIdentity();
-  const { data: profile, isLoading: profileLoading, isFetched: profileFetched } = useGetCallerUserProfile();
+  const { data: profile, isFetched: profileFetched } =
+    useGetCallerUserProfile();
   const ensureWallet = useEnsureWalletExists();
+  const ensureWalletRef = useRef(ensureWallet.mutateAsync);
+  ensureWalletRef.current = ensureWallet.mutateAsync;
 
   const [initError, setInitError] = useState<string | null>(null);
   const [isReady, setIsReady] = useState(false);
@@ -26,7 +33,7 @@ export default function AppInitializer({ children }: AppInitializerProps) {
     // Set timeout for initialization - show content anyway after timeout
     const timeoutId = setTimeout(() => {
       if (!isReady) {
-        console.warn('Initialization timeout - showing content with warning');
+        console.warn("Initialization timeout - showing content with warning");
         setShowTimeoutWarning(true);
         setIsReady(true);
       }
@@ -47,8 +54,10 @@ export default function AppInitializer({ children }: AppInitializerProps) {
         if (!actor) {
           if (!actorFetching) {
             // Actor failed to initialize but not fetching anymore
-            console.warn('Actor initialization failed, continuing anyway');
-            setInitError('Connection issues detected. Some features may be limited.');
+            console.warn("Actor initialization failed, continuing anyway");
+            setInitError(
+              "Connection issues detected. Some features may be limited.",
+            );
             setIsReady(true);
           }
           return;
@@ -57,9 +66,9 @@ export default function AppInitializer({ children }: AppInitializerProps) {
         // If authenticated, ensure wallet exists (but don't block on it)
         if (isAuthenticated && profile && profileFetched) {
           try {
-            await ensureWallet.mutateAsync();
+            await ensureWalletRef.current();
           } catch (error) {
-            console.warn('Wallet check failed, continuing anyway:', error);
+            console.warn("Wallet check failed, continuing anyway:", error);
             // Don't block initialization if wallet check fails
           }
         }
@@ -67,16 +76,23 @@ export default function AppInitializer({ children }: AppInitializerProps) {
         // Initialization complete - show the app
         setIsReady(true);
         setInitError(null);
-      } catch (error: any) {
-        console.error('App initialization error:', error);
+      } catch (error: unknown) {
+        console.error("App initialization error:", error);
         // On error, still show the app but with a warning
-        setInitError('Some features may be limited due to connection issues.');
+        setInitError("Some features may be limited due to connection issues.");
         setIsReady(true);
       }
     };
 
     initializeApp();
-  }, [actor, actorFetching, iiInitializing, isAuthenticated, profile, profileFetched]);
+  }, [
+    actor,
+    actorFetching,
+    iiInitializing,
+    isAuthenticated,
+    profile,
+    profileFetched,
+  ]);
 
   const handleRetry = () => {
     window.location.reload();
@@ -89,8 +105,12 @@ export default function AppInitializer({ children }: AppInitializerProps) {
         <div className="text-center space-y-4">
           <Loader2 className="w-12 h-12 animate-spin mx-auto text-indigo-600" />
           <div className="space-y-2">
-            <p className="text-lg font-semibold text-gray-900">Connecting to Chrpz...</p>
-            <p className="text-sm text-gray-600">Initializing backend connection</p>
+            <p className="text-lg font-semibold text-gray-900">
+              Connecting to Chrpz...
+            </p>
+            <p className="text-sm text-gray-600">
+              Initializing backend connection
+            </p>
           </div>
         </div>
       </div>
@@ -106,7 +126,8 @@ export default function AppInitializer({ children }: AppInitializerProps) {
             <div className="flex items-center gap-2">
               <AlertCircle className="w-4 h-4 text-yellow-800" />
               <p className="text-sm text-yellow-800">
-                {initError || 'Connection slow - some features may be limited. You can continue browsing.'}
+                {initError ||
+                  "Connection slow - some features may be limited. You can continue browsing."}
               </p>
             </div>
             <Button variant="outline" size="sm" onClick={handleRetry}>

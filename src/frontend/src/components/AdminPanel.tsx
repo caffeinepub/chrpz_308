@@ -1,30 +1,54 @@
-import React, { useState, useEffect } from 'react';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
-import { Button } from './ui/button';
-import { Badge } from './ui/badge';
-import { CheckCircle, XCircle, Clock, AlertTriangle, Trash2, Flag, Shield, Eye, Loader2 } from 'lucide-react';
-import { ScrollArea } from './ui/scroll-area';
-import { toast } from 'sonner';
-import { Principal } from '@icp-sdk/core/principal';
-import { 
-  useListApprovals,
-  useSetApproval,
-  useGetAdminPosts,
+import type { Principal } from "@icp-sdk/core/principal";
+import {
+  AlertTriangle,
+  CheckCircle,
+  Clock,
+  Eye,
+  Flag,
+  Loader2,
+  Shield,
+  Trash2,
+  XCircle,
+} from "lucide-react";
+import React, { useState, useEffect, useRef } from "react";
+import { toast } from "sonner";
+import {
   useDeletePost,
   useFlagPost,
+  useGetAdminPosts,
+  useGetReportedPosts,
+  useListApprovals,
+  useSetApproval,
   useUnflagPost,
-  useGetReportedPosts
-} from '../hooks/useQueries';
-import type { Post, UserApprovalInfo } from '../types';
-import { Checkbox } from './ui/checkbox';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
-import { ApprovalStatus } from '../backend';
+} from "../hooks/useQueries";
+import { ApprovalStatus } from "../lib/backendCompat";
+import type { Post, UserApprovalInfo } from "../types";
+import { Badge } from "./ui/badge";
+import { Button } from "./ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "./ui/card";
+import { Checkbox } from "./ui/checkbox";
+import { ScrollArea } from "./ui/scroll-area";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "./ui/select";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
 
 export default function AdminPanel() {
-  const [activeTab, setActiveTab] = useState('overview');
+  const [activeTab, setActiveTab] = useState("overview");
   const [selectedPosts, setSelectedPosts] = useState<Set<bigint>>(new Set());
-  const [filterType, setFilterType] = useState<'all' | 'reported' | 'flagged'>('all');
+  const [filterType, setFilterType] = useState<"all" | "reported" | "flagged">(
+    "all",
+  );
   const [posts, setPosts] = useState<Post[]>([]);
 
   // Approvals
@@ -38,63 +62,78 @@ export default function AdminPanel() {
   const flagPost = useFlagPost();
   const unflagPost = useUnflagPost();
 
-  const pendingApprovals = approvals.filter(a => a.status === ApprovalStatus.pending);
+  // Stable refs for mutateAsync functions
+  const getAdminPostsRef = useRef(getAdminPosts.mutateAsync);
+  getAdminPostsRef.current = getAdminPosts.mutateAsync;
+  const getReportedPostsRef = useRef(getReportedPosts.mutateAsync);
+  getReportedPostsRef.current = getReportedPosts.mutateAsync;
+
+  const pendingApprovals = approvals.filter(
+    (a) => a.status === ApprovalStatus.pending,
+  );
 
   // Load posts based on filter
   useEffect(() => {
     const loadPosts = async () => {
       try {
         let result: Post[];
-        if (filterType === 'reported') {
-          result = await getReportedPosts.mutateAsync();
+        if (filterType === "reported") {
+          result = await getReportedPostsRef.current();
         } else {
-          result = await getAdminPosts.mutateAsync();
+          result = await getAdminPostsRef.current();
         }
-        
+
         // Apply additional filtering
-        if (filterType === 'flagged') {
-          result = result.filter(p => p.flagged);
+        if (filterType === "flagged") {
+          result = result.filter((p) => p.flagged);
         }
-        
+
         setPosts(result);
-      } catch (error: any) {
-        console.error('Failed to load posts:', error);
-        toast.error(error.message || 'Failed to load posts');
+      } catch (error: unknown) {
+        const err = error as { message?: string };
+        console.error("Failed to load posts:", error);
+        toast.error(err.message || "Failed to load posts");
       }
     };
 
-    if (activeTab === 'posts') {
+    if (activeTab === "posts") {
       loadPosts();
     }
   }, [activeTab, filterType]);
 
   const handleApproveRegistration = async (principal: Principal) => {
     try {
-      await setApproval.mutateAsync({ user: principal, status: ApprovalStatus.approved });
-      toast.success('Registration approved successfully');
+      await setApproval.mutateAsync({
+        user: principal,
+        status: ApprovalStatus.approved,
+      });
+      toast.success("Registration approved successfully");
     } catch (error: any) {
-      toast.error(error.message || 'Failed to approve registration');
+      toast.error(error.message || "Failed to approve registration");
     }
   };
 
   const handleRejectRegistration = async (principal: Principal) => {
     try {
-      await setApproval.mutateAsync({ user: principal, status: ApprovalStatus.rejected });
-      toast.success('Registration rejected');
+      await setApproval.mutateAsync({
+        user: principal,
+        status: ApprovalStatus.rejected,
+      });
+      toast.success("Registration rejected");
     } catch (error: any) {
-      toast.error(error.message || 'Failed to reject registration');
+      toast.error(error.message || "Failed to reject registration");
     }
   };
 
   const handleDeletePost = async (postId: bigint) => {
-    if (!confirm('Are you sure you want to delete this post?')) return;
+    if (!confirm("Are you sure you want to delete this post?")) return;
 
     try {
       await deletePost.mutateAsync(postId);
-      toast.success('Post deleted successfully');
-      setPosts(posts.filter(p => p.id !== postId));
+      toast.success("Post deleted successfully");
+      setPosts(posts.filter((p) => p.id !== postId));
     } catch (error: any) {
-      toast.error(error.message || 'Failed to delete post');
+      toast.error(error.message || "Failed to delete post");
     }
   };
 
@@ -102,34 +141,41 @@ export default function AdminPanel() {
     try {
       if (currentlyFlagged) {
         await unflagPost.mutateAsync(postId);
-        toast.success('Post unflagged');
+        toast.success("Post unflagged");
       } else {
         await flagPost.mutateAsync(postId);
-        toast.success('Post flagged');
+        toast.success("Post flagged");
       }
-      setPosts(posts.map(p => p.id === postId ? { ...p, flagged: !currentlyFlagged } : p));
+      setPosts(
+        posts.map((p) =>
+          p.id === postId ? { ...p, flagged: !currentlyFlagged } : p,
+        ),
+      );
     } catch (error: any) {
-      toast.error(error.message || 'Failed to update flag status');
+      toast.error(error.message || "Failed to update flag status");
     }
   };
 
   const handleBulkDelete = async () => {
     if (selectedPosts.size === 0) {
-      toast.error('No posts selected');
+      toast.error("No posts selected");
       return;
     }
 
-    if (!confirm(`Are you sure you want to delete ${selectedPosts.size} post(s)?`)) return;
+    if (
+      !confirm(`Are you sure you want to delete ${selectedPosts.size} post(s)?`)
+    )
+      return;
 
     try {
       for (const postId of Array.from(selectedPosts)) {
         await deletePost.mutateAsync(postId);
       }
       toast.success(`${selectedPosts.size} post(s) deleted successfully`);
-      setPosts(posts.filter(p => !selectedPosts.has(p.id)));
+      setPosts(posts.filter((p) => !selectedPosts.has(p.id)));
       setSelectedPosts(new Set());
     } catch (error: any) {
-      toast.error(error.message || 'Failed to delete posts');
+      toast.error(error.message || "Failed to delete posts");
     }
   };
 
@@ -147,7 +193,7 @@ export default function AdminPanel() {
     if (selectedPosts.size === posts.length) {
       setSelectedPosts(new Set());
     } else {
-      setSelectedPosts(new Set(posts.map(p => p.id)));
+      setSelectedPosts(new Set(posts.map((p) => p.id)));
     }
   };
 
@@ -157,23 +203,31 @@ export default function AdminPanel() {
         <h1 className="text-4xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent mb-2">
           Admin Panel
         </h1>
-        <p className="text-muted-foreground">Manage users, posts, and platform settings</p>
+        <p className="text-muted-foreground">
+          Manage users, posts, and platform settings
+        </p>
       </div>
 
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
+      <Tabs
+        value={activeTab}
+        onValueChange={setActiveTab}
+        className="space-y-6"
+      >
         <TabsList className="grid w-full grid-cols-3 lg:w-auto">
           <TabsTrigger value="overview">Overview</TabsTrigger>
           <TabsTrigger value="registrations">
             Registrations
             {pendingApprovals.length > 0 && (
-              <Badge variant="destructive" className="ml-2">{pendingApprovals.length}</Badge>
+              <Badge variant="destructive" className="ml-2">
+                {pendingApprovals.length}
+              </Badge>
             )}
           </TabsTrigger>
           <TabsTrigger value="posts">
             Posts
-            {posts.filter(p => p.reported || p.flagged).length > 0 && (
+            {posts.filter((p) => p.reported || p.flagged).length > 0 && (
               <Badge variant="destructive" className="ml-2">
-                {posts.filter(p => p.reported || p.flagged).length}
+                {posts.filter((p) => p.reported || p.flagged).length}
               </Badge>
             )}
           </TabsTrigger>
@@ -184,34 +238,42 @@ export default function AdminPanel() {
           <div className="grid gap-6 md:grid-cols-3">
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Pending Registrations</CardTitle>
+                <CardTitle className="text-sm font-medium">
+                  Pending Registrations
+                </CardTitle>
                 <Clock className="h-4 w-4 text-amber-500" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold text-amber-500">{pendingApprovals.length}</div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Reported Posts</CardTitle>
-                <AlertTriangle className="h-4 w-4 text-red-500" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold text-red-500">
-                  {posts.filter(p => p.reported).length}
+                <div className="text-2xl font-bold text-amber-500">
+                  {pendingApprovals.length}
                 </div>
               </CardContent>
             </Card>
 
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Flagged Posts</CardTitle>
+                <CardTitle className="text-sm font-medium">
+                  Reported Posts
+                </CardTitle>
+                <AlertTriangle className="h-4 w-4 text-red-500" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold text-red-500">
+                  {posts.filter((p) => p.reported).length}
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">
+                  Flagged Posts
+                </CardTitle>
                 <Flag className="h-4 w-4 text-orange-500" />
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold text-orange-500">
-                  {posts.filter(p => p.flagged).length}
+                  {posts.filter((p) => p.flagged).length}
                 </div>
               </CardContent>
             </Card>
@@ -236,18 +298,28 @@ export default function AdminPanel() {
                   {pendingApprovals.length === 0 ? (
                     <div className="text-center py-12">
                       <CheckCircle className="w-16 h-16 text-green-500 mx-auto mb-4" />
-                      <p className="text-lg font-semibold text-foreground">All caught up!</p>
-                      <p className="text-muted-foreground">No pending registrations to review</p>
+                      <p className="text-lg font-semibold text-foreground">
+                        All caught up!
+                      </p>
+                      <p className="text-muted-foreground">
+                        No pending registrations to review
+                      </p>
                     </div>
                   ) : (
                     pendingApprovals.map((approval: UserApprovalInfo) => (
-                      <Card key={approval.principal.toString()} className="border-2 border-amber-200 bg-amber-50/50 dark:bg-amber-950/20">
+                      <Card
+                        key={approval.principal.toString()}
+                        className="border-2 border-amber-200 bg-amber-50/50 dark:bg-amber-950/20"
+                      >
                         <CardContent className="pt-6">
                           <div className="space-y-4">
                             <div className="flex items-start justify-between">
                               <div className="flex-1 space-y-2">
                                 <div className="flex items-center gap-2">
-                                  <Badge variant="outline" className="border-amber-500 text-amber-700">
+                                  <Badge
+                                    variant="outline"
+                                    className="border-amber-500 text-amber-700"
+                                  >
                                     <Clock className="w-3 h-3 mr-1" />
                                     Pending
                                   </Badge>
@@ -264,7 +336,9 @@ export default function AdminPanel() {
                             </div>
                             <div className="flex gap-2">
                               <Button
-                                onClick={() => handleApproveRegistration(approval.principal)}
+                                onClick={() =>
+                                  handleApproveRegistration(approval.principal)
+                                }
                                 disabled={setApproval.isPending}
                                 className="flex-1 bg-green-600 hover:bg-green-700"
                               >
@@ -276,7 +350,9 @@ export default function AdminPanel() {
                                 Approve
                               </Button>
                               <Button
-                                onClick={() => handleRejectRegistration(approval.principal)}
+                                onClick={() =>
+                                  handleRejectRegistration(approval.principal)
+                                }
                                 disabled={setApproval.isPending}
                                 variant="destructive"
                                 className="flex-1"
@@ -311,11 +387,15 @@ export default function AdminPanel() {
                     Post Moderation
                   </CardTitle>
                   <CardDescription>
-                    View, flag, and delete posts. Filter by reported or flagged content.
+                    View, flag, and delete posts. Filter by reported or flagged
+                    content.
                   </CardDescription>
                 </div>
                 <div className="flex items-center gap-2">
-                  <Select value={filterType} onValueChange={(value: any) => setFilterType(value)}>
+                  <Select
+                    value={filterType}
+                    onValueChange={(value: any) => setFilterType(value)}
+                  >
                     <SelectTrigger className="w-[180px]">
                       <SelectValue placeholder="Filter posts" />
                     </SelectTrigger>
@@ -351,32 +431,48 @@ export default function AdminPanel() {
                   {posts.length === 0 ? (
                     <div className="text-center py-12">
                       <Eye className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
-                      <p className="text-lg font-semibold text-foreground">No posts to moderate</p>
+                      <p className="text-lg font-semibold text-foreground">
+                        No posts to moderate
+                      </p>
                       <p className="text-muted-foreground">
-                        {filterType === 'all' ? 'No posts found' : `No ${filterType} posts found`}
+                        {filterType === "all"
+                          ? "No posts found"
+                          : `No ${filterType} posts found`}
                       </p>
                     </div>
                   ) : (
                     <>
                       <div className="flex items-center gap-2 mb-4">
                         <Checkbox
-                          checked={selectedPosts.size === posts.length && posts.length > 0}
+                          checked={
+                            selectedPosts.size === posts.length &&
+                            posts.length > 0
+                          }
                           onCheckedChange={selectAllPosts}
                         />
-                        <span className="text-sm text-muted-foreground">Select All</span>
+                        <span className="text-sm text-muted-foreground">
+                          Select All
+                        </span>
                       </div>
                       {posts.map((post) => (
-                        <Card key={post.id.toString()} className={`border-2 ${post.reported ? 'border-red-300 bg-red-50/50 dark:bg-red-950/20' : post.flagged ? 'border-orange-300 bg-orange-50/50 dark:bg-orange-950/20' : ''}`}>
+                        <Card
+                          key={post.id.toString()}
+                          className={`border-2 ${post.reported ? "border-red-300 bg-red-50/50 dark:bg-red-950/20" : post.flagged ? "border-orange-300 bg-orange-50/50 dark:bg-orange-950/20" : ""}`}
+                        >
                           <CardContent className="pt-6">
                             <div className="space-y-4">
                               <div className="flex items-start gap-4">
                                 <Checkbox
                                   checked={selectedPosts.has(post.id)}
-                                  onCheckedChange={() => togglePostSelection(post.id)}
+                                  onCheckedChange={() =>
+                                    togglePostSelection(post.id)
+                                  }
                                 />
                                 <div className="flex-1 space-y-2">
                                   <div className="flex items-center gap-2 flex-wrap">
-                                    <Badge variant="outline">ID: {post.id.toString()}</Badge>
+                                    <Badge variant="outline">
+                                      ID: {post.id.toString()}
+                                    </Badge>
                                     {post.reported && (
                                       <Badge variant="destructive">
                                         <AlertTriangle className="w-3 h-3 mr-1" />
@@ -390,24 +486,41 @@ export default function AdminPanel() {
                                       </Badge>
                                     )}
                                   </div>
-                                  <p className="text-sm text-foreground line-clamp-3">{post.content}</p>
+                                  <p className="text-sm text-foreground line-clamp-3">
+                                    {post.content}
+                                  </p>
                                   <div className="flex items-center gap-4 text-xs text-muted-foreground">
-                                    <span>Author: {post.author.toString().slice(0, 12)}...</span>
-                                    <span>Likes: {post.likeCount.toString()}</span>
-                                    <span>Comments: {post.commentCount.toString()}</span>
-                                    <span>{new Date(Number(post.timestamp) / 1000000).toLocaleDateString()}</span>
+                                    <span>
+                                      Author:{" "}
+                                      {post.author.toString().slice(0, 12)}...
+                                    </span>
+                                    <span>
+                                      Likes: {post.likeCount.toString()}
+                                    </span>
+                                    <span>
+                                      Comments: {post.commentCount.toString()}
+                                    </span>
+                                    <span>
+                                      {new Date(
+                                        Number(post.timestamp) / 1000000,
+                                      ).toLocaleDateString()}
+                                    </span>
                                   </div>
                                 </div>
                               </div>
                               <div className="flex gap-2">
                                 <Button
-                                  onClick={() => handleFlagPost(post.id, post.flagged)}
+                                  onClick={() =>
+                                    handleFlagPost(post.id, post.flagged)
+                                  }
                                   variant="outline"
                                   size="sm"
-                                  disabled={flagPost.isPending || unflagPost.isPending}
+                                  disabled={
+                                    flagPost.isPending || unflagPost.isPending
+                                  }
                                 >
                                   <Flag className="w-4 h-4 mr-2" />
-                                  {post.flagged ? 'Unflag' : 'Flag'}
+                                  {post.flagged ? "Unflag" : "Flag"}
                                 </Button>
                                 <Button
                                   onClick={() => handleDeletePost(post.id)}

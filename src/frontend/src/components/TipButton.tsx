@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
-import { Button } from './ui/button';
-import { DollarSign } from 'lucide-react';
-import TipModal from './TipModal';
-import { useInternetIdentity } from '../hooks/useInternetIdentity';
-import { toast } from 'sonner';
+import { DollarSign } from "lucide-react";
+import React, { useState } from "react";
+import { toast } from "sonner";
+import { useInternetIdentity } from "../hooks/useInternetIdentity";
+import TipModal from "./TipModal";
+import { Button } from "./ui/button";
 
 interface TipButtonProps {
   postId: bigint;
@@ -16,7 +16,7 @@ export default function TipButton({ postId, tipCount }: TipButtonProps) {
 
   const handleClick = () => {
     if (!identity) {
-      toast.error('Please sign in to send tips');
+      toast.error("Please sign in to send tips");
       return;
     }
     setShowTipModal(true);
@@ -24,11 +24,7 @@ export default function TipButton({ postId, tipCount }: TipButtonProps) {
 
   return (
     <>
-      <Button
-        variant="ghost"
-        size="sm"
-        onClick={handleClick}
-      >
+      <Button variant="ghost" size="sm" onClick={handleClick}>
         <DollarSign className="w-4 h-4 mr-2" />
         {tipCount}
       </Button>

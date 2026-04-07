@@ -1,295 +1,136 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { useActor } from './useActor';
-import { Principal } from '@icp-sdk/core/principal';
-import type { 
-  UserProfile, 
-  Wallet, 
-  Post, 
-  Tip, 
-  PaywallLink, 
-  PaywalledVideo, 
-  PostReport, 
-  TokenRegistryEntry,
-  Comment,
-  UserApprovalInfo,
+import type { Principal } from "@icp-sdk/core/principal";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import type {
   ApprovalStatus,
-  UserRole,
-  PostUpdatePayload
-} from '../types';
-import { ExternalBlob } from '../backend';
+  Post,
+  Tip,
+  TokenRegistryEntry,
+  UserApprovalInfo,
+  UserProfile,
+  Wallet,
+} from "../types";
+import { useActor } from "./useActor";
 
-// ============================================================================
-// USER REGISTRATION HOOKS (Backend Not Implemented)
-// ============================================================================
-
-export function useRegisterUser() {
-  const { actor } = useActor();
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: async ({
-      name,
-      bio,
-      referrerPrincipal,
-      subscribeToNewsletter,
-    }: {
-      name: string;
-      bio: string;
-      referrerPrincipal: Principal | null;
-      subscribeToNewsletter: boolean;
-    }) => {
-      if (!actor) throw new Error('Actor not available');
-      throw new Error('Backend method registerUser not implemented');
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['pendingRegistrations'] });
-      queryClient.invalidateQueries({ queryKey: ['currentUserProfile'] });
-    },
-  });
+// Helper: safely call actor method if it exists
+function actorCall<T>(
+  actor: unknown,
+  method: string,
+  ...args: unknown[]
+): Promise<T> {
+  const a = actor as Record<string, (...a: unknown[]) => Promise<T>>;
+  if (typeof a[method] !== "function") {
+    throw new Error(`Backend method ${method} not available`);
+  }
+  return a[method](...args);
 }
 
-// ============================================================================
-// USER PROFILE HOOKS
-// ============================================================================
+// ─── User ───────────────────────────────────────────────────────────────────
 
-export function useGetCallerUserProfile() {
-  const { actor, isFetching: actorFetching } = useActor();
-
-  const query = useQuery<UserProfile | null>({
-    queryKey: ['currentUserProfile'],
-    queryFn: async () => {
-      if (!actor) throw new Error('Actor not available');
-      return actor.getCallerUserProfile();
-    },
-    enabled: !!actor && !actorFetching,
-    retry: false,
-  });
-
-  return {
-    ...query,
-    isLoading: actorFetching || query.isLoading,
-    isFetched: !!actor && query.isFetched,
-  };
-}
-
-export function useGetUserProfile() {
-  const { actor } = useActor();
-
-  return useMutation({
-    mutationFn: async (principal: Principal) => {
-      if (!actor) throw new Error('Actor not available');
-      return actor.getUserProfile(principal);
-    },
-  });
-}
-
-export function useSaveCallerUserProfile() {
-  const { actor } = useActor();
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: async (profile: UserProfile) => {
-      if (!actor) throw new Error('Actor not available');
-      await actor.saveCallerUserProfile(profile);
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['currentUserProfile'] });
-    },
-  });
-}
-
-// ============================================================================
-// WALLET HOOKS
-// ============================================================================
-
-export function useEnsureWalletExists() {
+export function useRegisterOrGetUser() {
   const { actor } = useActor();
   const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: async () => {
-      if (!actor) throw new Error('Actor not available');
-      await actor.ensureWalletExists();
+      if (!actor) throw new Error("Actor not available");
+      return actorCall<UserProfile>(actor, "registerOrGetUser");
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['wallet'] });
-      queryClient.invalidateQueries({ queryKey: ['currentUserProfile'] });
+      queryClient.invalidateQueries({ queryKey: ["currentUser"] });
+      queryClient.invalidateQueries({ queryKey: ["isAdmin"] });
     },
   });
 }
 
-export function useGetCallerWallet() {
+export function useGetUserProfile(principalId?: string) {
   const { actor, isFetching: actorFetching } = useActor();
 
-  return useQuery<Wallet | null>({
-    queryKey: ['wallet'],
+  return useQuery<UserProfile | null>({
+    queryKey: ["userProfile", principalId],
     queryFn: async () => {
-      if (!actor) throw new Error('Actor not available');
-      return actor.getWallet();
+      if (!actor || !principalId) return null;
+      return actorCall<UserProfile | null>(
+        actor,
+        "getUserProfile",
+        principalId,
+      );
     },
-    enabled: !!actor && !actorFetching,
+    enabled: !!actor && !actorFetching && !!principalId,
   });
 }
 
-export function useGetWallet() {
+// Mutation version used by legacy UserProfilePage component
+export function useGetUserProfileMutation() {
   const { actor } = useActor();
 
   return useMutation({
-    mutationFn: async (owner: Principal) => {
-      if (!actor) throw new Error('Actor not available');
-      return actor.getWallet();
+    mutationFn: async (principalId: string) => {
+      if (!actor) return null;
+      try {
+        return await actorCall<UserProfile | null>(
+          actor,
+          "getUserProfile",
+          principalId,
+        );
+      } catch {
+        return null;
+      }
     },
   });
 }
 
-// ============================================================================
-// TOKEN IMPORT HOOKS
-// ============================================================================
-
-export function useGetCallerImportedTokens() {
-  const { actor, isFetching: actorFetching } = useActor();
-
-  return useQuery<string[]>({
-    queryKey: ['importedTokens'],
-    queryFn: async () => {
-      if (!actor) throw new Error('Actor not available');
-      return actor.getImportedTokens();
-    },
-    enabled: !!actor && !actorFetching,
-  });
-}
-
-export function useAddToken() {
+export function useUpdateProfile() {
   const { actor } = useActor();
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (canisterId: string) => {
-      if (!actor) throw new Error('Actor not available');
-      return actor.addToken(canisterId);
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['importedTokens'] });
-    },
-  });
-}
-
-export function useRemoveToken() {
-  const { actor } = useActor();
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: async (canisterId: string) => {
-      if (!actor) throw new Error('Actor not available');
-      await actor.removeToken(canisterId);
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['importedTokens'] });
-    },
-  });
-}
-
-// Legacy aliases for backward compatibility
-export const useImportToken = useAddToken;
-export const useRemoveImportedToken = useRemoveToken;
-
-// ============================================================================
-// TOKEN REGISTRY HOOKS (Backend Not Implemented)
-// ============================================================================
-
-export function useGetTokenRegistry() {
-  const { actor, isFetching: actorFetching } = useActor();
-
-  return useQuery<TokenRegistryEntry[]>({
-    queryKey: ['tokenRegistry'],
-    queryFn: async () => {
-      if (!actor) throw new Error('Actor not available');
-      throw new Error('Backend method getTokenRegistry not implemented');
-    },
-    enabled: false, // Disabled until backend implements
-  });
-}
-
-export function useAddTokenToRegistry() {
-  const { actor } = useActor();
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: async ({
-      canisterId,
-      name,
-      symbol,
-      decimals,
-    }: {
-      canisterId: string;
-      name: string;
-      symbol: string;
-      decimals: bigint;
+    mutationFn: async (profile: {
+      username: string;
+      bio: string;
+      avatarUrl: string;
     }) => {
-      if (!actor) throw new Error('Actor not available');
-      throw new Error('Backend method addTokenToRegistry not implemented');
+      if (!actor) throw new Error("Actor not available");
+      return actorCall<UserProfile>(actor, "updateProfile", profile);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['tokenRegistry'] });
+      queryClient.invalidateQueries({ queryKey: ["currentUser"] });
     },
   });
 }
 
-export function useVerifyTokenInRegistry() {
-  const { actor } = useActor();
-  const queryClient = useQueryClient();
+export function useIsAdmin() {
+  const { actor, isFetching: actorFetching } = useActor();
 
-  return useMutation({
-    mutationFn: async (canisterId: string) => {
-      if (!actor) throw new Error('Actor not available');
-      throw new Error('Backend method verifyTokenInRegistry not implemented');
+  return useQuery<boolean>({
+    queryKey: ["isAdmin"],
+    queryFn: async () => {
+      if (!actor) return false;
+      try {
+        return await actorCall<boolean>(actor, "isAdmin");
+      } catch {
+        return false;
+      }
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['tokenRegistry'] });
-    },
+    enabled: !!actor && !actorFetching,
   });
 }
 
-export function useRemoveTokenFromRegistry() {
-  const { actor } = useActor();
-  const queryClient = useQueryClient();
+// ─── Posts ──────────────────────────────────────────────────────────────────
 
-  return useMutation({
-    mutationFn: async (canisterId: string) => {
-      if (!actor) throw new Error('Actor not available');
-      throw new Error('Backend method removeTokenFromRegistry not implemented');
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['tokenRegistry'] });
-    },
-  });
-}
-
-// ============================================================================
-// POST HOOKS
-// ============================================================================
-
-export function useGetAllPosts() {
+export function useGetPosts() {
   const { actor, isFetching: actorFetching } = useActor();
 
   return useQuery<Post[]>({
-    queryKey: ['posts'],
+    queryKey: ["posts"],
     queryFn: async () => {
-      if (!actor) throw new Error('Actor not available');
-      return actor.getAllPosts();
+      if (!actor) return [];
+      try {
+        return await actorCall<Post[]>(actor, "getPosts");
+      } catch {
+        return [];
+      }
     },
     enabled: !!actor && !actorFetching,
-  });
-}
-
-export function useGetPost() {
-  const { actor } = useActor();
-
-  return useMutation({
-    mutationFn: async (postId: bigint) => {
-      if (!actor) throw new Error('Actor not available');
-      return actor.getPost(postId);
-    },
   });
 }
 
@@ -298,43 +139,29 @@ export function useCreatePost() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async ({
-      content,
-      media,
-      links,
-      tags,
-      categories,
-      fileNames,
-    }: {
-      content: string;
-      media: ExternalBlob[];
-      links: string[];
-      tags: string[];
-      categories: string[];
-      fileNames: string[];
-    }) => {
-      if (!actor) throw new Error('Actor not available');
-      return actor.createPost(content, media, links, tags, categories, fileNames);
+    mutationFn: async (payload: { content: string; imageUrl?: string }) => {
+      if (!actor) throw new Error("Actor not available");
+      return actorCall<Post>(actor, "createPost", payload);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['posts'] });
-      queryClient.invalidateQueries({ queryKey: ['adminPosts'] });
+      queryClient.invalidateQueries({ queryKey: ["posts"] });
+      queryClient.invalidateQueries({ queryKey: ["adminPosts"] });
     },
   });
 }
 
-export function useUpdatePost() {
+export function useEditPost() {
   const { actor } = useActor();
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async ({ postId, payload }: { postId: bigint; payload: PostUpdatePayload }) => {
-      if (!actor) throw new Error('Actor not available');
-      return actor.updatePost(postId, payload);
+    mutationFn: async (payload: { id: bigint; content: string }) => {
+      if (!actor) throw new Error("Actor not available");
+      return actorCall<Post>(actor, "editPost", payload);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['posts'] });
-      queryClient.invalidateQueries({ queryKey: ['adminPosts'] });
+      queryClient.invalidateQueries({ queryKey: ["posts"] });
+      queryClient.invalidateQueries({ queryKey: ["adminPosts"] });
     },
   });
 }
@@ -345,328 +172,18 @@ export function useDeletePost() {
 
   return useMutation({
     mutationFn: async (postId: bigint) => {
-      if (!actor) throw new Error('Actor not available');
-      await actor.deletePost(postId);
+      if (!actor) throw new Error("Actor not available");
+      await actorCall<void>(actor, "deletePost", postId);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['posts'] });
-      queryClient.invalidateQueries({ queryKey: ['adminPosts'] });
+      queryClient.invalidateQueries({ queryKey: ["posts"] });
+      queryClient.invalidateQueries({ queryKey: ["adminPosts"] });
+      queryClient.invalidateQueries({ queryKey: ["flaggedPosts"] });
     },
   });
 }
 
-// ============================================================================
-// TIPPING HOOKS (Backend Not Implemented)
-// ============================================================================
-
-export function useTipPost() {
-  const { actor } = useActor();
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: async ({ 
-      postId, 
-      amount, 
-      tokenType 
-    }: { 
-      postId: bigint; 
-      amount: bigint; 
-      tokenType: string;
-    }) => {
-      if (!actor) throw new Error('Actor not available');
-      throw new Error('Backend method tipPost not implemented');
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['wallet'] });
-      queryClient.invalidateQueries({ queryKey: ['posts'] });
-      queryClient.invalidateQueries({ queryKey: ['adminPosts'] });
-      queryClient.invalidateQueries({ queryKey: ['importedTokens'] });
-      queryClient.invalidateQueries({ queryKey: ['userTips'] });
-    },
-  });
-}
-
-export function useGetPostTips() {
-  const { actor } = useActor();
-
-  return useMutation({
-    mutationFn: async (postId: bigint) => {
-      if (!actor) throw new Error('Actor not available');
-      throw new Error('Backend method getPostTips not implemented');
-    },
-  });
-}
-
-export function useGetUserTips() {
-  const { actor, isFetching: actorFetching } = useActor();
-
-  return useQuery<Tip[]>({
-    queryKey: ['userTips'],
-    queryFn: async () => {
-      if (!actor) throw new Error('Actor not available');
-      throw new Error('Backend method getUserTips not implemented');
-    },
-    enabled: false, // Disabled until backend implements
-  });
-}
-
-// ============================================================================
-// SOCIAL INTERACTION HOOKS (Backend Not Implemented)
-// ============================================================================
-
-export function useLikePost() {
-  const { actor } = useActor();
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: async (postId: bigint) => {
-      if (!actor) throw new Error('Actor not available');
-      throw new Error('Backend method likePost not implemented');
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['posts'] });
-      queryClient.invalidateQueries({ queryKey: ['adminPosts'] });
-    },
-  });
-}
-
-export function useUnlikePost() {
-  const { actor } = useActor();
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: async (postId: bigint) => {
-      if (!actor) throw new Error('Actor not available');
-      throw new Error('Backend method unlikePost not implemented');
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['posts'] });
-      queryClient.invalidateQueries({ queryKey: ['adminPosts'] });
-    },
-  });
-}
-
-export function useRatePost() {
-  const { actor } = useActor();
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: async ({ postId, stars }: { postId: bigint; stars: bigint }) => {
-      if (!actor) throw new Error('Actor not available');
-      throw new Error('Backend method ratePost not implemented');
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['posts'] });
-      queryClient.invalidateQueries({ queryKey: ['adminPosts'] });
-    },
-  });
-}
-
-export function useAddComment() {
-  const { actor } = useActor();
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: async ({ postId, content }: { postId: bigint; content: string }) => {
-      if (!actor) throw new Error('Actor not available');
-      throw new Error('Backend method addComment not implemented');
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['posts'] });
-      queryClient.invalidateQueries({ queryKey: ['comments'] });
-      queryClient.invalidateQueries({ queryKey: ['adminPosts'] });
-    },
-  });
-}
-
-export function useGetCommentsForPost() {
-  const { actor } = useActor();
-
-  return useMutation({
-    mutationFn: async (postId: bigint) => {
-      if (!actor) throw new Error('Actor not available');
-      throw new Error('Backend method getCommentsForPost not implemented');
-    },
-  });
-}
-
-export function useDeleteComment() {
-  const { actor } = useActor();
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: async (commentId: bigint) => {
-      if (!actor) throw new Error('Actor not available');
-      throw new Error('Backend method deleteComment not implemented');
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['comments'] });
-      queryClient.invalidateQueries({ queryKey: ['posts'] });
-      queryClient.invalidateQueries({ queryKey: ['adminPosts'] });
-    },
-  });
-}
-
-export function useFollowUser() {
-  const { actor } = useActor();
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: async (userToFollow: Principal) => {
-      if (!actor) throw new Error('Actor not available');
-      throw new Error('Backend method followUser not implemented');
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['currentUserProfile'] });
-      queryClient.invalidateQueries({ queryKey: ['isFollowing'] });
-      queryClient.invalidateQueries({ queryKey: ['userProfile'] });
-    },
-  });
-}
-
-export function useUnfollowUser() {
-  const { actor } = useActor();
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: async (userToUnfollow: Principal) => {
-      if (!actor) throw new Error('Actor not available');
-      throw new Error('Backend method unfollowUser not implemented');
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['currentUserProfile'] });
-      queryClient.invalidateQueries({ queryKey: ['isFollowing'] });
-      queryClient.invalidateQueries({ queryKey: ['userProfile'] });
-    },
-  });
-}
-
-export function useIsFollowing() {
-  const { actor } = useActor();
-
-  return useMutation({
-    mutationFn: async (userToCheck: Principal) => {
-      if (!actor) throw new Error('Actor not available');
-      throw new Error('Backend method isFollowing not implemented');
-    },
-  });
-}
-
-// ============================================================================
-// PAYWALL HOOKS (Backend Not Implemented)
-// ============================================================================
-
-export function useUnlockPaywallContent() {
-  const { actor } = useActor();
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: async ({
-      postId,
-      contentType,
-      contentIndex,
-    }: {
-      postId: bigint;
-      contentType: string;
-      contentIndex: bigint;
-    }) => {
-      if (!actor) throw new Error('Actor not available');
-      throw new Error('Backend method unlockPaywallContent not implemented');
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['posts'] });
-      queryClient.invalidateQueries({ queryKey: ['wallet'] });
-      queryClient.invalidateQueries({ queryKey: ['paywallAccess'] });
-      queryClient.invalidateQueries({ queryKey: ['adminPosts'] });
-    },
-  });
-}
-
-export function useHasPaywallAccess() {
-  const { actor } = useActor();
-
-  return useMutation({
-    mutationFn: async ({
-      postId,
-      contentType,
-      contentIndex,
-    }: {
-      postId: bigint;
-      contentType: string;
-      contentIndex: bigint;
-    }) => {
-      if (!actor) throw new Error('Actor not available');
-      throw new Error('Backend method hasPaywallAccess not implemented');
-    },
-  });
-}
-
-// ============================================================================
-// ADMIN HOOKS
-// ============================================================================
-
-export function useIsCallerAdmin() {
-  const { actor, isFetching: actorFetching } = useActor();
-
-  return useQuery<boolean>({
-    queryKey: ['isAdmin'],
-    queryFn: async () => {
-      if (!actor) return false;
-      return actor.isCallerAdmin();
-    },
-    enabled: !!actor && !actorFetching,
-  });
-}
-
-export function useListApprovals() {
-  const { actor, isFetching: actorFetching } = useActor();
-
-  return useQuery<UserApprovalInfo[]>({
-    queryKey: ['approvals'],
-    queryFn: async () => {
-      if (!actor) return [];
-      return actor.listApprovals();
-    },
-    enabled: !!actor && !actorFetching,
-  });
-}
-
-export function useSetApproval() {
-  const { actor } = useActor();
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: async ({ user, status }: { user: Principal; status: ApprovalStatus }) => {
-      if (!actor) throw new Error('Actor not available');
-      await actor.setApproval(user, status);
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['approvals'] });
-    },
-  });
-}
-
-export function useGetAdminPosts() {
-  const { actor } = useActor();
-
-  return useMutation({
-    mutationFn: async () => {
-      if (!actor) throw new Error('Actor not available');
-      return actor.getAdminPosts();
-    },
-  });
-}
-
-export function useGetReportedPosts() {
-  const { actor } = useActor();
-
-  return useMutation({
-    mutationFn: async () => {
-      if (!actor) throw new Error('Actor not available');
-      return actor.getReportedPosts();
-    },
-  });
-}
+// ─── Moderation ─────────────────────────────────────────────────────────────
 
 export function useFlagPost() {
   const { actor } = useActor();
@@ -674,12 +191,13 @@ export function useFlagPost() {
 
   return useMutation({
     mutationFn: async (postId: bigint) => {
-      if (!actor) throw new Error('Actor not available');
-      await actor.flagPost(postId);
+      if (!actor) throw new Error("Actor not available");
+      await actorCall<void>(actor, "flagPost", postId);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['posts'] });
-      queryClient.invalidateQueries({ queryKey: ['adminPosts'] });
+      queryClient.invalidateQueries({ queryKey: ["posts"] });
+      queryClient.invalidateQueries({ queryKey: ["adminPosts"] });
+      queryClient.invalidateQueries({ queryKey: ["flaggedPosts"] });
     },
   });
 }
@@ -690,50 +208,268 @@ export function useUnflagPost() {
 
   return useMutation({
     mutationFn: async (postId: bigint) => {
-      if (!actor) throw new Error('Actor not available');
-      await actor.unflagPost(postId);
+      if (!actor) throw new Error("Actor not available");
+      await actorCall<void>(actor, "unflagPost", postId);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['posts'] });
-      queryClient.invalidateQueries({ queryKey: ['adminPosts'] });
+      queryClient.invalidateQueries({ queryKey: ["posts"] });
+      queryClient.invalidateQueries({ queryKey: ["adminPosts"] });
+      queryClient.invalidateQueries({ queryKey: ["flaggedPosts"] });
     },
   });
 }
 
-export function useReportPost() {
+export function useGetFlaggedPosts() {
+  const { actor, isFetching: actorFetching } = useActor();
+
+  return useQuery<Post[]>({
+    queryKey: ["flaggedPosts"],
+    queryFn: async () => {
+      if (!actor) return [];
+      try {
+        return await actorCall<Post[]>(actor, "getFlaggedPosts");
+      } catch {
+        return [];
+      }
+    },
+    enabled: !!actor && !actorFetching,
+  });
+}
+
+export function useGetAllPostsAdmin() {
+  const { actor, isFetching: actorFetching } = useActor();
+
+  return useQuery<Post[]>({
+    queryKey: ["adminPosts"],
+    queryFn: async () => {
+      if (!actor) return [];
+      try {
+        return await actorCall<Post[]>(actor, "getAllPostsAdmin");
+      } catch {
+        return [];
+      }
+    },
+    enabled: !!actor && !actorFetching,
+  });
+}
+
+export function useGetUsers() {
+  const { actor, isFetching: actorFetching } = useActor();
+
+  return useQuery<UserProfile[]>({
+    queryKey: ["users"],
+    queryFn: async () => {
+      if (!actor) return [];
+      try {
+        return await actorCall<UserProfile[]>(actor, "getUsers");
+      } catch {
+        return [];
+      }
+    },
+    enabled: !!actor && !actorFetching,
+  });
+}
+
+export function useDeleteUser() {
   const { actor } = useActor();
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async ({ postId, category, reason }: { postId: bigint; category: string; reason: string }) => {
-      if (!actor) throw new Error('Actor not available');
-      await actor.reportPost(postId, category, reason);
+    mutationFn: async (principalId: string) => {
+      if (!actor) throw new Error("Actor not available");
+      await actorCall<void>(actor, "deleteUser", principalId);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['posts'] });
-      queryClient.invalidateQueries({ queryKey: ['adminPosts'] });
+      queryClient.invalidateQueries({ queryKey: ["users"] });
     },
   });
 }
 
-export function useCleanUpReports() {
-  const { actor } = useActor();
-  const queryClient = useQueryClient();
+// ─── Compatibility stubs for legacy components ───────────────────────────────
+// These are no-ops that prevent type errors in old components that haven't been removed yet.
 
+const notImplemented = () => {
+  throw new Error("Not implemented");
+};
+
+export function useGetCallerUserProfile() {
+  const { actor, isFetching: actorFetching } = useActor();
+  const query = useQuery<UserProfile | null>({
+    queryKey: ["currentUserProfile"],
+    queryFn: async () => {
+      if (!actor) return null;
+      return actorCall<UserProfile | null>(actor, "getUserProfile");
+    },
+    enabled: !!actor && !actorFetching,
+    retry: false,
+  });
+  return {
+    ...query,
+    isLoading: actorFetching || query.isLoading,
+    isFetched: !!actor && query.isFetched,
+  };
+}
+
+export function useGetAllPosts() {
+  return useGetPosts();
+}
+export function useIsCallerAdmin() {
+  return useIsAdmin();
+}
+export function useRegisterUser() {
+  return useMutation({
+    mutationFn: async (_args: unknown) => notImplemented(),
+  });
+}
+export function useGetCallerWallet() {
+  const { actor, isFetching } = useActor();
+  return useQuery<Wallet | null>({
+    queryKey: ["wallet"],
+    queryFn: async () => null,
+    enabled: !!actor && !isFetching,
+  });
+}
+export function useEnsureWalletExists() {
+  const { actor } = useActor();
   return useMutation({
     mutationFn: async () => {
-      if (!actor) throw new Error('Actor not available');
-      await actor.cleanUpReports();
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['posts'] });
-      queryClient.invalidateQueries({ queryKey: ['adminPosts'] });
+      if (!actor) throw new Error("Actor not available");
     },
   });
 }
-
-// Helper hook for wallet balance (derived from wallet)
+export function useGetCallerImportedTokens() {
+  const { actor, isFetching } = useActor();
+  return useQuery<string[]>({
+    queryKey: ["importedTokens"],
+    queryFn: async () => [],
+    enabled: !!actor && !isFetching,
+  });
+}
+export function useAddToken() {
+  return useMutation({ mutationFn: async (_id: string) => notImplemented() });
+}
+export function useRemoveToken() {
+  return useMutation({ mutationFn: async (_id: string) => notImplemented() });
+}
+export function useLikePost() {
+  return useMutation({ mutationFn: async (_id: bigint) => notImplemented() });
+}
+export function useUnlikePost() {
+  return useMutation({ mutationFn: async (_id: bigint) => notImplemented() });
+}
+export function useRatePost() {
+  return useMutation({
+    mutationFn: async (_args: { postId: bigint; stars: bigint }) =>
+      notImplemented(),
+  });
+}
+export function useAddComment() {
+  return useMutation({
+    mutationFn: async (_args: { postId: bigint; content: string }) =>
+      notImplemented(),
+  });
+}
+export function useGetCommentsForPost() {
+  return useMutation({ mutationFn: async (_id: bigint) => notImplemented() });
+}
+export function useDeleteComment() {
+  return useMutation({ mutationFn: async (_id: bigint) => notImplemented() });
+}
+export function useFollowUser() {
+  return useMutation({ mutationFn: async (_p: Principal) => notImplemented() });
+}
+export function useUnfollowUser() {
+  return useMutation({ mutationFn: async (_p: Principal) => notImplemented() });
+}
+export function useIsFollowing() {
+  return useMutation({ mutationFn: async (_p: Principal) => notImplemented() });
+}
+export function useTipPost() {
+  return useMutation({
+    mutationFn: async (_args: {
+      postId: bigint;
+      amount: bigint;
+      tokenType: string;
+    }) => notImplemented(),
+  });
+}
+export function useUnlockPaywallContent() {
+  return useMutation({
+    mutationFn: async (_args: {
+      postId: bigint;
+      contentType: string;
+      contentIndex: bigint;
+    }) => notImplemented(),
+  });
+}
+export function useHasPaywallAccess() {
+  return useMutation({
+    mutationFn: async (_args: {
+      postId: bigint;
+      contentType: string;
+      contentIndex: bigint;
+    }) => notImplemented(),
+  });
+}
+export function useReportPost() {
+  return useMutation({
+    mutationFn: async (_args: {
+      postId: bigint;
+      category: string;
+      reason: string;
+    }) => notImplemented(),
+  });
+}
+export function useGetAdminPosts() {
+  return useMutation({ mutationFn: async () => notImplemented() });
+}
+export function useGetReportedPosts() {
+  return useMutation({ mutationFn: async () => notImplemented() });
+}
+export function useListApprovals() {
+  const { actor, isFetching } = useActor();
+  return useQuery<UserApprovalInfo[]>({
+    queryKey: ["approvals"],
+    queryFn: async () => [],
+    enabled: !!actor && !isFetching,
+  });
+}
+export function useSetApproval() {
+  return useMutation({
+    mutationFn: async (_args: { user: Principal; status: ApprovalStatus }) =>
+      notImplemented(),
+  });
+}
+export function useCleanUpReports() {
+  return useMutation({ mutationFn: async () => notImplemented() });
+}
+export function useGetTokenRegistry() {
+  const { actor: _actor, isFetching: _isFetching } = useActor();
+  return useQuery<TokenRegistryEntry[]>({
+    queryKey: ["tokenRegistry"],
+    queryFn: async () => [],
+    enabled: false,
+  });
+}
+export function useUpdatePost() {
+  return useMutation({
+    mutationFn: async (_args: { postId: bigint; payload: unknown }) =>
+      notImplemented(),
+  });
+}
+export function useGetPost() {
+  return useMutation({ mutationFn: async (_id: bigint) => notImplemented() });
+}
+export function useGetWallet() {
+  return useMutation({
+    mutationFn: async (_owner: Principal) => notImplemented(),
+  });
+}
 export function useGetWalletBalance() {
-  const { data: wallet } = useGetCallerWallet();
-  return { data: wallet?.balance || BigInt(0) };
+  return { data: BigInt(0) };
+}
+export function useSaveCallerUserProfile() {
+  return useMutation({
+    mutationFn: async (_profile: UserProfile) => notImplemented(),
+  });
 }

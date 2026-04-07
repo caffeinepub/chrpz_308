@@ -1,21 +1,36 @@
-import React, { useState } from 'react';
-import { Card, CardContent } from './ui/card';
-import { Button } from './ui/button';
-import { Badge } from './ui/badge';
-import { Heart, MessageCircle, Star, Trash2, Flag, AlertTriangle, User, Edit } from 'lucide-react';
-import PostMedia from './PostMedia';
-import PostMetadata from './PostMetadata';
-import CommentSection from './CommentSection';
-import TipButton from './TipButton';
-import RatingDisplay from './RatingDisplay';
-import PaywallLinkSection from './PaywallLinkSection';
-import VideoSection from './VideoSection';
-import EditPostModal from './EditPostModal';
-import type { Post } from '../types';
-import { useInternetIdentity } from '../hooks/useInternetIdentity';
-import { useLikePost, useUnlikePost, useDeletePost, useReportPost, useIsCallerAdmin } from '../hooks/useQueries';
-import { toast } from 'sonner';
-import UserProfilePage from './UserProfilePage';
+import {
+  AlertTriangle,
+  Edit,
+  Flag,
+  Heart,
+  MessageCircle,
+  Star,
+  Trash2,
+  User,
+} from "lucide-react";
+import React, { useState } from "react";
+import { toast } from "sonner";
+import { useInternetIdentity } from "../hooks/useInternetIdentity";
+import {
+  useDeletePost,
+  useIsCallerAdmin,
+  useLikePost,
+  useReportPost,
+  useUnlikePost,
+} from "../hooks/useQueries";
+import type { Post } from "../types";
+import CommentSection from "./CommentSection";
+import EditPostModal from "./EditPostModal";
+import PaywallLinkSection from "./PaywallLinkSection";
+import PostMedia from "./PostMedia";
+import PostMetadata from "./PostMetadata";
+import RatingDisplay from "./RatingDisplay";
+import TipButton from "./TipButton";
+import UserProfilePage from "./UserProfilePage";
+import VideoSection from "./VideoSection";
+import { Badge } from "./ui/badge";
+import { Button } from "./ui/button";
+import { Card, CardContent } from "./ui/card";
 
 interface PostCardProps {
   post: Post;
@@ -28,18 +43,19 @@ export default function PostCard({ post, onPostDeleted }: PostCardProps) {
   const [showUserProfile, setShowUserProfile] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [isLiked, setIsLiked] = useState(false);
-  
+
   const likePost = useLikePost();
   const unlikePost = useUnlikePost();
   const deletePost = useDeletePost();
   const reportPost = useReportPost();
   const { data: isAdmin } = useIsCallerAdmin();
 
-  const isAuthor = identity && post.author.toString() === identity.getPrincipal().toString();
+  const isAuthor =
+    identity && post.author.toString() === identity.getPrincipal().toString();
 
   const handleLike = async () => {
     if (!identity) {
-      toast.error('Please sign in to like posts');
+      toast.error("Please sign in to like posts");
       return;
     }
 
@@ -52,50 +68,53 @@ export default function PostCard({ post, onPostDeleted }: PostCardProps) {
         setIsLiked(true);
       }
     } catch (error: any) {
-      toast.error(error.message || 'Failed to update like');
+      toast.error(error.message || "Failed to update like");
     }
   };
 
   const handleDelete = async () => {
-    if (!confirm('Are you sure you want to delete this post?')) return;
+    if (!confirm("Are you sure you want to delete this post?")) return;
 
     try {
       await deletePost.mutateAsync(post.id);
-      toast.success('Post deleted');
+      toast.success("Post deleted");
       onPostDeleted?.();
     } catch (error: any) {
-      toast.error(error.message || 'Failed to delete post');
+      toast.error(error.message || "Failed to delete post");
     }
   };
 
   const handleReport = async () => {
     if (!identity) {
-      toast.error('Please sign in to report posts');
+      toast.error("Please sign in to report posts");
       return;
     }
 
-    const category = prompt('Report category (spam/inappropriate/other):');
+    const category = prompt("Report category (spam/inappropriate/other):");
     if (!category) return;
 
-    const reason = prompt('Please provide a reason for reporting:');
+    const reason = prompt("Please provide a reason for reporting:");
     if (!reason) return;
 
     try {
       await reportPost.mutateAsync({ postId: post.id, category, reason });
-      toast.success('Post reported');
+      toast.success("Post reported");
     } catch (error: any) {
-      toast.error(error.message || 'Failed to report post');
+      toast.error(error.message || "Failed to report post");
     }
   };
 
   return (
     <>
-      <Card className={`glass-dark border-2 ${post.reported ? 'border-red-500/50' : post.flagged ? 'border-orange-500/50' : ''}`}>
+      <Card
+        className={`glass-dark border-2 ${post.reported ? "border-red-500/50" : post.flagged ? "border-orange-500/50" : ""}`}
+      >
         <CardContent className="pt-6 space-y-4">
           {/* Author Info */}
           <div className="flex items-center justify-between">
-            <div 
-              className="flex items-center gap-2 cursor-pointer hover:opacity-80 transition-opacity"
+            <button
+              type="button"
+              className="flex items-center gap-2 cursor-pointer hover:opacity-80 transition-opacity bg-transparent border-none p-0"
               onClick={() => setShowUserProfile(true)}
             >
               <div className="w-10 h-10 rounded-full bg-gradient-to-br from-indigo-600 to-purple-600 flex items-center justify-center">
@@ -109,7 +128,7 @@ export default function PostCard({ post, onPostDeleted }: PostCardProps) {
                   {new Date(Number(post.timestamp) / 1000000).toLocaleString()}
                 </p>
               </div>
-            </div>
+            </button>
             <div className="flex items-center gap-2">
               {post.reported && (
                 <Badge variant="destructive" className="text-xs">
@@ -154,21 +173,6 @@ export default function PostCard({ post, onPostDeleted }: PostCardProps) {
           )}
 
           {/* Paywalled Videos */}
-          {post.paywalledVideos.length > 0 && (
-            <div className="space-y-3">
-              {post.paywalledVideos.map((video, index) => (
-                <VideoSection
-                  key={index}
-                  video={video.blob}
-                  postId={post.id}
-                  isPaywalled={true}
-                  price={video.price}
-                  description={video.description}
-                  contentIndex={index}
-                />
-              ))}
-            </div>
-          )}
 
           {/* Metadata */}
           {(post.links.length > 0 || post.tags.length > 0) && (
@@ -176,12 +180,13 @@ export default function PostCard({ post, onPostDeleted }: PostCardProps) {
           )}
 
           {/* Paywall Links */}
-          {post.paywallLinks.length > 0 && (
-            <PaywallLinkSection postId={post.id} links={post.paywallLinks} />
-          )}
 
           {/* Rating */}
-          <RatingDisplay postId={post.id} averageRating={post.averageRating} ratingCount={Number(post.ratingCount)} />
+          <RatingDisplay
+            postId={post.id}
+            averageRating={post.averageRating}
+            ratingCount={Number(post.ratingCount)}
+          />
 
           {/* Actions */}
           <div className="flex items-center gap-4 pt-2 border-t border-border">
@@ -190,9 +195,11 @@ export default function PostCard({ post, onPostDeleted }: PostCardProps) {
               size="sm"
               onClick={handleLike}
               disabled={!identity || likePost.isPending || unlikePost.isPending}
-              className={isLiked ? 'text-red-500' : ''}
+              className={isLiked ? "text-red-500" : ""}
             >
-              <Heart className={`w-4 h-4 mr-2 ${isLiked ? 'fill-current' : ''}`} />
+              <Heart
+                className={`w-4 h-4 mr-2 ${isLiked ? "fill-current" : ""}`}
+              />
               {post.likeCount.toString()}
             </Button>
 
@@ -205,7 +212,7 @@ export default function PostCard({ post, onPostDeleted }: PostCardProps) {
               {post.commentCount.toString()}
             </Button>
 
-            <TipButton postId={post.id} tipCount={post.tips.length} />
+            <TipButton postId={post.id} tipCount={0} />
 
             {identity && !isAuthor && (
               <Button

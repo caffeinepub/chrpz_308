@@ -1,0 +1,19 @@
+{
+  "overview": "Chrpz is a minimal social media platform on the Internet Computer. Users log in with Internet Identity, create posts with images, manage their profile, and admins can moderate flagged content.",
+  "features": [
+    "Internet Identity login with auto-registration",
+    "Post creation and feed (text + images)",
+    "User profiles with bio and picture",
+    "Admin moderation panel (flag, delete posts/users)",
+    "USA color scheme (red, white, navy)"
+  ],
+  "category": "social",
+  "tags": [
+    "social-media",
+    "internet-computer",
+    "icp",
+    "moderation",
+    "posts"
+  ],
+  "last_updated": "2026-04-07T22:47:27.948Z"
+}

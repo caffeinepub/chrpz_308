@@ -1,107 +1,47 @@
-// Frontend-only types until backend implements them
-import { Principal } from '@icp-sdk/core/principal';
-import { ExternalBlob } from '../backend';
+// Core types for Chrpz — minimal, no wallet/tipping/paywall
+
+export type UserRole = "admin" | "user";
 
 export interface UserProfile {
-  name: string;
+  principalId: string;
+  username: string;
   bio: string;
-  profilePicture: ExternalBlob | null;
-  joinedDate: bigint;
+  avatarUrl: string;
+  role: UserRole;
+  createdAt: bigint;
+  // Legacy compat fields
+  name?: string;
+  joinedDate?: bigint;
   followerCount: bigint;
   followingCount: bigint;
   averageRating: number;
   totalRatings: bigint;
-  accountId: string;
-  principalId: string;
-  newsletterSubscribed: boolean;
-}
-
-export interface Wallet {
-  owner: Principal;
-  balance: bigint;
-  transactionHistory: Tip[];
-  accountId: string;
-}
-
-export interface Tip {
-  sender: Principal;
-  recipient: Principal;
-  amount: bigint;
-  tokenType: string;
-  transactionHash: string;
-  timestamp: bigint;
+  accountId?: string;
+  newsletterSubscribed?: boolean;
 }
 
 export interface Post {
   id: bigint;
-  author: Principal;
+  authorId: string;
+  authorName: string;
   content: string;
+  imageUrl?: string;
+  createdAt: bigint;
+  flagged: boolean;
+  deleted: boolean;
+  // Legacy compat fields used by old components
+  author: import("@icp-sdk/core/principal").Principal;
   timestamp: bigint;
-  media: ExternalBlob[];
-  links: string[];
-  tags: string[];
-  categories: string[];
-  tips: Tip[];
-  fileNames: string[];
   likeCount: bigint;
-  averageRating: number;
-  ratingCount: bigint;
   commentCount: bigint;
-  paywallLinks: PaywallLink[];
-  publicVideos: ExternalBlob[];
-  paywalledVideos: PaywalledVideo[];
+  ratingCount: bigint;
+  averageRating: number;
   reported: boolean;
   reportCount: bigint;
-  flagged: boolean;
-}
-
-export interface Comment {
-  id: bigint;
-  postId: bigint;
-  author: Principal;
-  content: string;
-  timestamp: bigint;
-}
-
-export interface PaywallLink {
-  url: string;
-  price: bigint;
-  description: string;
-  isActive: boolean;
-}
-
-export interface PaywalledVideo {
-  blob: ExternalBlob;
-  price: bigint;
-  description: string;
-  isActive: boolean;
-}
-
-export interface ImportedToken {
-  canisterId: string;
-  name: string;
-  symbol: string;
-  decimals: bigint;
-  balance: bigint;
-  metadataFetched: boolean;
-}
-
-export interface PostReport {
-  id: bigint;
-  postId: bigint;
-  reporter: Principal;
-  category: string;
-  reason: string;
-  timestamp: bigint;
-  status: string;
-}
-
-export interface TokenRegistryEntry {
-  canisterId: string;
-  name: string;
-  symbol: string;
-  decimals: bigint;
-  addedBy: Principal;
-  timestamp: bigint;
-  verified: boolean;
+  tags: string[];
+  categories: string[];
+  links: string[];
+  fileNames: string[];
+  publicVideos: import("../backend").ExternalBlob[];
+  media: import("../backend").ExternalBlob[];
 }

@@ -1,0 +1,268 @@
+// Version: 3.0.0
+type Activity__40321653 =
+  {
+    action : Text;
+    contentPreview : Text;
+    id : Nat;
+    targetId : Nat;
+    timestamp : Int;
+    user : Principal
+  };
+type ApprovalStatus__641045796 = {#approved; #pending; #rejected};
+type Comment__975843394 =
+  {
+    author : Principal;
+    content : Text;
+    id : Nat;
+    postId : Nat;
+    timestamp : Int
+  };
+type Data__791452850<K, V> =
+  {var count : Nat__490723111; kvs : [var ?(K, V)]};
+type EmailAccount__161082925 =
+  {
+    createdAt : Int;
+    email : Text;
+    nonce : Text;
+    passwordHash : Text;
+    principal : Principal
+  };
+type EmailVerification__170094754 =
+  {email : Text; timestamp : Int; verificationCode : Text};
+type ExternalBlob__665380005 = Blob;
+type Follow__370775381 =
+  {follower : Principal; following : Principal; timestamp : Int};
+type ImportedToken__835193373 =
+  {
+    balance : Nat;
+    canisterId : Text;
+    decimals : Nat;
+    metadataFetched : Bool;
+    name : Text;
+    symbol : Text
+  };
+type Int__270357528 = Int__616954475;
+type Int__616954475 = Int;
+type Internal__8484328<K, V> =
+  {children : [var ?Node__46230540<K, V>]; data : Data__791452850<K, V>};
+type Leaf__809889148<K, V> = {data : Data__791452850<K, V>};
+type Like__911683250 = {postId : Nat; timestamp : Int; user : Principal};
+type Nat__490723111 = Nat__920180692;
+type Nat__920180692 = Nat;
+type Newsletter__315120773 =
+  {
+    content : Text;
+    id : Nat;
+    sentCount : Nat;
+    subject : Text;
+    timestamp : Int
+  };
+type Node__46230540<K, V> =
+  {#internal : Internal__8484328<K, V>; #leaf : Leaf__809889148<K, V>};
+type OldAccessControlState__841599830 =
+  {
+    var adminAssigned : Bool;
+    var userRoles : OldMap__30246564<Principal, OldUserRole__889293160>
+  };
+type OldApprovalState__567598485 =
+  {
+    var approvalStatus :
+      OldMap__30246564<Principal, ApprovalStatus__641045796>
+  };
+type OldMap__30246564<K, V> = {root : Tree__65991129<K, V>; size : Nat};
+type OldPost__784581407 =
+  {
+    author : Principal;
+    averageRating : Float;
+    categories : [Text];
+    commentCount : Nat;
+    content : Text;
+    fileNames : [Text];
+    flagged : Bool;
+    id : Nat;
+    likeCount : Nat;
+    links : [Text];
+    media : [ExternalBlob__665380005];
+    paywallLinks : [PaywallLink__197391263];
+    paywalledVideos : [PaywalledVideo__563843120];
+    publicVideos : [ExternalBlob__665380005];
+    ratingCount : Nat;
+    reportCount : Nat;
+    reported : Bool;
+    tags : [Text];
+    timestamp : Int;
+    tips : [Tip__463473247]
+  };
+type OldStorage__384370526 =
+  {var authorizedPrincipals : [Principal]; var blobTodeletete : [Blob]};
+type OldUserProfile__416069324 =
+  {
+    accountId : Text;
+    averageRating : Float;
+    bio : Text;
+    followerCount : Nat;
+    followingCount : Nat;
+    joinedDate : Int;
+    name : Text;
+    newsletterSubscribed : Bool;
+    principalId : Text;
+    profilePicture : ?ExternalBlob__665380005;
+    totalRatings : Nat
+  };
+type OldUserRole__889293160 = {#admin; #guest; #user};
+type PaywallAccess__966112090 =
+  {
+    amountPaid : Nat;
+    contentIndex : Nat;
+    contentType : Text;
+    postId : Nat;
+    timestamp : Int;
+    user : Principal
+  };
+type PaywallLink__197391263 =
+  {description : Text; isActive : Bool; price : Nat; url : Text};
+type PaywalledVideo__563843120 =
+  {
+    blob : ExternalBlob__665380005;
+    description : Text;
+    isActive : Bool;
+    price : Nat
+  };
+type PostReport__159942802 =
+  {
+    category : Text;
+    id : Nat;
+    postId : Nat;
+    reason : Text;
+    reporter : Principal;
+    status : Text;
+    timestamp : Int
+  };
+type Post__955439577 =
+  {
+    authorId : Principal;
+    var authorName : Text;
+    var content : Text;
+    createdAt : Time__900049286;
+    var deleted : Bool;
+    var flagged : Bool;
+    id : Nat;
+    var imageUrl : ?Text
+  };
+type Rating__201141064 =
+  {postId : Nat; stars : Nat; timestamp : Int; user : Principal};
+type Referral__346591054 =
+  {
+    referredUser : Principal;
+    referrer : Principal;
+    rewardVideoCount : Nat;
+    timestamp : Int
+  };
+type Role__931309261 = {#admin; #user};
+type StripeConfiguration__499622509 =
+  {allowedCountries : [Text]; secretKey : Text};
+type Time__796480547 = Int__270357528;
+type Time__900049286 = Time__796480547;
+type Tip__463473247 =
+  {
+    amount : Nat;
+    recipient : Principal;
+    sender : Principal;
+    timestamp : Int;
+    tokenType : Text;
+    transactionHash : Text
+  };
+type TokenCanister__973165142 = {canisterId : Text; lastChecked : Int};
+type TokenRegistryEntry__560598450 =
+  {
+    addedBy : Principal;
+    canisterId : Text;
+    decimals : Nat;
+    name : Text;
+    symbol : Text;
+    timestamp : Int;
+    verified : Bool
+  };
+type Tree__65991129<K, V> =
+  {
+    #black : (Tree__65991129<K, V>, K, V, Tree__65991129<K, V>);
+    #leaf;
+    #red : (Tree__65991129<K, V>, K, V, Tree__65991129<K, V>)
+  };
+type User__831686142 =
+  {
+    var avatarUrl : Text;
+    var bio : Text;
+    createdAt : Time__900049286;
+    principalId : Principal;
+    role : Role__931309261;
+    var username : Text
+  };
+type VerifiedEmail__791613585 = {principal : Principal; timestamp : Int};
+type Wallet__464227227 =
+  {
+    accountId : Text;
+    balance : Nat;
+    owner : Principal;
+    transactionHistory : [Tip__463473247]
+  };
+actor ({
+  in var accessControlState : OldAccessControlState__841599830;
+  in var activities : OldMap__30246564<Nat, Activity__40321653>;
+  in var adminMessages : OldMap__30246564<Nat, Text>;
+  in var adminWalletPrincipal : ?Principal;
+  in var approvalState : OldApprovalState__567598485;
+  in var blobFileNames : OldMap__30246564<Text, Text>;
+  in var blobOwnership : OldMap__30246564<Text, Principal>;
+  in var comments : OldMap__30246564<Nat, Comment__975843394>;
+  in var emailAccounts : OldMap__30246564<Text, EmailAccount__161082925>;
+  in var emailVerifications :
+    OldMap__30246564<Text, EmailVerification__170094754>;
+  in var follows : OldMap__30246564<Nat, Follow__370775381>;
+  in var importedTokensByUser :
+    OldMap__30246564<Principal, [ImportedToken__835193373]>;
+  in var likes : OldMap__30246564<Nat, Like__911683250>;
+  in var newsletters : OldMap__30246564<Nat, Newsletter__315120773>;
+  in var nextActivityId : Nat;
+  in var nextAdminMessageId : Nat;
+  in var nextCommentId : Nat;
+  in var nextFollowId : Nat;
+  in var nextLikeId : Nat;
+  in var nextNewsletterId : Nat;
+  in var nextNotificationId : Nat;
+  in var nextPaywallAccessId : Nat;
+  in var nextPostId : Nat;
+  in var nextPostReportId : Nat;
+  in var nextRatingId : Nat;
+  in var nextReferralId : Nat;
+  in var notifications : OldMap__30246564<Nat, Text>;
+  in var paywallAccesses : OldMap__30246564<Nat, PaywallAccess__966112090>;
+  in var pendingRegistrations :
+    OldMap__30246564<Principal, (Text, Text, ?Principal, Bool, Int)>;
+  in var postReports : OldMap__30246564<Nat, PostReport__159942802>;
+  in var posts : OldMap__30246564<Nat, OldPost__784581407>;
+  in var ratings : OldMap__30246564<Nat, Rating__201141064>;
+  in var referrals : OldMap__30246564<Nat, Referral__346591054>;
+  in storage : OldStorage__384370526;
+  in var stripeConfiguration : ?StripeConfiguration__499622509;
+  in var tokenCanisters :
+    OldMap__30246564<Principal, [TokenCanister__973165142]>;
+  in var tokenRegistry :
+    OldMap__30246564<Text, TokenRegistryEntry__560598450>;
+  in var userProfiles :
+    OldMap__30246564<Principal, OldUserProfile__416069324>;
+  in var verifiedEmails : OldMap__30246564<Text, VerifiedEmail__791613585>;
+  in var wallets : OldMap__30246564<Principal, Wallet__464227227>
+}, {
+  stable var nextPostId : Nat;
+  stable posts :
+    {
+      var root : Node__46230540<Nat, Post__955439577>;
+      var size : Nat__490723111
+    };
+  stable users :
+    {
+      var root : Node__46230540<Principal, User__831686142>;
+      var size : Nat__490723111
+    }
+}) ;

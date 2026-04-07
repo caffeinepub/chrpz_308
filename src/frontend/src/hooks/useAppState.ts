@@ -1,5 +1,5 @@
-import { useState, useCallback } from "react";
-import { Principal } from "@dfinity/principal";
+import type { Principal } from "@dfinity/principal";
+import { useCallback, useState } from "react";
 import type { SortCriteria } from "./useSorting";
 
 interface AppState {

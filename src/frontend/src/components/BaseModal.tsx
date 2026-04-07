@@ -1,5 +1,5 @@
 import { X } from "lucide-react";
-import { ReactNode } from "react";
+import type { ReactNode } from "react";
 
 interface BaseModalProps {
   isOpen: boolean;
@@ -41,6 +41,7 @@ export function BaseModal({
             {!title && <div />}
             {showCloseButton && (
               <button
+                type="button"
                 onClick={onClose}
                 className="p-2 hover:bg-gray-100 rounded-full transition-colors"
               >

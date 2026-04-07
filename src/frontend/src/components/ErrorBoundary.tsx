@@ -1,5 +1,5 @@
-import { Component, type ReactNode, type ErrorInfo } from "react";
 import { AlertTriangle, RefreshCw } from "lucide-react";
+import { Component, type ErrorInfo, type ReactNode } from "react";
 import { Button } from "./ui/button";
 
 interface Props {
@@ -44,7 +44,8 @@ export class ErrorBoundary extends Component<Props, State> {
               Oops! Something went wrong
             </h1>
             <p className="text-gray-600 mb-6">
-              We encountered an unexpected error. Don't worry, your data is safe.
+              We encountered an unexpected error. Don't worry, your data is
+              safe.
             </p>
             {this.state.error && (
               <div className="bg-gray-50 rounded-lg p-4 mb-6 text-left">

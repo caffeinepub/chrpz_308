@@ -3,10 +3,10 @@
  * Provides persistent caching and revalidation for ExternalBlob URLs
  */
 
-const CACHE_NAME = 'media-blob-cache-v4';
+const CACHE_NAME = "media-blob-cache-v4";
 const CACHE_EXPIRY_MS = 7 * 24 * 60 * 60 * 1000; // 7 days
 
-interface CacheMetadata {
+export interface CacheMetadata {
   url: string;
   timestamp: number;
   size?: number;
@@ -17,8 +17,8 @@ interface CacheMetadata {
  */
 export async function initBlobCache(): Promise<void> {
   try {
-    if (!('caches' in window)) {
-      console.warn('Cache API not available');
+    if (!("caches" in window)) {
+      console.warn("Cache API not available");
       return;
     }
 
@@ -30,17 +30,23 @@ export async function initBlobCache(): Promise<void> {
       try {
         const response = await cache.match(request);
         if (response) {
-          const metadata = await response.clone().json().catch(() => null);
-          if (metadata?.timestamp && now - metadata.timestamp > CACHE_EXPIRY_MS) {
+          const metadata = await response
+            .clone()
+            .json()
+            .catch(() => null);
+          if (
+            metadata?.timestamp &&
+            now - metadata.timestamp > CACHE_EXPIRY_MS
+          ) {
             await cache.delete(request);
           }
         }
       } catch (error) {
-        console.warn('Error cleaning cache entry:', error);
+        console.warn("Error cleaning cache entry:", error);
       }
     }
   } catch (error) {
-    console.error('Failed to initialize blob cache:', error);
+    console.error("Failed to initialize blob cache:", error);
   }
 }
 
@@ -53,14 +59,14 @@ export async function getCachedBlobUrl(
     forceRefresh?: boolean;
     onProgress?: (loaded: number, total: number) => void;
     maxRetries?: number;
-  }
+  },
 ): Promise<string> {
   const maxRetries = options?.maxRetries ?? 5;
-  let lastError: Error | null = null;
+  let _lastError: Error | null = null;
 
   for (let attempt = 0; attempt < maxRetries; attempt++) {
     try {
-      if (!('caches' in window)) {
+      if (!("caches" in window)) {
         return directUrl;
       }
 
@@ -77,15 +83,15 @@ export async function getCachedBlobUrl(
               return blobUrl;
             }
           } catch (error) {
-            console.warn('Cached blob invalid, refetching:', error);
+            console.warn("Cached blob invalid, refetching:", error);
             await cache.delete(cacheKey);
           }
         }
       }
 
       if (attempt > 0) {
-        const delay = Math.min(1000 * Math.pow(2, attempt - 1), 10000);
-        await new Promise(resolve => setTimeout(resolve, delay));
+        const delay = Math.min(1000 * 2 ** (attempt - 1), 10000);
+        await new Promise((resolve) => setTimeout(resolve, delay));
       }
 
       const controller = new AbortController();
@@ -93,33 +99,35 @@ export async function getCachedBlobUrl(
 
       try {
         const response = await fetch(directUrl, {
-          method: 'GET',
-          cache: 'no-cache',
+          method: "GET",
+          cache: "no-cache",
           signal: controller.signal,
         });
-        
+
         clearTimeout(timeoutId);
-        
+
         if (!response.ok) {
-          throw new Error(`Failed to fetch blob: ${response.status} ${response.statusText}`);
+          throw new Error(
+            `Failed to fetch blob: ${response.status} ${response.statusText}`,
+          );
         }
 
         const blob = await response.blob();
-        
+
         if (blob.size === 0) {
-          throw new Error('Received empty blob');
+          throw new Error("Received empty blob");
         }
 
         const blobUrl = URL.createObjectURL(blob);
 
         const responseClone = new Response(blob, {
           headers: {
-            'Content-Type': blob.type || 'application/octet-stream',
+            "Content-Type": blob.type || "application/octet-stream",
           },
         });
-        
+
         cache.put(cacheKey, responseClone).catch((error) => {
-          console.warn('Failed to cache blob:', error);
+          console.warn("Failed to cache blob:", error);
         });
 
         return blobUrl;
@@ -128,8 +136,11 @@ export async function getCachedBlobUrl(
         throw fetchError;
       }
     } catch (error) {
-      lastError = error instanceof Error ? error : new Error(String(error));
-      console.error(`Attempt ${attempt + 1}/${maxRetries} failed for ${directUrl}:`, error);
+      _lastError = error instanceof Error ? error : new Error(String(error));
+      console.error(
+        `Attempt ${attempt + 1}/${maxRetries} failed for ${directUrl}:`,
+        error,
+      );
     }
   }
 
@@ -142,11 +153,11 @@ export async function getCachedBlobUrl(
  */
 export async function clearBlobCache(): Promise<void> {
   try {
-    if ('caches' in window) {
+    if ("caches" in window) {
       await caches.delete(CACHE_NAME);
     }
   } catch (error) {
-    console.error('Failed to clear blob cache:', error);
+    console.error("Failed to clear blob cache:", error);
   }
 }
 
@@ -155,10 +166,10 @@ export async function clearBlobCache(): Promise<void> {
  */
 export function revokeBlobUrl(blobUrl: string): void {
   try {
-    if (blobUrl.startsWith('blob:')) {
+    if (blobUrl.startsWith("blob:")) {
       URL.revokeObjectURL(blobUrl);
     }
   } catch (error) {
-    console.warn('Failed to revoke blob URL:', error);
+    console.warn("Failed to revoke blob URL:", error);
   }
 }

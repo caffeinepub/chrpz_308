@@ -1,47 +1,77 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { useNavigate } from '@tanstack/react-router';
-import { useInternetIdentity } from '../hooks/useInternetIdentity';
-import { 
-  useGetCallerUserProfile, 
-  useGetCallerWallet, 
-  useGetCallerImportedTokens,
+import { useNavigate } from "@tanstack/react-router";
+import {
+  AlertCircle,
+  ArrowLeft,
+  CheckCircle,
+  Copy,
+  Plus,
+  QrCode,
+  RefreshCw,
+  Trash2,
+  Wallet,
+} from "lucide-react";
+import React, { useState, useEffect, useRef } from "react";
+import { toast } from "sonner";
+import { useInternetIdentity } from "../hooks/useInternetIdentity";
+import {
   useAddToken,
-  useRemoveToken
-} from '../hooks/useQueries';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
-import { Button } from './ui/button';
-import { Alert, AlertDescription } from './ui/alert';
-import { ArrowLeft, Wallet, Copy, CheckCircle, QrCode, Plus, RefreshCw, Trash2, AlertCircle } from 'lucide-react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from './ui/dialog';
-import { Input } from './ui/input';
-import { Label } from './ui/label';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
-import Header from './Header';
-import { toast } from 'sonner';
-import { ensureValidAccountId } from '../lib/accountId';
+  useGetCallerImportedTokens,
+  useGetCallerUserProfile,
+  useGetCallerWallet,
+  useRemoveToken,
+} from "../hooks/useQueries";
+import { ensureValidAccountId } from "../lib/accountId";
+import Header from "./Header";
+import { Alert, AlertDescription } from "./ui/alert";
+import { Button } from "./ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "./ui/card";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "./ui/dialog";
+import { Input } from "./ui/input";
+import { Label } from "./ui/label";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
 
 export default function WalletDashboard() {
   const navigate = useNavigate();
   const { identity } = useInternetIdentity();
-  const { data: profile, isLoading: profileLoading } = useGetCallerUserProfile();
-  const { data: wallet, isLoading: walletLoading, refetch: refetchWallet } = useGetCallerWallet();
-  const { data: importedTokens = [], isLoading: tokensLoading, refetch: refetchTokens } = useGetCallerImportedTokens();
-  
+  const { data: profile, isLoading: profileLoading } =
+    useGetCallerUserProfile();
+  const {
+    data: wallet,
+    isLoading: walletLoading,
+    refetch: refetchWallet,
+  } = useGetCallerWallet();
+  const { data: importedTokens = [], refetch: refetchTokens } =
+    useGetCallerImportedTokens();
+
   const addTokenMutation = useAddToken();
   const removeTokenMutation = useRemoveToken();
-  
+
   const [copiedField, setCopiedField] = useState<string | null>(null);
   const [showReceiveModal, setShowReceiveModal] = useState(false);
   const [showImportModal, setShowImportModal] = useState(false);
-  const [tokenCanisterId, setTokenCanisterId] = useState('');
+  const [tokenCanisterId, setTokenCanisterId] = useState("");
   const [isImporting, setIsImporting] = useState(false);
-  const [validAccountId, setValidAccountId] = useState<string>('');
+  const [validAccountId, setValidAccountId] = useState<string>("");
   const qrCanvasRef = useRef<HTMLCanvasElement>(null);
 
   // Ensure account ID is valid
   useEffect(() => {
     if (wallet?.accountId && identity) {
-      ensureValidAccountId(wallet.accountId, identity.getPrincipal()).then(setValidAccountId);
+      ensureValidAccountId(wallet.accountId, identity.getPrincipal()).then(
+        setValidAccountId,
+      );
     }
   }, [wallet?.accountId, identity]);
 
@@ -51,8 +81,8 @@ export default function WalletDashboard() {
       setCopiedField(fieldName);
       toast.success(`${fieldName} copied to clipboard`);
       setTimeout(() => setCopiedField(null), 2000);
-    } catch (error) {
-      toast.error('Failed to copy to clipboard');
+    } catch (_error) {
+      toast.error("Failed to copy to clipboard");
     }
   };
 
@@ -60,7 +90,7 @@ export default function WalletDashboard() {
     const canvas = qrCanvasRef.current;
     if (!canvas) return;
 
-    const ctx = canvas.getContext('2d');
+    const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
     const size = 300;
@@ -71,16 +101,21 @@ export default function WalletDashboard() {
     canvas.width = size;
     canvas.height = size;
 
-    ctx.fillStyle = '#FFFFFF';
+    ctx.fillStyle = "#FFFFFF";
     ctx.fillRect(0, 0, size, size);
 
-    ctx.fillStyle = '#000000';
-    ctx.fillRect(padding - 5, padding - 5, size - padding * 2 + 10, size - padding * 2 + 10);
+    ctx.fillStyle = "#000000";
+    ctx.fillRect(
+      padding - 5,
+      padding - 5,
+      size - padding * 2 + 10,
+      size - padding * 2 + 10,
+    );
 
-    ctx.fillStyle = '#FFFFFF';
+    ctx.fillStyle = "#FFFFFF";
     ctx.fillRect(padding, padding, size - padding * 2, size - padding * 2);
 
-    ctx.fillStyle = '#000000';
+    ctx.fillStyle = "#000000";
     for (let i = 0; i < gridSize; i++) {
       for (let j = 0; j < gridSize; j++) {
         const charCode = text.charCodeAt((i * gridSize + j) % text.length);
@@ -89,7 +124,7 @@ export default function WalletDashboard() {
             padding + j * cellSize,
             padding + i * cellSize,
             cellSize - 2,
-            cellSize - 2
+            cellSize - 2,
           );
         }
       }
@@ -97,11 +132,16 @@ export default function WalletDashboard() {
 
     const markerSize = cellSize * 2;
     const drawMarker = (x: number, y: number) => {
-      ctx.fillStyle = '#000000';
+      ctx.fillStyle = "#000000";
       ctx.fillRect(x, y, markerSize, markerSize);
-      ctx.fillStyle = '#FFFFFF';
-      ctx.fillRect(x + cellSize / 2, y + cellSize / 2, markerSize - cellSize, markerSize - cellSize);
-      ctx.fillStyle = '#000000';
+      ctx.fillStyle = "#FFFFFF";
+      ctx.fillRect(
+        x + cellSize / 2,
+        y + cellSize / 2,
+        markerSize - cellSize,
+        markerSize - cellSize,
+      );
+      ctx.fillStyle = "#000000";
       ctx.fillRect(x + cellSize, y + cellSize, cellSize / 2, cellSize / 2);
     };
 
@@ -110,9 +150,12 @@ export default function WalletDashboard() {
     drawMarker(padding, size - padding - markerSize);
   };
 
+  const generateQRCodeRef = useRef(generateQRCode);
+  generateQRCodeRef.current = generateQRCode;
+
   useEffect(() => {
     if (showReceiveModal && validAccountId) {
-      generateQRCode(validAccountId);
+      generateQRCodeRef.current(validAccountId);
     }
   }, [showReceiveModal, validAccountId]);
 
@@ -123,43 +166,48 @@ export default function WalletDashboard() {
   };
 
   const validateCanisterId = (canisterId: string): boolean => {
-    const canisterIdRegex = /^[a-z0-9]{5}-[a-z0-9]{5}-[a-z0-9]{5}-[a-z0-9]{5}-[a-z0-9]{3}$/;
+    const canisterIdRegex =
+      /^[a-z0-9]{5}-[a-z0-9]{5}-[a-z0-9]{5}-[a-z0-9]{5}-[a-z0-9]{3}$/;
     return canisterIdRegex.test(canisterId.trim());
   };
 
   const handleImportToken = async () => {
     const trimmedCanisterId = tokenCanisterId.trim();
-    
+
     if (!trimmedCanisterId) {
-      toast.error('Please enter a token canister ID');
+      toast.error("Please enter a token canister ID");
       return;
     }
 
     if (!validateCanisterId(trimmedCanisterId)) {
-      toast.error('Invalid canister ID format. Expected format: xxxxx-xxxxx-xxxxx-xxxxx-xxx');
+      toast.error(
+        "Invalid canister ID format. Expected format: xxxxx-xxxxx-xxxxx-xxxxx-xxx",
+      );
       return;
     }
 
     const alreadyImported = importedTokens.includes(trimmedCanisterId);
     if (alreadyImported) {
-      toast.error('This token is already imported');
+      toast.error("This token is already imported");
       return;
     }
 
     setIsImporting(true);
-    
+
     try {
       await addTokenMutation.mutateAsync(trimmedCanisterId);
-      
-      toast.success('Token imported successfully! You can now use it for tipping.');
-      
+
+      toast.success(
+        "Token imported successfully! You can now use it for tipping.",
+      );
+
       await refetchTokens();
-      
+
       setShowImportModal(false);
-      setTokenCanisterId('');
+      setTokenCanisterId("");
     } catch (error: any) {
-      console.error('Import token error:', error);
-      toast.error(error.message || 'Failed to import token');
+      console.error("Import token error:", error);
+      toast.error(error.message || "Failed to import token");
     } finally {
       setIsImporting(false);
     }
@@ -168,20 +216,20 @@ export default function WalletDashboard() {
   const handleRemoveToken = async (canisterId: string) => {
     try {
       await removeTokenMutation.mutateAsync(canisterId);
-      toast.success('Token removed successfully');
+      toast.success("Token removed successfully");
       await refetchTokens();
     } catch (error: any) {
-      console.error('Remove token error:', error);
-      toast.error(error.message || 'Failed to remove token');
+      console.error("Remove token error:", error);
+      toast.error(error.message || "Failed to remove token");
     }
   };
 
   const handleRefresh = async () => {
     try {
       await Promise.all([refetchWallet(), refetchTokens()]);
-      toast.success('Wallet refreshed');
-    } catch (error) {
-      toast.error('Failed to refresh wallet');
+      toast.success("Wallet refreshed");
+    } catch (_error) {
+      toast.error("Failed to refresh wallet");
     }
   };
 
@@ -191,7 +239,9 @@ export default function WalletDashboard() {
         <Header />
         <div className="container mx-auto p-6 max-w-4xl">
           <Alert className="glass-dark border-2">
-            <AlertDescription>Please sign in to view your wallet</AlertDescription>
+            <AlertDescription>
+              Please sign in to view your wallet
+            </AlertDescription>
           </Alert>
         </div>
       </div>
@@ -199,7 +249,7 @@ export default function WalletDashboard() {
   }
 
   const isLoading = profileLoading || walletLoading;
-  const displayAccountId = validAccountId || wallet?.accountId || '';
+  const displayAccountId = validAccountId || wallet?.accountId || "";
 
   return (
     <div className="min-h-screen bg-background">
@@ -207,15 +257,27 @@ export default function WalletDashboard() {
       <div className="container mx-auto p-6 max-w-4xl space-y-6">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
-            <Button variant="ghost" size="icon" onClick={() => navigate({ to: '/' })} className="hover:bg-primary/10">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => navigate({ to: "/" })}
+              className="hover:bg-primary/10"
+            >
               <ArrowLeft className="w-5 h-5" />
             </Button>
             <h1 className="text-3xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
               ICP Wallet
             </h1>
           </div>
-          <Button variant="outline" size="icon" onClick={handleRefresh} disabled={isLoading}>
-            <RefreshCw className={`w-4 h-4 ${isLoading ? 'animate-spin' : ''}`} />
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={handleRefresh}
+            disabled={isLoading}
+          >
+            <RefreshCw
+              className={`w-4 h-4 ${isLoading ? "animate-spin" : ""}`}
+            />
           </Button>
         </div>
 
@@ -246,7 +308,9 @@ export default function WalletDashboard() {
                 </CardHeader>
                 <CardContent>
                   <div className="p-6 rounded-lg bg-gradient-to-br from-indigo-600/10 to-purple-600/10 border border-primary/20">
-                    <p className="text-sm text-muted-foreground mb-2">Available Balance</p>
+                    <p className="text-sm text-muted-foreground mb-2">
+                      Available Balance
+                    </p>
                     <p className="text-4xl font-bold text-foreground">
                       {(Number(wallet.balance) / 100000000).toFixed(8)} ICP
                     </p>
@@ -261,8 +325,12 @@ export default function WalletDashboard() {
                   className="h-auto py-6 flex flex-col items-center gap-2 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700"
                 >
                   <QrCode className="w-8 h-8" />
-                  <span className="text-lg font-semibold">Receive ICP/Tokens</span>
-                  <span className="text-xs opacity-80">Show address & QR code</span>
+                  <span className="text-lg font-semibold">
+                    Receive ICP/Tokens
+                  </span>
+                  <span className="text-xs opacity-80">
+                    Show address & QR code
+                  </span>
                 </Button>
 
                 <Button
@@ -272,7 +340,9 @@ export default function WalletDashboard() {
                 >
                   <Plus className="w-8 h-8" />
                   <span className="text-lg font-semibold">Import Token</span>
-                  <span className="text-xs opacity-80">Add custom token for tipping</span>
+                  <span className="text-xs opacity-80">
+                    Add custom token for tipping
+                  </span>
                 </Button>
               </div>
 
@@ -283,12 +353,17 @@ export default function WalletDashboard() {
                     <Plus className="w-5 h-5 text-primary" />
                     Import Token
                   </CardTitle>
-                  <CardDescription>Add custom tokens to use for tipping</CardDescription>
+                  <CardDescription>
+                    Add custom tokens to use for tipping
+                  </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div className="flex gap-2">
                     <div className="flex-1">
-                      <Label htmlFor="canister-id-inline" className="text-sm text-muted-foreground mb-2 block">
+                      <Label
+                        htmlFor="canister-id-inline"
+                        className="text-sm text-muted-foreground mb-2 block"
+                      >
                         Canister ID
                       </Label>
                       <Input
@@ -301,7 +376,7 @@ export default function WalletDashboard() {
                       />
                     </div>
                     <div className="flex items-end">
-                      <Button 
+                      <Button
                         onClick={handleImportToken}
                         disabled={isImporting || !tokenCanisterId.trim()}
                         className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700"
@@ -321,7 +396,8 @@ export default function WalletDashboard() {
                     </div>
                   </div>
                   <p className="text-xs text-muted-foreground">
-                    Enter a valid token canister ID (format: xxxxx-xxxxx-xxxxx-xxxxx-xxx) to import it for tipping
+                    Enter a valid token canister ID (format:
+                    xxxxx-xxxxx-xxxxx-xxxxx-xxx) to import it for tipping
                   </p>
                 </CardContent>
               </Card>
@@ -330,14 +406,19 @@ export default function WalletDashboard() {
               {importedTokens.length > 0 && (
                 <Card className="glass-dark border-2">
                   <CardHeader>
-                    <CardTitle className="text-foreground">Imported Tokens</CardTitle>
-                    <CardDescription>Your custom tokens available for tipping ({importedTokens.length})</CardDescription>
+                    <CardTitle className="text-foreground">
+                      Imported Tokens
+                    </CardTitle>
+                    <CardDescription>
+                      Your custom tokens available for tipping (
+                      {importedTokens.length})
+                    </CardDescription>
                   </CardHeader>
                   <CardContent>
                     <div className="space-y-3">
                       {importedTokens.map((canisterId) => (
-                        <div 
-                          key={canisterId} 
+                        <div
+                          key={canisterId}
                           className="flex items-center justify-between p-4 rounded-lg bg-background/50 border border-border hover:border-primary/50 transition-colors"
                         >
                           <div className="flex-1">
@@ -374,12 +455,16 @@ export default function WalletDashboard() {
               {/* Account Details */}
               <Card className="glass-dark border-2">
                 <CardHeader>
-                  <CardTitle className="text-foreground">Account Details</CardTitle>
+                  <CardTitle className="text-foreground">
+                    Account Details
+                  </CardTitle>
                   <CardDescription>Your ICP wallet identifiers</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div className="space-y-2">
-                    <label className="text-sm font-medium text-muted-foreground">Account ID (AID)</label>
+                    <p className="text-sm font-medium text-muted-foreground">
+                      Account ID (AID)
+                    </p>
                     <div className="flex items-center gap-2">
                       <code className="flex-1 text-xs bg-background/50 p-3 rounded border border-border font-mono break-all">
                         {displayAccountId}
@@ -387,10 +472,12 @@ export default function WalletDashboard() {
                       <Button
                         variant="outline"
                         size="sm"
-                        onClick={() => copyToClipboard(displayAccountId, 'Account ID')}
+                        onClick={() =>
+                          copyToClipboard(displayAccountId, "Account ID")
+                        }
                         className="shrink-0"
                       >
-                        {copiedField === 'Account ID' ? (
+                        {copiedField === "Account ID" ? (
                           <CheckCircle className="w-4 h-4 text-green-500" />
                         ) : (
                           <Copy className="w-4 h-4" />
@@ -398,23 +485,33 @@ export default function WalletDashboard() {
                       </Button>
                     </div>
                     <p className="text-xs text-muted-foreground">
-                      64-character hexadecimal ICP account identifier for receiving tokens
+                      64-character hexadecimal ICP account identifier for
+                      receiving tokens
                     </p>
                   </div>
 
                   <div className="space-y-2">
-                    <label className="text-sm font-medium text-muted-foreground">Principal ID (PID)</label>
+                    <p className="text-sm font-medium text-muted-foreground">
+                      Principal ID (PID)
+                    </p>
                     <div className="flex items-center gap-2">
                       <code className="flex-1 text-xs bg-background/50 p-3 rounded border border-border font-mono break-all">
-                        {profile?.principalId || identity.getPrincipal().toString()}
+                        {profile?.principalId ||
+                          identity.getPrincipal().toString()}
                       </code>
                       <Button
                         variant="outline"
                         size="sm"
-                        onClick={() => copyToClipboard(profile?.principalId || identity.getPrincipal().toString(), 'Principal ID')}
+                        onClick={() =>
+                          copyToClipboard(
+                            profile?.principalId ||
+                              identity.getPrincipal().toString(),
+                            "Principal ID",
+                          )
+                        }
                         className="shrink-0"
                       >
-                        {copiedField === 'Principal ID' ? (
+                        {copiedField === "Principal ID" ? (
                           <CheckCircle className="w-4 h-4 text-green-500" />
                         ) : (
                           <Copy className="w-4 h-4" />
@@ -432,29 +529,50 @@ export default function WalletDashboard() {
               {wallet.transactionHistory.length > 0 && (
                 <Card className="glass-dark border-2">
                   <CardHeader>
-                    <CardTitle className="text-foreground">Recent Transactions</CardTitle>
-                    <CardDescription>Your latest wallet activity</CardDescription>
+                    <CardTitle className="text-foreground">
+                      Recent Transactions
+                    </CardTitle>
+                    <CardDescription>
+                      Your latest wallet activity
+                    </CardDescription>
                   </CardHeader>
                   <CardContent>
                     <div className="space-y-2">
-                      {wallet.transactionHistory.slice(-10).reverse().map((tx, index) => (
-                        <div key={index} className="flex items-center justify-between p-3 rounded-lg bg-background/50 border border-border">
-                          <div className="flex-1">
-                            <p className="text-sm font-medium text-foreground">
-                              {tx.sender.toString() === identity.getPrincipal().toString() ? 'Sent' : 'Received'}
-                            </p>
-                            <p className="text-xs text-muted-foreground">
-                              {new Date(Number(tx.timestamp) / 1000000).toLocaleString()}
-                            </p>
+                      {wallet.transactionHistory
+                        .slice(-10)
+                        .reverse()
+                        .map((tx, index) => (
+                          <div
+                            key={`${tx.timestamp.toString()}-${index}`}
+                            className="flex items-center justify-between p-3 rounded-lg bg-background/50 border border-border"
+                          >
+                            <div className="flex-1">
+                              <p className="text-sm font-medium text-foreground">
+                                {tx.sender.toString() ===
+                                identity.getPrincipal().toString()
+                                  ? "Sent"
+                                  : "Received"}
+                              </p>
+                              <p className="text-xs text-muted-foreground">
+                                {new Date(
+                                  Number(tx.timestamp) / 1000000,
+                                ).toLocaleString()}
+                              </p>
+                            </div>
+                            <div className="text-right">
+                              <p
+                                className={`text-sm font-bold ${tx.sender.toString() === identity.getPrincipal().toString() ? "text-red-500" : "text-green-500"}`}
+                              >
+                                {tx.sender.toString() ===
+                                identity.getPrincipal().toString()
+                                  ? "-"
+                                  : "+"}
+                                {(Number(tx.amount) / 100000000).toFixed(8)}{" "}
+                                {tx.tokenType}
+                              </p>
+                            </div>
                           </div>
-                          <div className="text-right">
-                            <p className={`text-sm font-bold ${tx.sender.toString() === identity.getPrincipal().toString() ? 'text-red-500' : 'text-green-500'}`}>
-                              {tx.sender.toString() === identity.getPrincipal().toString() ? '-' : '+'}
-                              {(Number(tx.amount) / 100000000).toFixed(8)} {tx.tokenType}
-                            </p>
-                          </div>
-                        </div>
-                      ))}
+                        ))}
                     </div>
                   </CardContent>
                 </Card>
@@ -464,7 +582,8 @@ export default function WalletDashboard() {
         ) : (
           <Alert className="glass-dark border-2">
             <AlertDescription>
-              Wallet not found. Your ICP wallet is automatically created upon registration approval.
+              Wallet not found. Your ICP wallet is automatically created upon
+              registration approval.
             </AlertDescription>
           </Alert>
         )}
@@ -474,7 +593,9 @@ export default function WalletDashboard() {
       <Dialog open={showReceiveModal} onOpenChange={setShowReceiveModal}>
         <DialogContent className="sm:max-w-md glass-dark border-2">
           <DialogHeader>
-            <DialogTitle className="text-foreground">Receive ICP/Tokens</DialogTitle>
+            <DialogTitle className="text-foreground">
+              Receive ICP/Tokens
+            </DialogTitle>
             <DialogDescription>
               Share your Account ID or scan the QR code to receive tokens
             </DialogDescription>
@@ -494,10 +615,13 @@ export default function WalletDashboard() {
                 <Button
                   variant="outline"
                   size="sm"
-                  onClick={() => displayAccountId && copyToClipboard(displayAccountId, 'Account ID')}
+                  onClick={() =>
+                    displayAccountId &&
+                    copyToClipboard(displayAccountId, "Account ID")
+                  }
                   className="shrink-0"
                 >
-                  {copiedField === 'Account ID' ? (
+                  {copiedField === "Account ID" ? (
                     <CheckCircle className="w-4 h-4 text-green-500" />
                   ) : (
                     <Copy className="w-4 h-4" />
@@ -508,11 +632,15 @@ export default function WalletDashboard() {
 
             <Alert className="glass-dark border-2 border-primary/50">
               <AlertDescription className="text-sm">
-                This is your unique ICP Account ID. Share it with others to receive ICP tokens or other ICRC-1 compatible tokens.
+                This is your unique ICP Account ID. Share it with others to
+                receive ICP tokens or other ICRC-1 compatible tokens.
               </AlertDescription>
             </Alert>
 
-            <Button onClick={() => setShowReceiveModal(false)} className="w-full">
+            <Button
+              onClick={() => setShowReceiveModal(false)}
+              className="w-full"
+            >
               Close
             </Button>
           </div>
@@ -531,7 +659,9 @@ export default function WalletDashboard() {
 
           <div className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="canister-id" className="text-foreground">Token Canister ID *</Label>
+              <Label htmlFor="canister-id" className="text-foreground">
+                Token Canister ID *
+              </Label>
               <Input
                 id="canister-id"
                 value={tokenCanisterId}
@@ -541,31 +671,33 @@ export default function WalletDashboard() {
                 disabled={isImporting}
               />
               <p className="text-xs text-muted-foreground">
-                Enter the canister ID of the token (format: xxxxx-xxxxx-xxxxx-xxxxx-xxx)
+                Enter the canister ID of the token (format:
+                xxxxx-xxxxx-xxxxx-xxxxx-xxx)
               </p>
             </div>
 
             <Alert className="glass-dark border-2 border-blue-500/50">
               <AlertDescription className="text-sm">
-                <strong>How it works:</strong> The token will be added to your wallet and made available for tipping. 
-                You can use any imported token when tipping posts.
+                <strong>How it works:</strong> The token will be added to your
+                wallet and made available for tipping. You can use any imported
+                token when tipping posts.
               </AlertDescription>
             </Alert>
 
             <div className="flex gap-2">
-              <Button 
-                onClick={handleImportToken} 
+              <Button
+                onClick={handleImportToken}
                 className="flex-1 bg-gradient-to-r from-indigo-600 to-purple-600"
                 disabled={isImporting}
               >
-                {isImporting ? 'Importing...' : 'Import Token'}
+                {isImporting ? "Importing..." : "Import Token"}
               </Button>
-              <Button 
+              <Button
                 onClick={() => {
                   setShowImportModal(false);
-                  setTokenCanisterId('');
-                }} 
-                variant="outline" 
+                  setTokenCanisterId("");
+                }}
+                variant="outline"
                 className="flex-1"
                 disabled={isImporting}
               >

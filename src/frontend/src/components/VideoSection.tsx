@@ -1,11 +1,15 @@
-import React, { useState } from 'react';
-import { Card, CardContent } from './ui/card';
-import { Button } from './ui/button';
-import { Lock, Play, AlertCircle } from 'lucide-react';
-import { useUnlockPaywallContent, useHasPaywallAccess, useGetCallerWallet } from '../hooks/useQueries';
-import { useInternetIdentity } from '../hooks/useInternetIdentity';
-import type { ExternalBlob } from '../backend';
-import { toast } from 'sonner';
+import { AlertCircle, Lock, Play } from "lucide-react";
+import React, { useRef, useState } from "react";
+import { toast } from "sonner";
+import type { ExternalBlob } from "../backend";
+import { useInternetIdentity } from "../hooks/useInternetIdentity";
+import {
+  useGetCallerWallet,
+  useHasPaywallAccess,
+  useUnlockPaywallContent,
+} from "../hooks/useQueries";
+import { Button } from "./ui/button";
+import { Card, CardContent } from "./ui/card";
 
 interface VideoSectionProps {
   video: ExternalBlob;
@@ -16,12 +20,21 @@ interface VideoSectionProps {
   contentIndex: number;
 }
 
-export default function VideoSection({ video, postId, isPaywalled, price, description, contentIndex }: VideoSectionProps) {
+export default function VideoSection({
+  video,
+  postId,
+  isPaywalled,
+  price,
+  description,
+  contentIndex,
+}: VideoSectionProps) {
   const { identity } = useInternetIdentity();
   const [hasAccess, setHasAccess] = useState(!isPaywalled);
   const [isPlaying, setIsPlaying] = useState(false);
   const unlockContent = useUnlockPaywallContent();
   const checkAccess = useHasPaywallAccess();
+  const checkAccessRef = useRef(checkAccess.mutateAsync);
+  checkAccessRef.current = checkAccess.mutateAsync;
   const { data: wallet } = useGetCallerWallet();
 
   const isAuthenticated = !!identity;
@@ -30,35 +43,38 @@ export default function VideoSection({ video, postId, isPaywalled, price, descri
 
   React.useEffect(() => {
     if (isPaywalled && isAuthenticated) {
-      checkAccess.mutateAsync({
-        postId,
-        contentType: 'video',
-        contentIndex: BigInt(contentIndex),
-      }).then(setHasAccess).catch(() => setHasAccess(false));
+      checkAccessRef
+        .current({
+          postId,
+          contentType: "video",
+          contentIndex: BigInt(contentIndex),
+        })
+        .then(setHasAccess)
+        .catch(() => setHasAccess(false));
     }
   }, [isPaywalled, isAuthenticated, postId, contentIndex]);
 
   const handleUnlock = async () => {
     if (!isAuthenticated) {
-      toast.error('Please sign in to unlock content');
+      toast.error("Please sign in to unlock content");
       return;
     }
 
     if (balance < price) {
-      toast.error('Insufficient balance');
+      toast.error("Insufficient balance");
       return;
     }
 
     try {
       await unlockContent.mutateAsync({
         postId,
-        contentType: 'video',
+        contentType: "video",
         contentIndex: BigInt(contentIndex),
       });
       setHasAccess(true);
-      toast.success('Video unlocked!');
+      toast.success("Video unlocked!");
     } catch (error: any) {
-      toast.error(error.message || 'Failed to unlock video');
+      toast.error(error.message || "Failed to unlock video");
     }
   };
 
@@ -72,16 +88,24 @@ export default function VideoSection({ video, postId, isPaywalled, price, descri
             </div>
           </div>
           <div>
-            <h3 className="text-lg font-semibold text-foreground mb-2">Premium Video</h3>
-            {description && <p className="text-sm text-muted-foreground mb-3">{description}</p>}
-            <p className="text-2xl font-bold text-amber-500">{priceICP.toFixed(4)} ICP</p>
+            <h3 className="text-lg font-semibold text-foreground mb-2">
+              Premium Video
+            </h3>
+            {description && (
+              <p className="text-sm text-muted-foreground mb-3">
+                {description}
+              </p>
+            )}
+            <p className="text-2xl font-bold text-amber-500">
+              {priceICP.toFixed(4)} ICP
+            </p>
           </div>
           <Button
             onClick={handleUnlock}
             disabled={unlockContent.isPending}
             className="bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700"
           >
-            {unlockContent.isPending ? 'Unlocking...' : 'Unlock Video'}
+            {unlockContent.isPending ? "Unlocking..." : "Unlock Video"}
           </Button>
         </CardContent>
       </Card>
@@ -96,10 +120,11 @@ export default function VideoSection({ video, postId, isPaywalled, price, descri
         className="w-full h-full"
         onPlay={() => setIsPlaying(true)}
         onPause={() => setIsPlaying(false)}
-        onError={(e) => {
-          toast.error('Failed to load video');
+        onError={(_e) => {
+          toast.error("Failed to load video");
         }}
       >
+        <track kind="captions" />
         Your browser does not support the video tag.
       </video>
       {!isPlaying && (

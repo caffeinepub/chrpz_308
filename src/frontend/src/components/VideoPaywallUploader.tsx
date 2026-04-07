@@ -1,29 +1,33 @@
-import React, { useState } from 'react';
-import { Card, CardContent } from './ui/card';
-import { Button } from './ui/button';
-import { Input } from './ui/input';
-import { Label } from './ui/label';
-import { Upload, X, Loader2 } from 'lucide-react';
-import { toast } from 'sonner';
-import { isVideoFile } from '../lib/mediaUpload';
+import { Loader2, Upload, X } from "lucide-react";
+import type React from "react";
+import { useState } from "react";
+import { toast } from "sonner";
+import { isVideoFile } from "../lib/mediaUpload";
+import { Button } from "./ui/button";
+import { Card, CardContent } from "./ui/card";
+import { Input } from "./ui/input";
+import { Label } from "./ui/label";
 
 interface VideoPaywallUploaderProps {
   onVideoAdded: (file: File, price: number, description: string) => void;
   disabled?: boolean;
 }
 
-export default function VideoPaywallUploader({ onVideoAdded, disabled }: VideoPaywallUploaderProps) {
+export default function VideoPaywallUploader({
+  onVideoAdded,
+  disabled,
+}: VideoPaywallUploaderProps) {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const [price, setPrice] = useState('0.01');
-  const [description, setDescription] = useState('');
+  const [price, setPrice] = useState("0.01");
+  const [description, setDescription] = useState("");
   const [isProcessing, setIsProcessing] = useState(false);
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
+    if (e.target.files?.[0]) {
       const file = e.target.files[0];
-      
+
       if (!isVideoFile(file.name)) {
-        toast.error('Please select a valid video file (mp4, mov, webm)');
+        toast.error("Please select a valid video file (mp4, mov, webm)");
         return;
       }
 
@@ -33,28 +37,28 @@ export default function VideoPaywallUploader({ onVideoAdded, disabled }: VideoPa
 
   const handleAdd = () => {
     if (!selectedFile) {
-      toast.error('Please select a video file');
+      toast.error("Please select a video file");
       return;
     }
 
-    const priceNum = parseFloat(price);
-    if (isNaN(priceNum) || priceNum <= 0) {
-      toast.error('Please enter a valid price');
+    const priceNum = Number.parseFloat(price);
+    if (Number.isNaN(priceNum) || priceNum <= 0) {
+      toast.error("Please enter a valid price");
       return;
     }
 
     setIsProcessing(true);
     try {
       onVideoAdded(selectedFile, priceNum, description);
-      
+
       // Reset form
       setSelectedFile(null);
-      setPrice('0.01');
-      setDescription('');
-      
-      toast.success('Video added to paywall');
+      setPrice("0.01");
+      setDescription("");
+
+      toast.success("Video added to paywall");
     } catch (error: any) {
-      toast.error(error.message || 'Failed to add video');
+      toast.error(error.message || "Failed to add video");
     } finally {
       setIsProcessing(false);
     }
@@ -62,8 +66,8 @@ export default function VideoPaywallUploader({ onVideoAdded, disabled }: VideoPa
 
   const handleClear = () => {
     setSelectedFile(null);
-    setPrice('0.01');
-    setDescription('');
+    setPrice("0.01");
+    setDescription("");
   };
 
   return (
@@ -93,7 +97,8 @@ export default function VideoPaywallUploader({ onVideoAdded, disabled }: VideoPa
           </div>
           {selectedFile && (
             <p className="text-sm text-muted-foreground">
-              Selected: {selectedFile.name} ({(selectedFile.size / 1024 / 1024).toFixed(2)} MB)
+              Selected: {selectedFile.name} (
+              {(selectedFile.size / 1024 / 1024).toFixed(2)} MB)
             </p>
           )}
         </div>

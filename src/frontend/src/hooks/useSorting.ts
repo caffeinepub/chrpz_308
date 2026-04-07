@@ -17,9 +17,8 @@ export function useSorting<T extends Sortable>(
     return [...items].sort((a, b) => {
       if (sortBy === "latest") {
         return Number(b.timestamp - a.timestamp);
-      } else {
-        return b.likedBy.length - a.likedBy.length;
       }
+      return b.likedBy.length - a.likedBy.length;
     });
   }, [items, sortBy]);
 }
@@ -40,9 +39,8 @@ export function useMultipleSorting<T extends Sortable>(
       sortedGroups[key] = [...items].sort((a, b) => {
         if (sortBy === "latest") {
           return Number(b.timestamp - a.timestamp);
-        } else {
-          return b.likedBy.length - a.likedBy.length;
         }
+        return b.likedBy.length - a.likedBy.length;
       });
     }
 

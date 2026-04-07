@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
-import { Star } from 'lucide-react';
-import { useRatePost } from '../hooks/useQueries';
-import { useInternetIdentity } from '../hooks/useInternetIdentity';
-import { toast } from 'sonner';
+import { Star } from "lucide-react";
+import React, { useState } from "react";
+import { toast } from "sonner";
+import { useInternetIdentity } from "../hooks/useInternetIdentity";
+import { useRatePost } from "../hooks/useQueries";
 
 interface RatingDisplayProps {
   postId: bigint;
@@ -10,7 +10,11 @@ interface RatingDisplayProps {
   ratingCount: number;
 }
 
-export default function RatingDisplay({ postId, averageRating, ratingCount }: RatingDisplayProps) {
+export default function RatingDisplay({
+  postId,
+  averageRating,
+  ratingCount,
+}: RatingDisplayProps) {
   const { identity } = useInternetIdentity();
   const ratePost = useRatePost();
   const [hoveredStar, setHoveredStar] = useState(0);
@@ -20,16 +24,16 @@ export default function RatingDisplay({ postId, averageRating, ratingCount }: Ra
 
   const handleRate = async (stars: number) => {
     if (!isAuthenticated) {
-      toast.error('Please sign in to rate posts');
+      toast.error("Please sign in to rate posts");
       return;
     }
 
     try {
       await ratePost.mutateAsync({ postId, stars: BigInt(stars) });
       setUserRating(stars);
-      toast.success(stars === 0 ? 'Rating removed' : `Rated ${stars} stars`);
+      toast.success(stars === 0 ? "Rating removed" : `Rated ${stars} stars`);
     } catch (error: any) {
-      toast.error(error.message || 'Failed to rate post');
+      toast.error(error.message || "Failed to rate post");
     }
   };
 
@@ -40,6 +44,7 @@ export default function RatingDisplay({ postId, averageRating, ratingCount }: Ra
       <div className="flex items-center gap-1">
         {[1, 2, 3, 4, 5].map((star) => (
           <button
+            type="button"
             key={star}
             onClick={() => handleRate(star)}
             onMouseEnter={() => setHoveredStar(star)}
@@ -50,8 +55,8 @@ export default function RatingDisplay({ postId, averageRating, ratingCount }: Ra
             <Star
               className={`w-5 h-5 ${
                 star <= (hoveredStar || displayRating)
-                  ? 'fill-amber-500 text-amber-500'
-                  : 'text-muted-foreground'
+                  ? "fill-amber-500 text-amber-500"
+                  : "text-muted-foreground"
               }`}
             />
           </button>
@@ -60,10 +65,11 @@ export default function RatingDisplay({ postId, averageRating, ratingCount }: Ra
       <div className="text-sm text-muted-foreground">
         {averageRating > 0 ? (
           <>
-            {averageRating.toFixed(1)} ({ratingCount} {ratingCount === 1 ? 'rating' : 'ratings'})
+            {averageRating.toFixed(1)} ({ratingCount}{" "}
+            {ratingCount === 1 ? "rating" : "ratings"})
           </>
         ) : (
-          'No ratings yet'
+          "No ratings yet"
         )}
       </div>
     </div>
